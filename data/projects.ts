@@ -61,6 +61,21 @@ export const PROJECTS: Project[] = [
     status: "shipped",
   },
   {
+    id: "tokenlitre",
+    title: "TokenLitre",
+    category: "AI",
+    summary:
+      "Translates AI usage — messages, tokens — into real-world environmental damage.",
+    description:
+      "A calculator that converts abstract AI units like messages and tokens into comprehensible measures of environmental impact: water lost, carbon emissions, miles driven, water bottles. Built to make the hidden cost of every prompt feel tangible.",
+    stack: ["Next.js", "Tailwind", "TypeScript", "Vercel"],
+    link: {
+      label: "Visit tokenlitre.vercel.app",
+      href: "https://tokenlitre.vercel.app/",
+    },
+    status: "shipped",
+  },
+  {
     id: "en2u-site",
     title: "EN2U",
     category: "Web",
