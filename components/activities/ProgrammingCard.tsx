@@ -13,39 +13,35 @@ export default function ProgrammingCard() {
       <motion.div
         whileHover={{ y: -2 }}
         transition={{ duration: 0.3 }}
-        className="group relative border border-edge rounded-xl p-7 md:p-9 bg-ink-2/40 backdrop-blur-sm overflow-hidden"
+        className="group relative border border-edge rounded-xl p-7 md:p-9 bg-ink-2/40 backdrop-blur-sm overflow-hidden h-full flex flex-col"
       >
-        {/* faint number watermark */}
-        <span
-          aria-hidden
-          className="absolute -bottom-8 -right-2 font-syne font-extrabold text-[200px] leading-none text-white/[0.02] select-none"
-        >
-          /0
-        </span>
-
-        <header className="flex items-center justify-between mb-8">
+        {/* Header — two clearly separated elements */}
+        <header className="flex items-center justify-between gap-4 mb-7 md:mb-8">
           <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
-            ◆ Programming · {PROJECTS.length} projects
+            ◆ Programming
           </span>
           <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric-soft">
-            archive
+            {PROJECTS.length} projects · archive
           </span>
         </header>
 
         <h3 className="font-syne font-extrabold uppercase tracking-[-0.025em] text-fog text-3xl md:text-4xl leading-[0.95] mb-5">
-          Code, shipped &amp;<br />
+          Code, shipped &amp;
+          <br />
           in&nbsp;progress.
         </h3>
 
-        <p className="font-inter text-fog-2 text-[14.5px] leading-[1.7] max-w-[440px] mb-9">
+        <p className="font-inter text-fog-2 text-[14.5px] leading-[1.7] max-w-[440px] mb-9 flex-1">
           A small but deliberate stack of tools — AI for debaters, an
-          open-source motion archive, and the infrastructure under
-          things like EN2U.
+          open-source motion archive, and the infrastructure under things like
+          EN2U.
         </p>
 
+        {/* Clear CTA button */}
         <button
           onClick={() => setOpen(true)}
-          className="relative inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-fog px-5 py-3.5 border border-edge-2 rounded-full hover:border-electric hover:text-electric-soft transition-colors"
+          type="button"
+          className="self-start inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-fog px-5 py-3.5 border border-edge-2 rounded-full hover:border-electric hover:text-electric-soft transition-colors cursor-pointer"
         >
           <span>Click to view projects</span>
           <span

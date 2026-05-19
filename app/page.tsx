@@ -9,35 +9,47 @@ export default function Home() {
     <main className="relative">
       <Hero />
 
-      {/* divider — subtle vertical accent between chapters */}
-      <Divider label="Chapter ii" />
+      <ChapterDivider label="Chapter ii" />
       <Timeline />
 
-      <Divider label="Chapter iii" />
+      <ChapterDivider label="Chapter iii" />
       <Activities />
 
-      <Divider label="Chapter iv" tone="warn" />
+      <ChapterDivider label="Chapter iv" tone="warn" />
       <Friction />
 
-      <Divider label="Chapter v" />
+      <ChapterDivider label="Chapter v" />
       <Footer />
     </main>
   );
 }
 
-function Divider({ label, tone = "default" }: { label: string; tone?: "default" | "warn" }) {
+/**
+ * Slim section divider — a horizontal line with a small chapter chip on top.
+ * Used between every chapter. Lives in the same horizontal container as the
+ * surrounding sections so it lines up cleanly.
+ */
+function ChapterDivider({
+  label,
+  tone = "default",
+}: {
+  label: string;
+  tone?: "default" | "warn";
+}) {
   return (
     <div
       aria-hidden
-      className="relative h-px bg-edge mx-6 md:mx-10 lg:mx-16 max-w-[1200px] xl:mx-auto"
+      className="px-5 sm:px-8 md:px-10 lg:px-16"
     >
-      <span
-        className={`absolute -top-2 left-0 px-2 py-1 -translate-y-1/2 font-jetbrains text-[9.5px] tracking-[0.22em] uppercase bg-ink ${
-          tone === "warn" ? "text-flame" : "text-fog-3"
-        }`}
-      >
-        ※ {label}
-      </span>
+      <div className="relative h-px bg-edge max-w-[1200px] mx-auto">
+        <span
+          className={`absolute left-0 top-1/2 -translate-y-1/2 pr-3 pl-0 py-1 font-jetbrains text-[9.5px] tracking-[0.22em] uppercase bg-ink ${
+            tone === "warn" ? "text-flame" : "text-fog-3"
+          }`}
+        >
+          ※ {label}
+        </span>
+      </div>
     </div>
   );
 }

@@ -2,22 +2,25 @@
 
 import { motion } from "framer-motion";
 
+const TAGS = ["AXYZ", "Stratum AI", "Infra", "TypeScript"];
+
 export default function KytheraCard() {
   return (
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.3 }}
-      className="group relative border border-edge rounded-xl p-7 md:p-9 bg-gradient-to-br from-ink-2/60 to-ink-3/40 backdrop-blur-sm overflow-hidden"
+      className="group relative border border-edge rounded-xl p-7 md:p-10 bg-gradient-to-br from-ink-2/60 to-ink-3/40 backdrop-blur-sm overflow-hidden"
     >
-      {/* watermark mark */}
+      {/* Pushed further off-canvas so it never overlaps headline text */}
       <span
         aria-hidden
-        className="absolute -top-12 -right-6 font-syne font-extrabold text-[160px] leading-none text-white/[0.02] select-none tracking-tighter"
+        className="absolute -top-16 -right-12 font-syne font-extrabold text-[180px] leading-none text-white/[0.025] select-none tracking-tighter pointer-events-none"
       >
         KV
       </span>
 
-      <header className="flex items-center justify-between mb-8">
+      {/* Top row — category left, status right */}
+      <header className="relative flex items-center justify-between gap-4 mb-8">
         <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
           ◆ Executive · 2026 —
         </span>
@@ -26,31 +29,33 @@ export default function KytheraCard() {
         </span>
       </header>
 
-      <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric mb-3">
+      {/* Role title on its own line */}
+      <p className="relative font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric mb-3">
         Chief Technology Officer
       </p>
 
-      <h3 className="font-syne font-extrabold uppercase tracking-[-0.025em] text-fog text-3xl md:text-4xl leading-[0.95] mb-5">
-        Kythera<br />
+      <h3 className="relative font-syne font-extrabold uppercase tracking-[-0.025em] text-fog text-3xl md:text-4xl leading-[0.95] mb-5">
+        Kythera
+        <br />
         Ventures.
       </h3>
 
-      <p className="font-inter text-fog-2 text-[14.5px] leading-[1.7] max-w-[460px] mb-9">
-        CTO at AXYZ and the Stratum AI solutions arm of Kythera
-        Ventures — shipping infrastructure for the next decade of
-        Japanese AI work.
+      <p className="relative font-inter text-fog-2 text-[14.5px] leading-[1.7] max-w-[480px] mb-8">
+        CTO at AXYZ and the Stratum AI solutions arm of Kythera Ventures —
+        shipping infrastructure for the next decade of Japanese AI work.
       </p>
 
-      <div className="flex flex-wrap gap-1.5">
-        {["AXYZ", "Stratum AI", "Infra", "TypeScript"].map((t) => (
-          <span
+      {/* Pill tags — explicit list, generous spacing so they read as separate chips */}
+      <ul className="relative flex flex-wrap gap-2">
+        {TAGS.map((t) => (
+          <li
             key={t}
-            className="font-jetbrains text-[10px] tracking-[0.06em] text-fog-2 px-2 py-1 border border-edge rounded"
+            className="font-jetbrains text-[10px] tracking-[0.08em] uppercase text-fog-2 px-2.5 py-1 border border-edge-2 rounded-full bg-ink-3/40"
           >
             {t}
-          </span>
+          </li>
         ))}
-      </div>
+      </ul>
     </motion.div>
   );
 }
