@@ -1,20 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 interface Social {
   label: string;
   handle: string;
-  href: string;
+  href: string | null;
+  cta: "PRESS" | "COPY";
 }
 
 const SOCIALS: Social[] = [
-  { label: "Twitter", handle: "@seiafunayama", href: "https://twitter.com/seiafunayama" },
-  { label: "Instagram", handle: "@seiafunayama", href: "https://instagram.com/seiafunayama" },
-  { label: "Email", handle: "Funayamad31@gmail.com", href: "mailto:Funayamad31@gmail.com" },
-  { label: "GitHub", handle: "seia00", href: "https://github.com/seia00" },
-  { label: "LinkedIn", handle: "Seia Funayama", href: "https://linkedin.com/in/seiafunayama" },
-  { label: "Discord", handle: "sei_a000", href: "#" },
+  { label: "TWITTER",   handle: "@seiafunayama",           href: "https://twitter.com/seiafunayama",      cta: "PRESS" },
+  { label: "INSTAGRAM", handle: "@seiafunayama",           href: "https://instagram.com/seiafunayama",    cta: "PRESS" },
+  { label: "EMAIL",     handle: "Funayamad31@gmail.com",   href: "mailto:Funayamad31@gmail.com",          cta: "PRESS" },
+  { label: "GITHUB",    handle: "seia00",                  href: "https://github.com/seia00",             cta: "PRESS" },
+  { label: "LINKEDIN",  handle: "Seia Funayama",           href: "https://linkedin.com/in/seiafunayama",  cta: "PRESS" },
+  { label: "DISCORD",   handle: "sei_a000",                href: null,                                    cta: "COPY"  },
 ];
 
 export default function Footer() {
@@ -22,53 +24,168 @@ export default function Footer() {
     <footer
       id="connect"
       aria-label="Connect"
-      className="relative px-6 md:px-10 lg:px-16 pt-32 pb-16 font-inter"
+      className="relative px-6 md:px-10 lg:px-16 pt-32 pb-16 font-vt323 text-fog overflow-hidden"
     >
-      <div className="max-w-[1200px] mx-auto">
-        <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 mb-6">
-          ◇ Chapter v / connect
-        </p>
-        <h2 className="font-inter font-light text-fog leading-[1.02] tracking-[-0.025em] text-[clamp(46px,7vw,84px)] mb-16 max-w-[820px]">
-          Let&apos;s
-          <br />
-          <span className="text-fog/40">connect.</span>
-        </h2>
+      {/* CRT scanline overlay — purely decorative */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none crt-scanlines opacity-50"
+      />
 
-        {/* social dock */}
-        <ul className="flex flex-wrap gap-3 md:gap-4 mb-20">
+      <div className="relative max-w-[1100px] mx-auto">
+        {/* Tiny pixel eyebrow */}
+        <p className="font-press-start text-[10px] tracking-[0.2em] text-electric-soft mb-8">
+          [ CHAPTER · V ] &gt;&gt; CONNECT
+        </p>
+
+        {/* Pixel-bordered headline cartridge */}
+        <div className="border-2 border-fog/80 p-6 md:p-10 mb-8 relative">
+          {/* corner notches */}
+          <Corner pos="tl" />
+          <Corner pos="tr" />
+          <Corner pos="bl" />
+          <Corner pos="br" />
+
+          <h2 className="font-vt323 text-fog leading-[0.9] tracking-tight text-[clamp(64px,12vw,160px)]">
+            LET&apos;S CONNECT
+            <span aria-hidden className="blink text-electric-soft">_</span>
+          </h2>
+          <p className="font-press-start text-[10px] md:text-[11px] tracking-[0.18em] text-fog-3 mt-6">
+            ▸ PRESS START TO PLAY
+          </p>
+        </div>
+
+        {/* The "menu" — one row per social, gamified */}
+        <ul className="border-2 border-fog/80 divide-y-2 divide-fog/30">
           {SOCIALS.map((s) => (
-            <li key={s.label}>
-              <motion.a
-                href={s.href}
-                target={s.href.startsWith("http") ? "_blank" : undefined}
-                rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                whileHover={{ scale: 1.06, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="group flex items-center gap-3 px-5 py-3.5 border border-edge rounded-full bg-ink-2/40 backdrop-blur hover:border-edge-2 transition-colors"
-              >
-                <span className="block w-1.5 h-1.5 rounded-full bg-fog-4 group-hover:bg-electric group-hover:shadow-[0_0_10px_rgba(91,141,255,0.8)] transition-all" />
-                <span className="font-jetbrains text-[10px] tracking-[0.2em] uppercase text-fog-3 group-hover:text-fog-2 transition-colors">
-                  {s.label}
-                </span>
-                <span className="font-inter text-[13.5px] text-fog group-hover:text-electric-soft transition-colors">
-                  {s.handle}
-                </span>
-              </motion.a>
-            </li>
+            <SocialRow key={s.label} social={s} />
           ))}
         </ul>
 
-        {/* baseline */}
-        <div className="pt-8 border-t border-edge flex flex-wrap items-center justify-between gap-3">
-          <span className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-fog-4">
-            Seia Funayama · MMXXVI
+        {/* Lower HUD strip */}
+        <div className="mt-8 border-2 border-fog/40 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+          <span className="font-press-start text-[10px] tracking-[0.18em] text-fog-3">
+            P1 · SEIA FUNAYAMA · MMXXVI
           </span>
-          <span className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-fog-4">
-            Built with intent · Next.js · Framer Motion
+          <span className="font-press-start text-[10px] tracking-[0.18em] text-fog-3">
+            HI-SCORE: <span className="text-electric-soft">∞</span>
           </span>
         </div>
+
+        {/* Build credit, retro terminal */}
+        <p className="font-vt323 text-fog-3 text-base mt-6 flex items-center gap-2">
+          <span aria-hidden className="text-electric-soft">$</span>
+          built with intent · next.js · framer motion
+          <span aria-hidden className="blink text-electric-soft">▮</span>
+        </p>
       </div>
     </footer>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────────── */
+
+function SocialRow({ social }: { social: Social }) {
+  const [hover, setHover] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleClick = () => {
+    if (social.cta === "COPY") {
+      navigator.clipboard
+        .writeText(social.handle)
+        .then(() => {
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 1500);
+        })
+        .catch(() => {});
+    }
+  };
+
+  const inner = (
+    <>
+      {/* Cursor */}
+      <span
+        aria-hidden
+        className={`font-vt323 text-2xl md:text-3xl w-6 text-center transition-colors ${
+          hover ? "text-electric-soft" : "text-fog-4"
+        }`}
+      >
+        {hover ? "▶" : ">"}
+      </span>
+
+      {/* Platform label — pixel font, fixed width-ish */}
+      <span className="font-press-start text-[10px] md:text-[11px] tracking-[0.18em] text-fog group-hover:text-electric-soft transition-colors min-w-[110px] md:min-w-[140px]">
+        {social.label}
+      </span>
+
+      {/* Handle — VT323, larger, readable */}
+      <span className="font-vt323 text-fog-2 text-xl md:text-2xl flex-1 min-w-0 truncate group-hover:text-fog transition-colors">
+        {social.handle}
+      </span>
+
+      {/* CTA chip — [ PRESS ] or [ COPY ] */}
+      <motion.span
+        animate={hover ? { x: 2 } : { x: 0 }}
+        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        className={`font-press-start text-[9px] md:text-[10px] tracking-[0.15em] px-3 py-2 border-2 shrink-0 ${
+          hover
+            ? "border-electric text-electric-soft bg-electric/10"
+            : "border-fog-4 text-fog-3"
+        }`}
+      >
+        [ {copied ? "OK!" : social.cta} ]
+      </motion.span>
+    </>
+  );
+
+  const baseClass =
+    "group flex items-center gap-3 md:gap-5 px-4 md:px-6 py-4 md:py-5 hover:bg-electric/[0.04] transition-colors w-full text-left";
+
+  if (social.href) {
+    return (
+      <li>
+        <a
+          href={social.href}
+          target={social.href.startsWith("http") ? "_blank" : undefined}
+          rel={social.href.startsWith("http") ? "noopener noreferrer" : undefined}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          className={`${baseClass} cursor-pointer`}
+        >
+          {inner}
+        </a>
+      </li>
+    );
+  }
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={handleClick}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        className={`${baseClass} cursor-pointer`}
+        aria-label={`Copy ${social.label} handle ${social.handle}`}
+      >
+        {inner}
+      </button>
+    </li>
+  );
+}
+
+/* Corner notch — tiny stepped square in each corner of the cartridge */
+function Corner({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) {
+  const map = {
+    tl: "-top-1.5 -left-1.5",
+    tr: "-top-1.5 -right-1.5",
+    bl: "-bottom-1.5 -left-1.5",
+    br: "-bottom-1.5 -right-1.5",
+  } as const;
+  return (
+    <span
+      aria-hidden
+      className={`absolute ${map[pos]} w-3 h-3 bg-electric-soft`}
+    />
   );
 }

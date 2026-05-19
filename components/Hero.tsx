@@ -4,11 +4,14 @@ import { motion } from "framer-motion";
 import { fadeUp, staggerParent } from "@/lib/motion";
 
 const stats = [
-  { label: "Currently", value: "Year 9 · Shibuya Makuhari" },
+  { label: "Currently", value: "Year 10 · Shibuya Makuhari" },
   { label: "Building", value: "AXYZ · Kythera Ventures" },
-  { label: "Hobbies", value: "Debate · Code · Long-form reading" },
-  { label: "Favorite food", value: "Tonkotsu ramen" },
-  { label: "On loop", value: "Frank Ocean — Blonde" },
+  {
+    label: "Hobbies",
+    value: "Studying ML · Finetuning LLMs · Gunpla · Hardware tinkering",
+  },
+  { label: "Favorite food", value: "Meat" },
+  { label: "On loop", value: "Swim — BTS" },
 ];
 
 export default function Hero() {
@@ -40,13 +43,15 @@ export default function Hero() {
           ◣ Seia Funayama · Chiba, Japan
         </motion.p>
 
-        {/* Name */}
+        {/* Name — Funayama broken to Funa- / yama. so the descender side
+            stays inside the viewport on every breakpoint. */}
         <motion.h1
           variants={fadeUp}
-          className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(64px,12vw,180px)] mb-16"
+          className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(56px,11vw,160px)] mb-16"
         >
           <span className="block">Seia</span>
-          <span className="block text-fog/30 -mt-1">Funayama.</span>
+          <span className="block text-fog/30 -mt-1">Funa-</span>
+          <span className="block text-fog/30 -mt-1">yama.</span>
         </motion.h1>
 
         {/* Centerpiece quote */}

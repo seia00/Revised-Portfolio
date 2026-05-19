@@ -14,6 +14,23 @@ export interface Award {
 }
 
 export const DEBATE: Record<number, Award[]> = {
+  2026: [
+    {
+      tournament: "WSDC Team Japan '26",
+      award: "Top 8 Candidate",
+      type: "team",
+    },
+    {
+      tournament: "Keio Debate Open",
+      award: "Rookie Finalist",
+      type: "team",
+    },
+    {
+      tournament: "Keio Debate Open",
+      award: "2nd Best Speaker",
+      type: "individual",
+    },
+  ],
   2025: [
     { tournament: "PDA", award: "5th Best Team", type: "team" },
     { tournament: "PDA", award: "Best Speaker", type: "individual" },

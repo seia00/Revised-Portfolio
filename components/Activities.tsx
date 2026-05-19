@@ -31,11 +31,11 @@ export default function Activities() {
           </motion.p>
           <motion.h2
             variants={fadeUp}
-            className="font-inter font-medium text-fog leading-[1.0] tracking-[-0.025em] text-[clamp(46px,7vw,84px)]"
+            className="font-space-grotesk font-bold text-fog leading-[0.95] tracking-[-0.04em] text-[clamp(48px,7.5vw,92px)]"
           >
             The four
             <br />
-            <span className="text-fog/40">things I actually do.</span>
+            <span className="text-fog/40 italic">things I actually do.</span>
           </motion.h2>
           <motion.p
             variants={fadeUp}

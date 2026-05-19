@@ -13,6 +13,7 @@ export default function DebateAccordion() {
     setOpen((prev) => ({ ...prev, [year]: !prev[year] }));
 
   return (
+    <>
     <div className="border border-edge rounded-xl overflow-hidden bg-ink-2/40 backdrop-blur-sm">
       {YEARS_DESC.map((year) => {
         const items = DEBATE[year];
@@ -83,6 +84,10 @@ export default function DebateAccordion() {
         );
       })}
     </div>
+    <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-4 mt-4 pl-1">
+      ⋯ and many more across the circuit
+    </p>
+    </>
   );
 }
 

@@ -13,21 +13,21 @@ export interface Milestone {
 export const TIMELINE: Milestone[] = [
   {
     year: "—",
-    place: "Chiba, Japan",
+    place: "Kyoto → Yokohama, Japan",
     title: "Roots.",
-    body: "Born in Chiba. The version of me that exists now was first shaped by an island that values precision, deference, and the long view.",
+    body: "Born in Kyoto, but moved to Yokohama shortly after. The version of me that exists now was first shaped by an island that values precision, deference, and the long view.",
   },
   {
     year: "—",
     place: "Cupertino, California",
     title: "Crossing.",
-    body: "Spent formative years in Cupertino. The collision of two cultures — one quiet, one loud — became the lens I see most things through.",
+    body: "In my years in Cupertino I fell in love with technology and entrepreneurship — and with the idea that you can just build the thing you wish existed.",
   },
   {
     year: "—",
     place: "Shibuya Makuhari",
-    title: "Top 10 high school.",
-    body: "Accepted into one of the top high schools in Japan. The first time the work I put in actually compounded.",
+    title: "Prestigious high school.",
+    body: "Accepted into a prestigious high school in Japan. The first time the work I put in actually compounded.",
   },
   {
     year: "2024",

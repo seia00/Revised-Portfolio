@@ -5,6 +5,9 @@ import {
   Inter,
   JetBrains_Mono,
   Anton,
+  Space_Grotesk,
+  Press_Start_2P,
+  VT323,
 } from "next/font/google";
 import "./globals.css";
 
@@ -42,6 +45,27 @@ const anton = Anton({
   display: "swap",
 });
 
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const pressStart = Press_Start_2P({
+  variable: "--font-press-start",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
+const vt323 = VT323({
+  variable: "--font-vt323",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Seia Funayama",
   description:
@@ -54,7 +78,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${playfair.variable} ${inter.variable} ${jetbrains.variable} ${anton.variable}`}
+      className={`${syne.variable} ${playfair.variable} ${inter.variable} ${jetbrains.variable} ${anton.variable} ${spaceGrotesk.variable} ${pressStart.variable} ${vt323.variable}`}
     >
       <body className="min-h-screen bg-ink text-fog antialiased font-inter selection:bg-electric/30 selection:text-white">
         {children}
