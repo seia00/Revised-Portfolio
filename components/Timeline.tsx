@@ -1,43 +1,61 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionValueEvent,
+  type MotionValue,
+} from "framer-motion";
 import { TIMELINE, type Milestone } from "@/data/timeline";
 
-export default function Timeline() {
-  const railRef = useRef<HTMLOListElement>(null);
-  const [progress, setProgress] = useState(0); // 0..1 — how far along the rail
-  const [atEnd, setAtEnd] = useState(false);
+/**
+ * Horizontal scroll-jacked chapter book.
+ *
+ * Mechanic: the outer <section> is N * 100vh tall, so the page has plenty of
+ * vertical scroll room. A sticky inner viewport stays pinned at 100vh while
+ * the user scrolls through that range, and we map scroll progress (0..1) to a
+ * negative translateX on the flex row of full-screen panels.
+ *
+ * Net effect: scrolling DOWN advances chapters horizontally. Each chapter
+ * fills the entire viewport.
+ */
 
-  // Track horizontal scroll progress for the bottom indicator + fade fade-out.
-  useEffect(() => {
-    const el = railRef.current;
-    if (!el) return;
-    const handler = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      const p = max <= 0 ? 1 : el.scrollLeft / max;
-      setProgress(p);
-      setAtEnd(p > 0.985);
-    };
-    handler();
-    el.addEventListener("scroll", handler, { passive: true });
-    window.addEventListener("resize", handler);
-    return () => {
-      el.removeEventListener("scroll", handler);
-      window.removeEventListener("resize", handler);
-    };
-  }, []);
+const N = TIMELINE.length;
+
+export default function Timeline() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Translate from 0 → -(N-1) * 100vw across the scroll range.
+  const x = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["0vw", `-${(N - 1) * 100}vw`]
+  );
+
+  // Discrete chapter index (drives the "01 / 06" indicator)
+  const [chapter, setChapter] = useState(0);
+  // Continuous 0..100 percentage
+  const [percent, setPercent] = useState(0);
+
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    // Clamp so the count doesn't overshoot at boundaries.
+    const clamped = Math.max(0, Math.min(1, p));
+    setChapter(Math.min(N - 1, Math.floor(clamped * N)));
+    setPercent(Math.round(clamped * 100));
+  });
 
   return (
-    <section
-      id="timeline"
-      aria-label="My life thus far"
-      className="relative py-40 md:py-56"
-    >
-      {/* ── Header (full-width, vertical stack — unchanged) ── */}
-      <div className="px-6 md:px-10 lg:px-16">
+    <>
+      {/* ── Vertical header (stays full-width, stacked, as requested) ── */}
+      <div className="px-6 md:px-10 lg:px-16 pt-40 md:pt-56 pb-24 md:pb-32">
         <div className="max-w-[1080px] mx-auto">
-          <div className="mb-20 md:mb-28 max-w-[680px]">
+          <div className="max-w-[680px]">
             <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 mb-6">
               ◇ Chapter ii
             </p>
@@ -48,139 +66,175 @@ export default function Timeline() {
             </h2>
             <p className="font-playfair text-fog-2 mt-8 text-lg md:text-xl leading-[1.6] max-w-[560px]">
               Six waypoints that explain how I got here — and where I&apos;m
-              pointed next.
+              pointed next. Keep scrolling to advance the chapters.
             </p>
           </div>
         </div>
       </div>
 
-      {/* ── Horizontal scroll rail ── */}
-      <div className="relative">
-        <ol
-          ref={railRef}
-          className="no-scrollbar flex gap-5 md:gap-6 overflow-x-auto snap-x snap-mandatory px-6 md:px-10 lg:px-16 pb-2"
-          style={{
-            // generous end padding so the last card can fully clear the
-            // right-edge fade overlay
-            paddingRight: "max(96px, 8vw)",
-            scrollPaddingLeft: "1.5rem",
-          }}
-          aria-label="Life milestones — scroll horizontally"
-        >
-          {TIMELINE.map((m, idx) => (
-            <TimelineCard
-              key={`${m.year}-${idx}`}
-              milestone={m}
-              index={idx}
-              total={TIMELINE.length}
-            />
-          ))}
-        </ol>
+      {/* ── Scroll-jacked horizontal chapter book ── */}
+      <section
+        ref={sectionRef}
+        id="timeline"
+        aria-label="My life — chapters"
+        className="relative"
+        style={{ height: `${N * 100}vh` }}
+      >
+        <div className="sticky top-0 h-screen w-screen overflow-hidden bg-ink">
+          {/* Moving rail of panels */}
+          <motion.ol
+            style={{ x }}
+            className="flex h-full will-change-transform"
+          >
+            {TIMELINE.map((m, idx) => (
+              <ChapterPanel
+                key={`${m.year}-${idx}`}
+                milestone={m}
+                index={idx}
+                progress={scrollYProgress}
+              />
+            ))}
+          </motion.ol>
 
-        {/* Right-edge fade hint — fades out when user reaches the end */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-0 bottom-0 right-0 w-24 md:w-32 transition-opacity duration-300"
-          style={{
-            opacity: atEnd ? 0 : 1,
-            background:
-              "linear-gradient(to left, rgba(6,7,10,1) 0%, rgba(6,7,10,0.85) 40%, rgba(6,7,10,0) 100%)",
-          }}
-        />
-      </div>
-
-      {/* ── Scroll indicator (label + thin progress bar) ── */}
-      <div className="px-6 md:px-10 lg:px-16 mt-8">
-        <div className="max-w-[1080px] mx-auto flex items-center gap-4">
-          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
-            Scroll
-          </span>
-          <span aria-hidden className="text-fog-3 text-base">
-            →
-          </span>
-          <div className="flex-1 max-w-[200px] h-px bg-edge relative overflow-hidden">
-            <motion.div
-              className="absolute inset-y-0 left-0 bg-electric shadow-[0_0_10px_rgba(91,141,255,0.7)]"
-              style={{ width: `${progress * 100}%` }}
-              transition={{ ease: "linear" }}
-            />
-          </div>
-          <span className="font-jetbrains text-[10px] tracking-[0.18em] uppercase text-fog-4">
-            {String(Math.min(TIMELINE.length, Math.round(progress * (TIMELINE.length - 1)) + 1)).padStart(2, "0")}
-            <span className="text-fog-4/60"> / {String(TIMELINE.length).padStart(2, "0")}</span>
-          </span>
+          {/* Fixed UI overlay — stays put while panels translate beneath */}
+          <FixedOverlay chapter={chapter} percent={percent} progress={scrollYProgress} />
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
-interface CardProps {
+/* ─────────────────────────────────────────────────────────────────────── */
+
+interface PanelProps {
   milestone: Milestone;
   index: number;
-  total: number;
+  progress: MotionValue<number>;
 }
 
-function TimelineCard({ milestone, index, total }: CardProps) {
+function ChapterPanel({ milestone, index, progress }: PanelProps) {
+  // Each panel "owns" the progress slice [index/N, (index+1)/N].
+  // We fade-in title and body as the panel becomes the active one.
+  const start = index / N;
+  const center = (index + 0.4) / N;
+  const end = (index + 1) / N;
+
+  const contentOpacity = useTransform(
+    progress,
+    [start, center, end],
+    [0.4, 1, 0.4]
+  );
+  const contentY = useTransform(
+    progress,
+    [start, center, end],
+    [40, 0, -40]
+  );
+  const watermarkOpacity = useTransform(
+    progress,
+    [start, center, end],
+    [0, 0.06, 0]
+  );
+
+  // Big watermark text — year when present, otherwise the chapter number.
+  const watermark = milestone.year && milestone.year !== "—" ? milestone.year : String(index + 1).padStart(2, "0");
+
   return (
-    <motion.li
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px -10% 0px -10%" }}
-      transition={{
-        duration: 0.7,
-        delay: Math.min(index, 4) * 0.06,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      className="snap-start shrink-0 relative flex flex-col border border-edge rounded-xl bg-ink-2/40 backdrop-blur-sm p-7 md:p-8 overflow-hidden"
-      style={{
-        width: "min(380px, 86vw)",
-        minHeight: "440px",
-      }}
-    >
-      {/* glowing dot + ring — same vocabulary as the old vertical timeline */}
-      <div className="flex items-center justify-between mb-7">
-        <div className="relative">
-          <span
-            aria-hidden
-            className="block h-3.5 w-3.5 rounded-full bg-electric shadow-[0_0_18px_rgba(91,141,255,0.85)]"
-          />
-          <span
-            aria-hidden
-            className="absolute -inset-[6px] rounded-full border border-electric/25"
-          />
-        </div>
-        <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-fog-4">
-          {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-        </span>
-      </div>
-
-      {/* year + place row */}
-      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5">
-        <span className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-electric-soft">
-          {milestone.year}
-        </span>
-        <span className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3">
-          / {milestone.place}
-        </span>
-      </div>
-
-      <h3 className="font-playfair italic font-medium text-fog leading-[1.05] tracking-[-0.01em] text-[clamp(28px,3.2vw,40px)] mb-5">
-        {milestone.title}
-      </h3>
-
-      <p className="font-playfair text-fog-2 text-base md:text-lg leading-[1.65]">
-        {milestone.body}
-      </p>
-
-      {/* large faint index in the corner, matches Hero/Friction watermark vibe */}
-      <span
+    <li className="relative shrink-0 h-full w-screen flex items-center px-8 md:px-16 lg:px-24 overflow-hidden">
+      {/* Bottom-left huge watermark */}
+      <motion.span
         aria-hidden
-        className="absolute -bottom-6 -right-2 font-playfair italic text-white/[0.03] select-none pointer-events-none"
-        style={{ fontSize: "160px", lineHeight: 0.8 }}
+        style={{ opacity: watermarkOpacity }}
+        className="absolute -bottom-6 md:-bottom-12 left-4 md:left-8 font-syne font-extrabold uppercase tracking-tighter text-fog leading-[0.8] select-none pointer-events-none"
       >
-        {index + 1}
-      </span>
-    </motion.li>
+        <span className="block text-[28vw] md:text-[24vw]">{watermark}</span>
+      </motion.span>
+
+      {/* Center content */}
+      <motion.div
+        style={{ opacity: contentOpacity, y: contentY }}
+        className="relative z-10 max-w-[1100px] w-full"
+      >
+        {/* Chapter label */}
+        <p className="font-jetbrains text-[11px] md:text-[12px] tracking-[0.24em] uppercase text-fog-3 mb-8 md:mb-10">
+          ※ Chapter · {String(index + 1).padStart(2, "0")} ·{" "}
+          <span className="text-electric-soft">{milestone.place}</span>
+        </p>
+
+        {/* Headline — Playfair italic, big-and-quiet editorial energy */}
+        <h3 className="font-playfair italic font-medium text-fog leading-[0.96] tracking-[-0.025em] mb-8 md:mb-10 text-[clamp(56px,10vw,148px)]">
+          {milestone.title.replace(/\.$/, "")}
+          <span className="text-electric-soft">.</span>
+        </h3>
+
+        {/* Body */}
+        <p className="font-playfair text-fog-2 leading-[1.55] max-w-[720px] text-[clamp(15px,1.5vw,22px)]">
+          {milestone.body}
+        </p>
+
+        {/* Year tag (only when an actual year exists) */}
+        {milestone.year && milestone.year !== "—" && (
+          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-fog-4 mt-10">
+            ◆ {milestone.year}
+          </p>
+        )}
+      </motion.div>
+    </li>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────── */
+
+interface OverlayProps {
+  chapter: number;
+  percent: number;
+  progress: MotionValue<number>;
+}
+
+function FixedOverlay({ chapter, percent, progress }: OverlayProps) {
+  const barWidth = useTransform(progress, [0, 1], ["0%", "100%"]);
+
+  return (
+    <div
+      aria-hidden
+      className="absolute inset-0 pointer-events-none z-20 flex flex-col"
+    >
+      {/* Top bar */}
+      <div className="flex items-start justify-between p-6 md:p-8 lg:p-10">
+        {/* Brand mark */}
+        <span className="font-syne font-extrabold uppercase text-fog tracking-tighter text-base md:text-lg">
+          SF<span className="text-electric-soft">.</span>
+        </span>
+
+        {/* Chapter counter + progress bar */}
+        <div className="flex items-center gap-4 md:gap-5">
+          <span className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-2">
+            <span className="text-fog">
+              {String(chapter + 1).padStart(2, "0")}
+            </span>
+            <span className="text-fog-4"> / {String(N).padStart(2, "0")}</span>
+          </span>
+          <div className="hidden sm:block w-[120px] md:w-[160px] h-px bg-edge relative overflow-hidden">
+            <motion.div
+              style={{ width: barWidth }}
+              className="absolute inset-y-0 left-0 bg-electric shadow-[0_0_10px_rgba(91,141,255,0.7)]"
+            />
+          </div>
+          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-4 tabular-nums">
+            {String(percent).padStart(2, "0")}%
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom cue */}
+      <div className="mt-auto flex items-end justify-between p-6 md:p-8 lg:p-10">
+        <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-fog-4">
+          ◇ My life · chapter ii
+        </span>
+        <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-fog-3 flex items-center gap-2">
+          Scroll
+          <span aria-hidden className="text-base">↓</span>
+        </span>
+      </div>
+    </div>
   );
 }
