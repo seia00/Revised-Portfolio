@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ── Font families (variables come from next/font in layout.tsx) ── */
+  --font-syne: var(--font-syne);
+  --font-playfair: var(--font-playfair);
+  --font-inter: var(--font-inter);
+  --font-jetbrains: var(--font-jetbrains);
+  --font-anton: var(--font-anton);
+
+  /* ── Dark palette ── */
+  --color-ink: #06070a;
+  --color-ink-2: #0c0e14;
+  --color-ink-3: #14171f;
+  --color-ink-4: #1e222c;
+  --color-fog: #e6e8ec;
+  --color-fog-2: #a8acb6;
+  --color-fog-3: #6b6f7a;
+  --color-fog-4: #3a3d46;
+  --color-edge: rgba(255, 255, 255, 0.07);
+  --color-edge-2: rgba(255, 255, 255, 0.12);
+  --color-electric: #5b8dff;
+  --color-electric-soft: #7faaff;
+  --color-flame: #ff6b3d;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html,
+body {
+  background: #06070a;
+  color: #e6e8ec;
+}
+
+/* Subtle mesh-gradient backdrop, layered above the flat ink fill */
+body {
+  background-image:
+    radial-gradient(ellipse 60% 50% at 18% 0%, rgba(91, 141, 255, 0.10), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 82% 25%, rgba(255, 107, 61, 0.04), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 80%, rgba(91, 141, 255, 0.06), transparent 60%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes friction-shake {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  10% {
+    transform: translate(-8px, 2px) rotate(-0.35deg);
+  }
+  20% {
+    transform: translate(6px, -3px) rotate(0.25deg);
+  }
+  30% {
+    transform: translate(-5px, 4px) rotate(-0.2deg);
+  }
+  40% {
+    transform: translate(7px, -2px) rotate(0.3deg);
+  }
+  50% {
+    transform: translate(-4px, 3px) rotate(-0.15deg);
+  }
+  60% {
+    transform: translate(5px, -4px) rotate(0.2deg);
+  }
+  70% {
+    transform: translate(-3px, 2px) rotate(-0.1deg);
+  }
+  80% {
+    transform: translate(2px, -2px) rotate(0.05deg);
+  }
+  90% {
+    transform: translate(-1px, 1px) rotate(-0.05deg);
   }
 }
 
+.friction-shake {
+  animation: friction-shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .friction-shake {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}
+
+/* Hide horizontal overflow caused by motion offsets */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar so it doesn't look like white default on dark */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
