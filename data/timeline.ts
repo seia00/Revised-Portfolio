@@ -30,10 +30,10 @@ export const TIMELINE: Milestone[] = [
     body: "Accepted into a prestigious high school in Japan. The first time the work I put in actually compounded.",
   },
   {
-    year: "2024",
+    year: "2024 → now",
     place: "International circuit",
     title: "Debate.",
-    body: "Started competing seriously. Grand Finalist at Sophistry WSDC. 2nd Best Speaker. Years of reading suddenly had somewhere to go.",
+    body: "Top 8 candidate for WSDC Team Japan '26. Rookie Finalist and 2nd Best Speaker at Keio Debate Open — and many more across the circuit. Years of reading suddenly had somewhere to go.",
   },
   {
     year: "2025",

@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DEBATE, YEARS_DESC, type Award } from "@/data/debate";
 
 export default function DebateAccordion() {
+  // Every year starts collapsed — user must click to expand
   const [open, setOpen] = useState<Record<number, boolean>>(() =>
-    Object.fromEntries(YEARS_DESC.map((y, i) => [y, i === 0])) // open most recent by default
+    Object.fromEntries(YEARS_DESC.map((y) => [y, false]))
   );
 
   const toggle = (year: number) =>
