@@ -90,10 +90,18 @@ body {
   }
 }
 
-/* Hide horizontal overflow caused by motion offsets */
+/*
+ * Hide horizontal overflow caused by motion offsets.
+ *
+ * NOTE: use `overflow-x: clip` rather than `overflow-x: hidden`.
+ * `hidden` establishes a scroll container on <html>/<body>, which silently
+ * disables `position: sticky` for every descendant — that's what was making
+ * the scroll-jacked Timeline scroll right through instead of pinning.
+ * `clip` clips without creating a scroll container, so sticky keeps working.
+ */
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Per-element scrollbar hiding (used by horizontal scroll-snap rails) */
