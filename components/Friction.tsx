@@ -26,6 +26,7 @@ export default function Friction() {
   const inView = useInView(ref, { margin: "-30% 0px -30% 0px", once: true });
   const [shaking, setShaking] = useState(false);
 
+  // Trigger the shake exactly once when the section first enters the viewport.
   useEffect(() => {
     if (!inView) return;
     setShaking(true);
@@ -38,85 +39,78 @@ export default function Friction() {
       ref={ref}
       id="friction"
       aria-label="What I don't like"
-      className={`relative px-5 sm:px-8 md:px-10 lg:px-16 py-32 md:py-48 overflow-hidden ${
+      className={`relative px-6 md:px-10 lg:px-16 py-40 md:py-56 overflow-hidden ${
         shaking ? "friction-shake" : ""
       }`}
     >
-      {/* Harsh repeating grid backdrop */}
+      {/* harsh grid backdrop */}
       <div
         aria-hidden
-        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        className="absolute inset-0 opacity-[0.07] pointer-events-none"
         style={{
           backgroundImage:
             "repeating-linear-gradient(0deg, transparent 0 23px, rgba(255,255,255,0.5) 23px 24px), repeating-linear-gradient(90deg, transparent 0 23px, rgba(255,255,255,0.5) 23px 24px)",
         }}
       />
 
-      <div className="max-w-[1200px] mx-auto relative z-10">
-        {/* Caution divider — styled as a proper section divider */}
-        <div className="flex items-center gap-4 mb-12 md:mb-16">
-          <span
-            aria-hidden
-            className="block h-px flex-1 bg-flame/40"
-          />
-          <span className="font-jetbrains text-[10px] md:text-[11px] tracking-[0.24em] uppercase text-flame whitespace-nowrap">
-            ※ Caution · raw section ahead ※
-          </span>
-          <span aria-hidden className="block h-px flex-1 bg-flame/40" />
-        </div>
+      {/* red tape strip top-left */}
+      <div
+        aria-hidden
+        className="absolute -left-6 top-32 rotate-[-4deg] bg-flame text-ink font-anton uppercase tracking-[0.18em] text-[11px] px-6 py-1.5 select-none"
+      >
+        ※ Caution · raw section ahead ※
+      </div>
 
-        {/* Header */}
+      <div className="max-w-[1200px] mx-auto relative z-10">
+        {/* heading — VIOLENTLY large Anton */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.45 }}
-          className="mb-16 md:mb-24"
+          className="mb-20 md:mb-28"
         >
-          <p className="font-jetbrains text-[10px] md:text-[11px] tracking-[0.24em] uppercase text-flame mb-5 md:mb-6">
+          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-flame mb-6">
             /// Chapter iv — friction
           </p>
-          <h2 className="font-anton uppercase text-fog leading-[0.84] tracking-[-0.005em] text-[clamp(56px,13vw,200px)]">
+          <h2 className="font-anton uppercase text-fog leading-[0.78] tracking-[-0.01em] text-[clamp(72px,16vw,260px)]">
             Three things
             <br />
             <span className="text-flame">I&nbsp;cannot&nbsp;stand.</span>
           </h2>
         </motion.div>
 
-        {/* Stacked full-width blocks — one per item */}
-        <ul className="border-y-2 border-fog">
+        {/* items — slabby, hard-edged cards with skewed accents */}
+        <ul className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y-2 border-fog">
           {ITEMS.map((it, idx) => (
             <motion.li
               key={it.n}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{
-                delay: 0.12 + idx * 0.1,
+                delay: 0.15 + idx * 0.12,
                 duration: 0.55,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className={`relative grid grid-cols-1 md:grid-cols-[120px_1fr] gap-6 md:gap-10 py-10 md:py-12 px-1 md:px-4 ${
-                idx !== ITEMS.length - 1 ? "border-b-2 border-fog" : ""
+              className={`relative p-8 md:p-10 ${
+                idx !== ITEMS.length - 1
+                  ? "border-r-0 md:border-r-2 border-b-2 md:border-b-0 border-fog"
+                  : ""
               }`}
             >
-              {/* Left — number label */}
-              <span className="font-anton uppercase text-flame text-5xl md:text-6xl leading-none tracking-tighter">
+              <span className="font-anton uppercase block text-flame text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
                 /{it.n}
               </span>
+              <h3 className="font-anton uppercase text-fog text-3xl md:text-4xl leading-[0.95] mb-5 tracking-[-0.005em]">
+                {it.title}
+              </h3>
+              <p className="font-jetbrains text-fog-2 text-[13px] leading-[1.65] max-w-[280px]">
+                {it.body}
+              </p>
 
-              {/* Right — title + body */}
-              <div className="min-w-0">
-                <h3 className="font-anton uppercase text-fog text-3xl md:text-5xl leading-[0.95] mb-4 md:mb-5 tracking-[-0.005em]">
-                  {it.title}
-                </h3>
-                <p className="font-jetbrains text-fog-2 text-[13px] md:text-[14px] leading-[1.65] max-w-[420px]">
-                  {it.body}
-                </p>
-              </div>
-
-              {/* Bottom-right corner stamp — consistent position across all items */}
+              {/* corner stamp */}
               <span
                 aria-hidden
-                className="absolute bottom-3 right-1 md:right-3 font-jetbrains text-[9px] tracking-[0.2em] uppercase text-fog-4"
+                className="absolute top-3 right-3 font-jetbrains text-[9px] tracking-[0.18em] uppercase text-fog-4"
               >
                 no.{it.n}
               </span>
