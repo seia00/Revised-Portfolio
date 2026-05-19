@@ -96,6 +96,15 @@ body {
   overflow-x: hidden;
 }
 
+/* Per-element scrollbar hiding (used by horizontal scroll-snap rails) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom scrollbar so it doesn't look like white default on dark */
 ::-webkit-scrollbar {
   width: 10px;
