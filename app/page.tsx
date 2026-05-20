@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import Timeline from "@/components/Timeline";
 import Activities from "@/components/Activities";
 import Friction from "@/components/Friction";
+import Manifesto from "@/components/Manifesto";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -20,6 +21,9 @@ export default function Home() {
       <Friction />
 
       <Divider label="Chapter v" />
+      <Manifesto />
+
+      <Divider label="Chapter vi" />
       <Footer />
     </main>
   );

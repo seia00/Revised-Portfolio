@@ -1,0 +1,299 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - region "Hero" [ref=e3]:
+      - generic: SF
+      - generic [ref=e4]:
+        - paragraph [ref=e5]: ◣ Seia Funayama · Chiba, Japan
+        - heading "Seia Funa yama." [level=1] [ref=e6]:
+          - generic [ref=e7]: Seia
+          - generic [ref=e8]: Funa
+          - generic [ref=e9]: yama.
+        - figure "— Steve Jobs" [ref=e10]:
+          - blockquote [ref=e11]:
+            - text: “Stay hungry,
+            - text: stay foolish.”
+          - generic [ref=e12]: — Steve Jobs
+        - generic [ref=e13]:
+          - generic [ref=e14]:
+            - term [ref=e15]: Currently
+            - definition [ref=e16]: Year 10 · Shibuya Makuhari
+          - generic [ref=e17]:
+            - term [ref=e18]: Building
+            - definition [ref=e19]: AXYZ · Kythera Ventures
+          - generic [ref=e20]:
+            - term [ref=e21]: Hobbies
+            - definition [ref=e22]: Studying ML · Finetuning LLMs · Gunpla · Hardware tinkering
+          - generic [ref=e23]:
+            - term [ref=e24]: Favorite food
+            - definition [ref=e25]: Meat
+          - generic [ref=e26]:
+            - term [ref=e27]: On loop
+            - definition [ref=e28]: Swim — BTS
+      - generic [ref=e31]: Scroll
+    - generic [ref=e33]: ※ Chapter ii
+    - generic [ref=e36]:
+      - paragraph [ref=e37]: ◇ Chapter ii
+      - heading "My life, thus far." [level=2] [ref=e38]:
+        - text: My life,
+        - text: thus far.
+      - paragraph [ref=e39]: Six waypoints that explain how I got here — and where I'm pointed next. Keep scrolling to advance the chapters.
+    - region "My life — chapters" [ref=e40]:
+      - generic [ref=e41]:
+        - list [ref=e42]:
+          - listitem [ref=e43]:
+            - generic:
+              - generic: "01"
+            - generic [ref=e44]:
+              - paragraph [ref=e45]: ※ Chapter · 01 · Kyoto → Yokohama, Japan
+              - heading "Roots." [level=3] [ref=e46]
+              - paragraph [ref=e47]: Born in Kyoto, but moved to Yokohama shortly after.
+          - listitem [ref=e48]:
+            - generic:
+              - generic: "02"
+            - generic [ref=e49]:
+              - paragraph [ref=e50]: ※ Chapter · 02 · Cupertino, California
+              - heading "Crossing." [level=3] [ref=e51]
+              - paragraph [ref=e52]: In my years in Cupertino I fell in love with technology and entrepreneurship — and with the idea that you can just build the thing you wish existed.
+          - listitem [ref=e53]:
+            - generic:
+              - generic: "03"
+            - generic [ref=e54]:
+              - paragraph [ref=e55]: ※ Chapter · 03 · Shibuya Makuhari
+              - heading "Prestigious high school." [level=3] [ref=e56]
+              - paragraph [ref=e57]: Accepted into a prestigious high school in Japan. The first time the work I put in actually compounded.
+          - listitem [ref=e58]:
+            - generic:
+              - generic: 2024 → now
+            - generic [ref=e59]:
+              - paragraph [ref=e60]: ※ Chapter · 04 · International circuit
+              - heading "Debate." [level=3] [ref=e61]
+              - paragraph [ref=e62]: Top 8 candidate for WSDC Team Japan '26. Rookie Finalist and 2nd Best Speaker at Keio Debate Open — and many more across the circuit. Years of reading suddenly had somewhere to go.
+              - paragraph [ref=e63]: ◆ 2024 → now
+          - listitem [ref=e64]:
+            - generic:
+              - generic: "2025"
+            - generic [ref=e65]:
+              - paragraph [ref=e66]: ※ Chapter · 05 · EN2U · Japan
+              - heading "Built EN2U." [level=3] [ref=e67]
+              - paragraph [ref=e68]: Co-founded a non-profit connecting youth in underserved Japanese communities with peer-led English education. Built the platform end-to-end.
+              - paragraph [ref=e69]: ◆ 2025
+          - listitem [ref=e70]:
+            - generic:
+              - generic: "2026"
+            - generic [ref=e71]:
+              - paragraph [ref=e72]: ※ Chapter · 06 · AXYZ · Kythera Ventures
+              - heading "CTO." [level=3] [ref=e73]
+              - paragraph [ref=e74]: Took on Chief Technology Officer at AXYZ and the Stratum AI solutions arm of Kythera Ventures. Currently shipping infrastructure for the people who shape the next decade of Japanese tech.
+              - paragraph [ref=e75]: ◆ 2026
+        - generic:
+          - generic:
+            - generic: SF.
+            - generic:
+              - generic:
+                - text: "06"
+                - generic: / 06
+              - generic: 100%
+          - generic:
+            - generic: ◇ My life · chapter ii
+            - generic:
+              - text: Scroll
+              - generic: ↓
+    - generic [ref=e77]: ※ Chapter iii
+    - region "Activities" [ref=e78]:
+      - generic [ref=e79]:
+        - generic [ref=e80]:
+          - paragraph [ref=e81]: ◇ Chapter iii / activities
+          - heading "The four things I actually do." [level=2] [ref=e82]:
+            - text: The four
+            - text: things I actually do.
+          - paragraph [ref=e83]: Debate, code, mentorship, and an early-stage CTO role. Each one feeds the others.
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - heading "Debate" [level=3] [ref=e86]
+            - generic [ref=e87]: /01 — competitive results
+          - generic [ref=e88]:
+            - button "2025 8 tournaments · 15 results" [ref=e90]:
+              - generic [ref=e91]:
+                - generic [ref=e92]: "2025"
+                - generic [ref=e93]: 8 tournaments · 15 results
+              - generic [ref=e94]: +
+            - button "2024 6 tournaments · 10 results" [ref=e96]:
+              - generic [ref=e97]:
+                - generic [ref=e98]: "2024"
+                - generic [ref=e99]: 6 tournaments · 10 results
+              - generic [ref=e100]: +
+          - paragraph [ref=e101]: ⋯ and many more across the circuit
+        - generic [ref=e102]:
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - heading "Programming" [level=3] [ref=e105]
+              - generic [ref=e106]: /02
+            - generic [ref=e107]:
+              - generic [ref=e108]: /0
+              - generic [ref=e109]:
+                - generic [ref=e110]: ◆ Programming · 9 projects
+                - generic [ref=e111]: archive
+              - heading "Code, shipped & in progress." [level=3] [ref=e112]:
+                - text: Code, shipped &
+                - text: in progress.
+              - paragraph [ref=e113]: A small but deliberate stack of tools — AI for debaters, an open-source motion archive, and the infrastructure under things like EN2U.
+              - button "Click to view projects" [ref=e114]:
+                - generic [ref=e115]: Click to view projects
+          - generic [ref=e117]:
+            - generic [ref=e118]:
+              - heading "NPO Work" [level=3] [ref=e119]
+              - generic [ref=e120]: /03
+            - 'link "◆ Non-profit en2u.vercel.app EN2U. A peer-mentorship network: 13–18 year olds teach English to other teens in underserved Japanese communities. I co-founded it and built the platform. Visit site" [ref=e121]':
+              - /url: https://en2u.vercel.app/
+              - generic [ref=e122]:
+                - generic [ref=e123]: ◆ Non-profit
+                - generic [ref=e124]: en2u.vercel.app
+              - heading "EN2U." [level=3] [ref=e125]
+              - paragraph [ref=e126]: "A peer-mentorship network: 13–18 year olds teach English to other teens in underserved Japanese communities. I co-founded it and built the platform."
+              - generic [ref=e127]:
+                - text: Visit site
+                - generic [ref=e128]: ↗
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - heading "Kythera Ventures" [level=3] [ref=e131]
+            - generic [ref=e132]: /04 — exec
+          - generic [ref=e133]:
+            - generic [ref=e134]: KV
+            - generic [ref=e135]:
+              - generic [ref=e136]: ◆ Executive · 2026 —
+              - generic [ref=e137]: Active role
+            - paragraph [ref=e138]: Chief Technology Officer
+            - heading "Kythera Ventures." [level=3] [ref=e139]:
+              - text: Kythera
+              - text: Ventures.
+            - paragraph [ref=e140]: CTO at AXYZ and the Stratum AI solutions arm of Kythera Ventures — shipping infrastructure for the next decade of Japanese AI work.
+            - generic [ref=e141]:
+              - generic [ref=e142]: AXYZ
+              - generic [ref=e143]: Stratum AI
+              - generic [ref=e144]: Infra
+              - generic [ref=e145]: TypeScript
+    - generic [ref=e147]: ※ Chapter iv
+    - region "What I don't like" [ref=e148]:
+      - generic [ref=e149]: ※ Caution · raw section ahead ※
+      - generic [ref=e150]:
+        - generic [ref=e151]:
+          - paragraph [ref=e152]: /// Chapter iv — friction
+          - heading "Three things I cannot stand." [level=2] [ref=e153]:
+            - text: Three things
+            - text: I cannot stand.
+        - list [ref=e154]:
+          - listitem [ref=e155]:
+            - generic [ref=e156]: /01
+            - heading "PEOPLE THAT ARE ALL TALK" [level=3] [ref=e157]
+            - paragraph [ref=e158]: If you describe what you'll do more than you do it, the equation is broken.
+            - generic [ref=e159]: no.01
+          - listitem [ref=e160]:
+            - generic [ref=e161]: /02
+            - heading "PHONIES" [level=3] [ref=e162]
+            - paragraph [ref=e163]: Holden Caulfield was onto something. You can spot it in the eyes before the mouth opens.
+            - generic [ref=e164]: no.02
+          - listitem [ref=e165]:
+            - generic [ref=e166]: /03
+            - heading "VEGETABLES" [level=3] [ref=e167]
+            - paragraph [ref=e168]: Sorry.
+            - generic [ref=e169]: no.03
+    - generic [ref=e171]: ※ Chapter v
+    - region "Manifesto" [ref=e172]:
+      - generic [ref=e173]:
+        - generic [ref=e174]: // manifesto
+        - paragraph [ref=e175]: ◇ Chapter v · manifesto
+        - generic:
+          - paragraph:
+            - generic: I truly believe that life was made to live on the edge.
+    - generic [ref=e177]: ※ Chapter vi
+    - generic "Connect" [ref=e178]:
+      - generic [ref=e179]:
+        - paragraph [ref=e180]: "[ CHAPTER · VI ] >> CONNECT"
+        - generic [ref=e181]:
+          - heading "LET'S CONNECT" [level=2] [ref=e186]: LET'S CONNECT_
+          - paragraph [ref=e187]: "* PRESS START TO PLAY"
+        - list [ref=e188]:
+          - listitem [ref=e189]:
+            - link "TWITTER @seiafunayama [ PRESS ]" [ref=e190]:
+              - /url: https://twitter.com/seiafunayama
+              - generic [ref=e191]: ♥
+              - generic [ref=e192]: "*"
+              - generic [ref=e193]: TWITTER
+              - generic [ref=e194]: "@seiafunayama"
+              - generic [ref=e195]: "[ PRESS ]"
+          - listitem [ref=e196]:
+            - link "INSTAGRAM @seiafunayama [ PRESS ]" [ref=e197]:
+              - /url: https://instagram.com/seiafunayama
+              - generic [ref=e198]: ♥
+              - generic [ref=e199]: "*"
+              - generic [ref=e200]: INSTAGRAM
+              - generic [ref=e201]: "@seiafunayama"
+              - generic [ref=e202]: "[ PRESS ]"
+          - listitem [ref=e203]:
+            - link "EMAIL seiafunayama@gmail.com [ PRESS ]" [ref=e204]:
+              - /url: mailto:seiafunayama@gmail.com
+              - generic [ref=e205]: ♥
+              - generic [ref=e206]: "*"
+              - generic [ref=e207]: EMAIL
+              - generic [ref=e208]: seiafunayama@gmail.com
+              - generic [ref=e209]: "[ PRESS ]"
+          - listitem [ref=e210]:
+            - link "EMAIL · ALT Funayamad31@gmail.com [ PRESS ]" [ref=e211]:
+              - /url: mailto:Funayamad31@gmail.com
+              - generic [ref=e212]: ♥
+              - generic [ref=e213]: "*"
+              - generic [ref=e214]: EMAIL · ALT
+              - generic [ref=e215]: Funayamad31@gmail.com
+              - generic [ref=e216]: "[ PRESS ]"
+          - listitem [ref=e217]:
+            - link "GITHUB seia00 [ PRESS ]" [ref=e218]:
+              - /url: https://github.com/seia00
+              - generic [ref=e219]: ♥
+              - generic [ref=e220]: "*"
+              - generic [ref=e221]: GITHUB
+              - generic [ref=e222]: seia00
+              - generic [ref=e223]: "[ PRESS ]"
+          - listitem [ref=e224]:
+            - link "LINKEDIN Seia Funayama [ PRESS ]" [ref=e225]:
+              - /url: https://www.linkedin.com/in/seiafunayama/
+              - generic [ref=e226]: ♥
+              - generic [ref=e227]: "*"
+              - generic [ref=e228]: LINKEDIN
+              - generic [ref=e229]: Seia Funayama
+              - generic [ref=e230]: "[ PRESS ]"
+          - listitem [ref=e231]:
+            - button "Copy DISCORD handle sei_a000" [ref=e232]:
+              - generic [ref=e233]: ♥
+              - generic [ref=e234]: "*"
+              - generic [ref=e235]: DISCORD
+              - generic [ref=e236]: sei_a000
+              - generic [ref=e237]: "[ COPY ]"
+        - generic [ref=e238]:
+          - generic [ref=e239]: "* P1 · SEIA FUNAYAMA · MMXXVI"
+          - generic [ref=e240]: "HI-SCORE: ∞"
+        - paragraph [ref=e241]:
+          - generic [ref=e242]: $
+          - text: built with intent · next.js · framer motion
+          - generic [ref=e243]: ▮
+  - navigation "Chapter navigation":
+    - button "Jump to chapter I — Origin":
+      - generic: I
+      - generic: Origin
+    - button "Jump to chapter II — Life":
+      - generic: II
+      - generic: Life
+    - button "Jump to chapter III — Activities":
+      - generic: III
+      - generic: Activities
+    - button "Jump to chapter IV — Friction":
+      - generic: IV
+      - generic: Friction
+    - button "Jump to chapter V — Manifesto":
+      - generic: V
+      - generic: Manifesto
+    - button "Jump to chapter VI — Connect":
+      - generic: VI
+      - generic: Connect
+  - button "Open Next.js Dev Tools" [ref=e274] [cursor=pointer]:
+    - img [ref=e275]
+  - alert [ref=e278]

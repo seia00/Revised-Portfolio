@@ -7,7 +7,8 @@ const CHAPTERS = [
   { id: "timeline",   label: "Life",       numeral: "II"  },
   { id: "activities", label: "Activities", numeral: "III" },
   { id: "friction",   label: "Friction",   numeral: "IV"  },
-  { id: "connect",    label: "Connect",    numeral: "V"   },
+  { id: "manifesto",  label: "Manifesto",  numeral: "V"   },
+  { id: "connect",    label: "Connect",    numeral: "VI"  },
 ] as const;
 
 export default function ChapterRail() {
@@ -34,8 +35,9 @@ export default function ChapterRail() {
     return () => observer.disconnect();
   }, []);
 
-  // Hide while inside Timeline — its internal overlay handles chapter UI.
-  const hidden = active === "timeline";
+  // Hide during Timeline (internal overlay handles UI) and Manifesto
+  // (cinematic section — rail would compete with the centered text).
+  const hidden = active === "timeline" || active === "manifesto";
 
   function scrollTo(id: string) {
     const el = document.getElementById(id);

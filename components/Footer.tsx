@@ -13,9 +13,10 @@ interface Social {
 const SOCIALS: Social[] = [
   { label: "TWITTER",   handle: "@seiafunayama",           href: "https://twitter.com/seiafunayama",      cta: "PRESS" },
   { label: "INSTAGRAM", handle: "@seiafunayama",           href: "https://instagram.com/seiafunayama",    cta: "PRESS" },
-  { label: "EMAIL",     handle: "Funayamad31@gmail.com",   href: "mailto:Funayamad31@gmail.com",          cta: "PRESS" },
+  { label: "EMAIL",     handle: "seiafunayama@gmail.com",  href: "mailto:seiafunayama@gmail.com",         cta: "PRESS" },
+  { label: "EMAIL · ALT", handle: "Funayamad31@gmail.com", href: "mailto:Funayamad31@gmail.com",          cta: "PRESS" },
   { label: "GITHUB",    handle: "seia00",                  href: "https://github.com/seia00",             cta: "PRESS" },
-  { label: "LINKEDIN",  handle: "Seia Funayama",           href: "https://linkedin.com/in/seiafunayama",  cta: "PRESS" },
+  { label: "LINKEDIN",  handle: "Seia Funayama",           href: "https://www.linkedin.com/in/seiafunayama/", cta: "PRESS" },
   { label: "DISCORD",   handle: "sei_a000",                href: null,                                    cta: "COPY"  },
 ];
 
@@ -35,7 +36,7 @@ export default function Footer() {
       <div className="relative max-w-[1100px] mx-auto">
         {/* Tiny pixel eyebrow */}
         <p className="font-8bit text-[13px] tracking-[0.2em] text-electric-soft mb-8">
-          [ CHAPTER · V ] &gt;&gt; CONNECT
+          [ CHAPTER · VI ] &gt;&gt; CONNECT
         </p>
 
         {/* Pixel-bordered headline cartridge */}
