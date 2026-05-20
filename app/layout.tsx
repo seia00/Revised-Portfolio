@@ -13,6 +13,7 @@ import {
 import "./globals.css";
 import MusicPrompt from "@/components/MusicPrompt";
 import ChapterRail from "@/components/ChapterRail";
+import CustomCursor from "@/components/CustomCursor";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -94,6 +95,7 @@ export default function RootLayout({
         {children}
         <ChapterRail />
         <MusicPrompt />
+        <CustomCursor />
       </body>
     </html>
   );

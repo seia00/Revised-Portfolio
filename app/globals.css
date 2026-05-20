@@ -103,6 +103,37 @@ body {
     2px 0 0 0 currentColor;
 }
 
+/* ── Custom shuriken cursor ─────────────────────────────────── */
+@media (hover: hover) {
+  html.cursor-shuriken-active,
+  html.cursor-shuriken-active * {
+    cursor: none !important;
+  }
+}
+
+.cursor-shuriken-wrap { left: 0; top: 0; }
+.cursor-shuriken-center {
+  /* Re-center the shuriken on the pointer hotspot. */
+  transform: translate(-50%, -50%);
+  transition: scale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cursor-shuriken-press .cursor-shuriken-center {
+  scale: 0.78;
+}
+
+@keyframes cursor-shuriken-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.cursor-shuriken-spin {
+  animation: cursor-shuriken-spin 1.4s linear infinite;
+  transform-origin: center;
+  display: block;
+}
+.cursor-shuriken-press .cursor-shuriken-spin {
+  animation-duration: 0.5s;
+}
+
 /* ── Equalizer animation (used by MusicPrompt) ─────────────── */
 @keyframes eq-bar-1 {
   0%, 100% { transform: scaleY(0.30); }
