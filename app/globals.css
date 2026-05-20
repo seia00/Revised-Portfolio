@@ -10,6 +10,7 @@
   --font-space-grotesk: var(--font-space-grotesk);
   --font-press-start: var(--font-press-start);
   --font-vt323: var(--font-vt323);
+  --font-pixelify: var(--font-pixelify);
 
   /* ── Dark palette ── */
   --color-ink: #06070a;
@@ -25,6 +26,8 @@
   --color-electric: #5b8dff;
   --color-electric-soft: #7faaff;
   --color-flame: #ff6b3d;
+  --color-undertale: #ffd900;
+  --color-undertale-soft: #ffe14a;
 }
 
 html,
@@ -99,6 +102,36 @@ body {
     -2px 0 0 0 currentColor,
     2px 0 0 0 currentColor;
 }
+
+/* ── Equalizer animation (used by MusicPrompt) ─────────────── */
+@keyframes eq-bar-1 {
+  0%, 100% { transform: scaleY(0.30); }
+  50%      { transform: scaleY(0.95); }
+}
+@keyframes eq-bar-2 {
+  0%, 100% { transform: scaleY(0.75); }
+  50%      { transform: scaleY(0.20); }
+}
+@keyframes eq-bar-3 {
+  0%, 100% { transform: scaleY(0.50); }
+  25%      { transform: scaleY(0.95); }
+  75%      { transform: scaleY(0.30); }
+}
+@keyframes eq-bar-4 {
+  0%, 100% { transform: scaleY(0.85); }
+  50%      { transform: scaleY(0.40); }
+}
+.eq-bar {
+  transform-origin: bottom center;
+  animation-duration: 0.9s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+.eq-bar-1 { animation-name: eq-bar-1; animation-duration: 0.85s; }
+.eq-bar-2 { animation-name: eq-bar-2; animation-duration: 1.05s; }
+.eq-bar-3 { animation-name: eq-bar-3; animation-duration: 0.75s; }
+.eq-bar-4 { animation-name: eq-bar-4; animation-duration: 1.15s; }
+.eq-paused .eq-bar { animation-play-state: paused; }
 
 /* Subtle CRT scanlines overlay */
 .crt-scanlines {

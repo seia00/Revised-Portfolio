@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import MusicPrompt from "@/components/MusicPrompt";
 import {
   Syne,
   Playfair_Display,
@@ -9,8 +8,11 @@ import {
   Space_Grotesk,
   Press_Start_2P,
   VT323,
+  Pixelify_Sans,
 } from "next/font/google";
 import "./globals.css";
+import MusicPrompt from "@/components/MusicPrompt";
+import ChapterRail from "@/components/ChapterRail";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -67,6 +69,13 @@ const vt323 = VT323({
   display: "swap",
 });
 
+const pixelify = Pixelify_Sans({
+  variable: "--font-pixelify",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Seia Funayama",
   description:
@@ -79,10 +88,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${playfair.variable} ${inter.variable} ${jetbrains.variable} ${anton.variable} ${spaceGrotesk.variable} ${pressStart.variable} ${vt323.variable}`}
+      className={`${syne.variable} ${playfair.variable} ${inter.variable} ${jetbrains.variable} ${anton.variable} ${spaceGrotesk.variable} ${pressStart.variable} ${vt323.variable} ${pixelify.variable}`}
     >
       <body className="min-h-screen bg-ink text-fog antialiased font-inter selection:bg-electric/30 selection:text-white">
         {children}
+        <ChapterRail />
         <MusicPrompt />
       </body>
     </html>

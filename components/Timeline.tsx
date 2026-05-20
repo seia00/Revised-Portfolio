@@ -24,6 +24,34 @@ import { TIMELINE, type Milestone } from "@/data/timeline";
 
 const N = TIMELINE.length;
 
+// Dwell fraction within each panel slot (0..1). The rest is the transition
+// to the next panel. Higher = more "hold time" on each chapter.
+const DWELL = 0.6;
+
+// Build keyframed inputs/outputs so each panel holds still for the dwell
+// portion of its slot, then transitions to the next during the remainder.
+function buildXKeyframes() {
+  const inputs: number[] = [0];
+  const outputs: string[] = ["0vw"];
+  for (let i = 0; i < N; i++) {
+    const dwellEnd = (i + DWELL) / N;
+    const slotEnd = (i + 1) / N;
+    inputs.push(dwellEnd);
+    outputs.push(`-${i * 100}vw`);
+    if (i < N - 1) {
+      inputs.push(slotEnd);
+      outputs.push(`-${(i + 1) * 100}vw`);
+    }
+  }
+  if (inputs[inputs.length - 1] < 1) {
+    inputs.push(1);
+    outputs.push(`-${(N - 1) * 100}vw`);
+  }
+  return { inputs, outputs };
+}
+
+const { inputs: X_INPUTS, outputs: X_OUTPUTS } = buildXKeyframes();
+
 export default function Timeline() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -31,12 +59,8 @@ export default function Timeline() {
     offset: ["start start", "end end"],
   });
 
-  // Translate from 0 → -(N-1) * 100vw across the scroll range.
-  const x = useTransform(
-    scrollYProgress,
-    [0, 1],
-    ["0vw", `-${(N - 1) * 100}vw`]
-  );
+  // Keyframed translate — holds each panel still for DWELL of its slot.
+  const x = useTransform(scrollYProgress, X_INPUTS, X_OUTPUTS);
 
   // Discrete chapter index (drives the "01 / 06" indicator)
   const [chapter, setChapter] = useState(0);
@@ -78,7 +102,7 @@ export default function Timeline() {
         id="timeline"
         aria-label="My life — chapters"
         className="relative"
-        style={{ height: `${N * 100}vh` }}
+        style={{ height: `${N * 200}vh` }}
       >
         <div className="sticky top-0 h-screen w-screen overflow-hidden bg-ink">
           {/* Moving rail of panels */}
@@ -113,26 +137,29 @@ interface PanelProps {
 }
 
 function ChapterPanel({ milestone, index, progress }: PanelProps) {
-  // Each panel "owns" the progress slice [index/N, (index+1)/N].
-  // We fade-in title and body as the panel becomes the active one.
-  const start = index / N;
-  const center = (index + 0.4) / N;
-  const end = (index + 1) / N;
+  // Each panel "owns" the progress slice [index/N, (index+1)/N]. Within that
+  // slice, the rail holds still for the first DWELL portion, then transitions
+  // out. We mirror that with content opacity: full during dwell, fade during
+  // transitions, so text "lands" and stays put before sliding away.
+  const inStart = (index - (1 - DWELL)) / N; // start of incoming transition
+  const dwellStart = index / N;
+  const dwellEnd = (index + DWELL) / N;
+  const outEnd = (index + 1) / N;
 
   const contentOpacity = useTransform(
     progress,
-    [start, center, end],
-    [0.4, 1, 0.4]
+    [inStart, dwellStart, dwellEnd, outEnd],
+    [0, 1, 1, 0]
   );
   const contentY = useTransform(
     progress,
-    [start, center, end],
-    [40, 0, -40]
+    [inStart, dwellStart, dwellEnd, outEnd],
+    [40, 0, 0, -40]
   );
   const watermarkOpacity = useTransform(
     progress,
-    [start, center, end],
-    [0, 0.06, 0]
+    [inStart, dwellStart, dwellEnd, outEnd],
+    [0, 0.06, 0.06, 0]
   );
 
   // Big watermark text — year when present, otherwise the chapter number.

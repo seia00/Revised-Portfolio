@@ -50,7 +50,7 @@ export default function Hero() {
           className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(56px,11vw,160px)] mb-16"
         >
           <span className="block">Seia</span>
-          <span className="block text-fog/30 -mt-1">Funa-</span>
+          <span className="block text-fog/30 -mt-1">Funa</span>
           <span className="block text-fog/30 -mt-1">yama.</span>
         </motion.h1>
 
