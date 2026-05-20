@@ -48,7 +48,7 @@ export default function SplineHero() {
   return (
     <div
       ref={wrapRef}
-      className="relative w-full aspect-square max-w-[560px] mx-auto"
+      className="relative w-full h-full"
       aria-hidden
     >
       {shouldMount && (

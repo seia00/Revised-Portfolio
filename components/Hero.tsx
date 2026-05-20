@@ -22,10 +22,22 @@ export default function Hero() {
       aria-label="Hero"
       className="relative min-h-screen flex flex-col justify-center px-6 md:px-10 lg:px-16 py-32 overflow-hidden"
     >
-      {/* large faint mark */}
+      {/* Background layers — Spline scene, dark tint, bottom fade. */}
+      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+        {/* Spline (desktop/tablet only) */}
+        <div className="hidden md:block absolute inset-0">
+          <SplineHero />
+        </div>
+        {/* Subtle dark overlay over the scene so text stays legible */}
+        <div className="absolute inset-0 bg-ink/30" />
+        {/* Bottom fade into ink — smooth transition to the next section */}
+        <div className="absolute inset-x-0 bottom-0 h-[36vh] bg-gradient-to-b from-transparent to-ink" />
+      </div>
+
+      {/* large faint mark — sits behind the dark overlay so it whispers */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-[10%] -right-[6%] text-[40vw] leading-none font-syne font-bold text-white/[0.015] select-none tracking-tighter"
+        className="pointer-events-none absolute -top-[10%] -right-[6%] text-[40vw] leading-none font-syne font-bold text-white/[0.015] select-none tracking-tighter z-0"
       >
         SF
       </div>
@@ -44,23 +56,15 @@ export default function Hero() {
           ◣ Seia Funayama · Chiba, Japan
         </motion.p>
 
-        {/* Name + Spline asset — side by side on desktop, stacked on mobile. */}
-        <motion.div
+        {/* Name — broken across three lines for compact cascading. */}
+        <motion.h1
           variants={fadeUp}
-          className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,500px)] gap-8 lg:gap-12 items-center mb-16"
+          className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(56px,11vw,160px)] mb-16"
         >
-          {/* Name — broken across three lines for compact cascading. */}
-          <h1 className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(56px,10vw,150px)]">
-            <span className="block">Seia</span>
-            <span className="block text-fog/30 -mt-1">Funa</span>
-            <span className="block text-fog/30 -mt-1">yama.</span>
-          </h1>
-
-          {/* Spline 3D asset */}
-          <div className="hidden lg:block">
-            <SplineHero />
-          </div>
-        </motion.div>
+          <span className="block">Seia</span>
+          <span className="block text-fog/30 -mt-1">Funa</span>
+          <span className="block text-fog/30 -mt-1">yama.</span>
+        </motion.h1>
 
         {/* Centerpiece quote */}
         <motion.figure

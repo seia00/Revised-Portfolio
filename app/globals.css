@@ -105,35 +105,45 @@ body {
     2px 0 0 0 currentColor;
 }
 
-/* ── Custom shuriken cursor ─────────────────────────────────── */
+/* ── Minimalist ring cursor ─────────────────────────────────── */
 @media (hover: hover) {
-  html.cursor-shuriken-active,
-  html.cursor-shuriken-active * {
+  html.cursor-ring-active,
+  html.cursor-ring-active * {
     cursor: none !important;
   }
 }
 
-.cursor-shuriken-wrap { left: 0; top: 0; }
-.cursor-shuriken-center {
-  /* Re-center the shuriken on the pointer hotspot. */
-  transform: translate(-50%, -50%);
-  transition: scale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.cursor-shuriken-press .cursor-shuriken-center {
-  scale: 0.78;
+.cursor-ring-wrap { left: 0; top: 0; }
+.cursor-ring-hidden { opacity: 0; }
+
+.cursor-ring-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1.5px solid var(--color-electric);
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    border-color   180ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform      180ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow     220ms cubic-bezier(0.16, 1, 0.3, 1),
+    background     180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes cursor-shuriken-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+.cursor-ring-hover .cursor-ring-dot {
+  border-color: var(--color-flame);
+  background: rgba(255, 107, 61, 0.08);
+  transform: translate(-50%, -50%) scale(1.35);
+  box-shadow:
+    0 0 14px 0 rgba(255, 107, 61, 0.55),
+    inset 0 0 6px 0 rgba(255, 107, 61, 0.35);
 }
-.cursor-shuriken-spin {
-  animation: cursor-shuriken-spin 1.4s linear infinite;
-  transform-origin: center;
-  display: block;
+
+.cursor-ring-press .cursor-ring-dot {
+  transform: translate(-50%, -50%) scale(0.85);
 }
-.cursor-shuriken-press .cursor-shuriken-spin {
-  animation-duration: 0.5s;
+.cursor-ring-hover.cursor-ring-press .cursor-ring-dot {
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 /* ── Equalizer animation (used by MusicPrompt) ─────────────── */
