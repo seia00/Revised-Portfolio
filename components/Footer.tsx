@@ -34,7 +34,7 @@ export default function Footer() {
 
       <div className="relative max-w-[1100px] mx-auto">
         {/* Tiny pixel eyebrow */}
-        <p className="font-8bit text-[13px] tracking-[0.2em] text-undertale mb-8">
+        <p className="font-8bit text-[13px] tracking-[0.2em] text-electric-soft mb-8">
           [ CHAPTER · V ] &gt;&gt; CONNECT
         </p>
 
@@ -48,7 +48,7 @@ export default function Footer() {
 
           <h2 className="font-vt323 text-fog leading-[0.9] tracking-tight text-[clamp(64px,12vw,160px)]">
             LET&apos;S CONNECT
-            <span aria-hidden className="blink text-undertale">_</span>
+            <span aria-hidden className="blink text-flame">_</span>
           </h2>
           <p className="font-8bit text-[13px] md:text-[14px] tracking-[0.18em] text-fog-3 mt-6">
             * PRESS START TO PLAY
@@ -68,15 +68,15 @@ export default function Footer() {
             * P1 · SEIA FUNAYAMA · MMXXVI
           </span>
           <span className="font-8bit text-[13px] tracking-[0.18em] text-fog-3">
-            HI-SCORE: <span className="text-undertale">∞</span>
+            HI-SCORE: <span className="text-flame">∞</span>
           </span>
         </div>
 
         {/* Build credit, retro terminal */}
         <p className="font-vt323 text-fog-3 text-base mt-6 flex items-center gap-2">
-          <span aria-hidden className="text-undertale">$</span>
+          <span aria-hidden className="text-electric-soft">$</span>
           built with intent · next.js · framer motion
-          <span aria-hidden className="blink text-undertale">▮</span>
+          <span aria-hidden className="blink text-electric-soft">▮</span>
         </p>
       </div>
     </footer>
@@ -107,7 +107,7 @@ function SocialRow({ social }: { social: Social }) {
       <span
         aria-hidden
         className={`text-xl md:text-2xl w-5 text-center transition-colors ${
-          hover ? "text-undertale" : "text-transparent"
+          hover ? "text-flame" : "text-transparent"
         }`}
       >
         ♥
@@ -117,14 +117,14 @@ function SocialRow({ social }: { social: Social }) {
       <span
         aria-hidden
         className={`font-8bit text-xl md:text-2xl leading-none transition-colors ${
-          hover ? "text-undertale" : "text-fog-2"
+          hover ? "text-flame" : "text-fog-2"
         }`}
       >
         *
       </span>
 
       {/* Platform label — pixel font, fixed width-ish */}
-      <span className="font-8bit text-[13px] md:text-[15px] tracking-[0.18em] text-fog group-hover:text-undertale transition-colors min-w-[120px] md:min-w-[150px]">
+      <span className="font-8bit text-[13px] md:text-[15px] tracking-[0.18em] text-fog group-hover:text-flame transition-colors min-w-[120px] md:min-w-[150px]">
         {social.label}
       </span>
 
@@ -139,7 +139,7 @@ function SocialRow({ social }: { social: Social }) {
         transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
         className={`font-8bit text-[12px] md:text-[13px] tracking-[0.15em] px-3 py-2 border-2 shrink-0 ${
           hover
-            ? "border-undertale text-undertale bg-undertale/10"
+            ? "border-flame text-flame bg-flame/10"
             : "border-fog-4 text-fog-3"
         }`}
       >
@@ -149,7 +149,7 @@ function SocialRow({ social }: { social: Social }) {
   );
 
   const baseClass =
-    "group flex items-center gap-3 md:gap-5 px-4 md:px-6 py-4 md:py-5 hover:bg-undertale/[0.05] transition-colors w-full text-left";
+    "group flex items-center gap-3 md:gap-5 px-4 md:px-6 py-4 md:py-5 hover:bg-flame/[0.05] transition-colors w-full text-left";
 
   if (social.href) {
     return (
@@ -195,7 +195,7 @@ function Corner({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) {
   return (
     <span
       aria-hidden
-      className={`absolute ${map[pos]} w-3 h-3 bg-undertale`}
+      className={`absolute ${map[pos]} w-3 h-3 bg-flame`}
     />
   );
 }

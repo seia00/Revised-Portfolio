@@ -15,7 +15,7 @@ export const TIMELINE: Milestone[] = [
     year: "—",
     place: "Kyoto → Yokohama, Japan",
     title: "Roots.",
-    body: "Born in Kyoto, but moved to Yokohama shortly after. The version of me that exists now was first shaped by an island that values precision, deference, and the long view.",
+    body: "Born in Kyoto, but moved to Yokohama shortly after.",
   },
   {
     year: "—",

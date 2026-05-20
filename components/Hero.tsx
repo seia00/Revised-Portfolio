@@ -53,7 +53,7 @@ export default function Hero() {
           variants={fadeUp}
           className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-fog-3 mb-10"
         >
-          ◣ Seia Funayama · Chiba, Japan
+          <span className="text-flame">◣</span> Seia Funayama · Chiba, Japan
         </motion.p>
 
         {/* Name — broken across three lines for compact cascading. */}
@@ -63,7 +63,7 @@ export default function Hero() {
         >
           <span className="block">Seia</span>
           <span className="block text-fog/30 -mt-1">Funa</span>
-          <span className="block text-fog/30 -mt-1">yama.</span>
+          <span className="block text-fog/30 -mt-1">yama<span className="text-flame">.</span></span>
         </motion.h1>
 
         {/* Centerpiece quote */}
@@ -77,7 +77,7 @@ export default function Hero() {
             stay foolish.”
           </blockquote>
           <figcaption className="mt-5 font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3">
-            — Steve Jobs
+            <span className="text-flame">—</span> Steve Jobs
           </figcaption>
         </motion.figure>
 
@@ -107,7 +107,7 @@ export default function Hero() {
         className="absolute left-6 md:left-10 lg:left-16 bottom-10 flex items-center gap-3 text-fog-3"
         aria-hidden
       >
-        <span className="block h-px w-8 bg-fog-3" />
+        <span className="block h-px w-8 bg-flame" />
         <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase">
           Scroll
         </span>
