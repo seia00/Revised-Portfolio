@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MusicPrompt from "@/components/MusicPrompt";
 import {
   Syne,
   Playfair_Display,
@@ -82,6 +83,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-ink text-fog antialiased font-inter selection:bg-electric/30 selection:text-white">
         {children}
+        <MusicPrompt />
       </body>
     </html>
   );
