@@ -138,29 +138,37 @@ interface PanelProps {
 
 function ChapterPanel({ milestone, index, progress }: PanelProps) {
   // Each panel "owns" the progress slice [index/N, (index+1)/N]. Within that
-  // slice, the rail holds still for the first DWELL portion, then transitions
-  // out. We mirror that with content opacity: full during dwell, fade during
-  // transitions, so text "lands" and stays put before sliding away.
-  const inStart = (index - (1 - DWELL)) / N; // start of incoming transition
+  // slice the rail holds still for the first DWELL portion, then transitions
+  // out. Content opacity mirrors that — full during dwell, fading during
+  // transitions — so text "lands" and stays put before sliding away.
+  //
+  // Boundary panels (first/last) use 3-point curves so all input offsets
+  // stay within [0, 1] (framer-motion / WAAPI rejects negative offsets).
+  const isFirst = index === 0;
+  const isLast = index === N - 1;
+
   const dwellStart = index / N;
   const dwellEnd = (index + DWELL) / N;
-  const outEnd = (index + 1) / N;
+  const inStart = Math.max(0, (index - (1 - DWELL)) / N);
+  const outEnd = Math.min(1, (index + 1) / N);
 
-  const contentOpacity = useTransform(
-    progress,
-    [inStart, dwellStart, dwellEnd, outEnd],
-    [0, 1, 1, 0]
-  );
-  const contentY = useTransform(
-    progress,
-    [inStart, dwellStart, dwellEnd, outEnd],
-    [40, 0, 0, -40]
-  );
-  const watermarkOpacity = useTransform(
-    progress,
-    [inStart, dwellStart, dwellEnd, outEnd],
-    [0, 0.06, 0.06, 0]
-  );
+  const inputs = isFirst
+    ? [0, dwellEnd, outEnd]
+    : isLast
+    ? [inStart, dwellStart, 1]
+    : [inStart, dwellStart, dwellEnd, outEnd];
+
+  const opacityOut = isFirst ? [1, 1, 0] : isLast ? [0, 1, 1] : [0, 1, 1, 0];
+  const yOut = isFirst ? [0, 0, -40] : isLast ? [40, 0, 0] : [40, 0, 0, -40];
+  const wmOut = isFirst
+    ? [0.06, 0.06, 0]
+    : isLast
+    ? [0, 0.06, 0.06]
+    : [0, 0.06, 0.06, 0];
+
+  const contentOpacity = useTransform(progress, inputs, opacityOut);
+  const contentY = useTransform(progress, inputs, yOut);
+  const watermarkOpacity = useTransform(progress, inputs, wmOut);
 
   // Big watermark text — year when present, otherwise the chapter number.
   const watermark = milestone.year && milestone.year !== "—" ? milestone.year : String(index + 1).padStart(2, "0");
