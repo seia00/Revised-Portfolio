@@ -102,7 +102,7 @@ export default function Timeline() {
         id="timeline"
         aria-label="My life — chapters"
         className="relative"
-        style={{ height: `${N * 200}vh` }}
+        style={{ height: `${N * 100}vh` }}
       >
         <div className="sticky top-0 h-screen w-screen overflow-hidden bg-ink">
           {/* Moving rail of panels */}
