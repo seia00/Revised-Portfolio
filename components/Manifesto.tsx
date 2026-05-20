@@ -114,7 +114,7 @@ export default function Manifesto() {
           className="absolute left-0 right-0 text-center font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 z-20"
           style={{ top: "38vh", opacity: opacities[0] }}
         >
-          ◇ Chapter v · manifesto
+          ◇ Chapter ii · manifesto
         </p>
 
         {/* Stacked sentence layers — all absolute-positioned in the same
@@ -152,8 +152,12 @@ function ManifestoLine({ text, opacity }: { text: string; opacity: number }) {
       }}
     >
       <span
-        className="font-inter font-light leading-[1.3] tracking-[-0.02em]"
-        style={{ fontSize: "clamp(1.8rem, 4vw, 3.2rem)" }}
+        className="leading-[1.3] tracking-[-0.02em]"
+        style={{
+          fontSize: "clamp(1.8rem, 4vw, 3.2rem)",
+          fontFamily: "'Quffer', 'Playfair Display', serif",
+          fontWeight: 400,
+        }}
       >
         <span
           style={{

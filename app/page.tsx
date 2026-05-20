@@ -12,16 +12,16 @@ export default function Home() {
 
       {/* divider — subtle vertical accent between chapters */}
       <Divider label="Chapter ii" />
-      <Timeline />
+      <Manifesto />
 
       <Divider label="Chapter iii" />
+      <Timeline />
+
+      <Divider label="Chapter iv" />
       <Activities />
 
-      <Divider label="Chapter iv" tone="warn" />
+      <Divider label="Chapter v" tone="warn" />
       <Friction />
-
-      <Divider label="Chapter v" />
-      <Manifesto />
 
       <Divider label="Chapter vi" />
       <Footer />

@@ -81,7 +81,7 @@ export default function Timeline() {
         <div className="max-w-[1080px] mx-auto">
           <div className="max-w-[680px]">
             <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 mb-6">
-              ◇ Chapter ii
+              ◇ Chapter iii
             </p>
             <h2 className="font-playfair italic font-medium text-fog leading-[1.02] tracking-[-0.02em] text-[clamp(46px,7vw,88px)]">
               My life,
@@ -263,7 +263,7 @@ function FixedOverlay({ chapter, percent, progress }: OverlayProps) {
       {/* Bottom cue */}
       <div className="mt-auto flex items-end justify-between p-6 md:p-8 lg:p-10">
         <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-fog-4">
-          ◇ My life · chapter ii
+          ◇ My life · chapter iii
         </span>
         <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-fog-3 flex items-center gap-2">
           Scroll

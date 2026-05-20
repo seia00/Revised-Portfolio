@@ -27,7 +27,7 @@ export default function Activities() {
             variants={fadeUp}
             className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 mb-6"
           >
-            ◇ Chapter iii / activities
+            ◇ Chapter iv / activities
           </motion.p>
           <motion.h2
             variants={fadeUp}

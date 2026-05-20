@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 
 const CHAPTERS = [
   { id: "hero",       label: "Origin",     numeral: "I"   },
-  { id: "timeline",   label: "Life",       numeral: "II"  },
-  { id: "activities", label: "Activities", numeral: "III" },
-  { id: "friction",   label: "Friction",   numeral: "IV"  },
-  { id: "manifesto",  label: "Manifesto",  numeral: "V"   },
+  { id: "manifesto",  label: "Manifesto",  numeral: "II"  },
+  { id: "timeline",   label: "Life",       numeral: "III" },
+  { id: "activities", label: "Activities", numeral: "IV"  },
+  { id: "friction",   label: "Friction",   numeral: "V"   },
   { id: "connect",    label: "Connect",    numeral: "VI"  },
 ] as const;
 

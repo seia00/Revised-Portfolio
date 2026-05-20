@@ -70,7 +70,7 @@ export default function Friction() {
           className="mb-20 md:mb-28"
         >
           <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-flame mb-6">
-            /// Chapter iv — friction
+            /// Chapter v — friction
           </p>
           <h2 className="font-anton uppercase text-fog leading-[0.78] tracking-[-0.01em] text-[clamp(72px,16vw,260px)]">
             Three things

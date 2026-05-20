@@ -1,6 +1,20 @@
 @import url('https://fonts.cdnfonts.com/css/8-bit-operator');
 @import "tailwindcss";
 
+/* Quffer — locally hosted commercial serif by TasiPas.
+   Drop the licensed file at /public/fonts/Quffer.woff2 (and optionally .woff). */
+@font-face {
+  font-family: "Quffer";
+  src:
+    url("/fonts/Quffer.woff2") format("woff2"),
+    url("/fonts/Quffer.woff")  format("woff"),
+    url("/fonts/Quffer.otf")   format("opentype"),
+    url("/fonts/Quffer.ttf")   format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   /* ── Font families (variables come from next/font in layout.tsx) ── */
   --font-syne: var(--font-syne);
