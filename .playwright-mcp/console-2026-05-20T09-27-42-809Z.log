@@ -1,0 +1,66 @@
+[    1049ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://fonts.cdnfonts.com/css/8-bit-operator:0
+[    1064ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[    1152ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[   32445ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[   32523ms] [LOG] [Fast Refresh] done in 156ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_VALUE: glTexStorage2D: Texture dimensions must all be greater than zero. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glClear: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glClearBufferfv: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElementsInstanced: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElementsInstanced: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32539ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32545ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32545ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32545ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32545ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32545ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32545ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32545ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glClear: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glClearBufferfv: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElementsInstanced: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElementsInstanced: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawElements: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
+[   32546ms] [WARNING] [.WebGL-0x11c004aea00] GL_INVALID_FRAMEBUFFER_OPERATION: glDrawArrays: Framebuffer is incomplete: Attachment has zero size. @ http://localhost:3000/:0
