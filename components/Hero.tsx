@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { fadeUp, staggerParent } from "@/lib/motion";
+import SplineHero from "./SplineHero";
 
 const stats = [
   { label: "Currently", value: "Year 10 · Shibuya Makuhari" },
@@ -43,16 +44,23 @@ export default function Hero() {
           ◣ Seia Funayama · Chiba, Japan
         </motion.p>
 
-        {/* Name — Funayama broken to Funa- / yama. so the descender side
-            stays inside the viewport on every breakpoint. */}
-        <motion.h1
+        {/* Name + Spline asset — side by side on desktop, stacked on mobile. */}
+        <motion.div
           variants={fadeUp}
-          className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(56px,11vw,160px)] mb-16"
+          className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,500px)] gap-8 lg:gap-12 items-center mb-16"
         >
-          <span className="block">Seia</span>
-          <span className="block text-fog/30 -mt-1">Funa</span>
-          <span className="block text-fog/30 -mt-1">yama.</span>
-        </motion.h1>
+          {/* Name — broken across three lines for compact cascading. */}
+          <h1 className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(56px,10vw,150px)]">
+            <span className="block">Seia</span>
+            <span className="block text-fog/30 -mt-1">Funa</span>
+            <span className="block text-fog/30 -mt-1">yama.</span>
+          </h1>
+
+          {/* Spline 3D asset */}
+          <div className="hidden lg:block">
+            <SplineHero />
+          </div>
+        </motion.div>
 
         {/* Centerpiece quote */}
         <motion.figure

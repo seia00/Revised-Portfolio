@@ -34,7 +34,7 @@ export default function Footer() {
 
       <div className="relative max-w-[1100px] mx-auto">
         {/* Tiny pixel eyebrow */}
-        <p className="font-pixelify text-[13px] tracking-[0.2em] text-undertale mb-8">
+        <p className="font-8bit text-[13px] tracking-[0.2em] text-undertale mb-8">
           [ CHAPTER · V ] &gt;&gt; CONNECT
         </p>
 
@@ -50,7 +50,7 @@ export default function Footer() {
             LET&apos;S CONNECT
             <span aria-hidden className="blink text-undertale">_</span>
           </h2>
-          <p className="font-pixelify text-[13px] md:text-[14px] tracking-[0.18em] text-fog-3 mt-6">
+          <p className="font-8bit text-[13px] md:text-[14px] tracking-[0.18em] text-fog-3 mt-6">
             * PRESS START TO PLAY
           </p>
         </div>
@@ -64,10 +64,10 @@ export default function Footer() {
 
         {/* Lower HUD strip */}
         <div className="mt-8 border-2 border-fog/40 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
-          <span className="font-pixelify text-[13px] tracking-[0.18em] text-fog-3">
+          <span className="font-8bit text-[13px] tracking-[0.18em] text-fog-3">
             * P1 · SEIA FUNAYAMA · MMXXVI
           </span>
-          <span className="font-pixelify text-[13px] tracking-[0.18em] text-fog-3">
+          <span className="font-8bit text-[13px] tracking-[0.18em] text-fog-3">
             HI-SCORE: <span className="text-undertale">∞</span>
           </span>
         </div>
@@ -116,7 +116,7 @@ function SocialRow({ social }: { social: Social }) {
       {/* Asterisk — Undertale narration prefix */}
       <span
         aria-hidden
-        className={`font-pixelify text-xl md:text-2xl leading-none transition-colors ${
+        className={`font-8bit text-xl md:text-2xl leading-none transition-colors ${
           hover ? "text-undertale" : "text-fog-2"
         }`}
       >
@@ -124,7 +124,7 @@ function SocialRow({ social }: { social: Social }) {
       </span>
 
       {/* Platform label — pixel font, fixed width-ish */}
-      <span className="font-pixelify text-[13px] md:text-[15px] tracking-[0.18em] text-fog group-hover:text-undertale transition-colors min-w-[120px] md:min-w-[150px]">
+      <span className="font-8bit text-[13px] md:text-[15px] tracking-[0.18em] text-fog group-hover:text-undertale transition-colors min-w-[120px] md:min-w-[150px]">
         {social.label}
       </span>
 
@@ -137,7 +137,7 @@ function SocialRow({ social }: { social: Social }) {
       <motion.span
         animate={hover ? { x: 2 } : { x: 0 }}
         transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-        className={`font-pixelify text-[12px] md:text-[13px] tracking-[0.15em] px-3 py-2 border-2 shrink-0 ${
+        className={`font-8bit text-[12px] md:text-[13px] tracking-[0.15em] px-3 py-2 border-2 shrink-0 ${
           hover
             ? "border-undertale text-undertale bg-undertale/10"
             : "border-fog-4 text-fog-3"

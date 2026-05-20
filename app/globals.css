@@ -1,3 +1,4 @@
+@import url('https://fonts.cdnfonts.com/css/8-bit-operator');
 @import "tailwindcss";
 
 @theme inline {
@@ -11,6 +12,7 @@
   --font-press-start: var(--font-press-start);
   --font-vt323: var(--font-vt323);
   --font-pixelify: var(--font-pixelify);
+  --font-8bit: '8-bit Operator', 'Courier New', monospace;
 
   /* ── Dark palette ── */
   --color-ink: #06070a;
