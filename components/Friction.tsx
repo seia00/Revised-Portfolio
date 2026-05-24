@@ -72,7 +72,7 @@ export default function Friction() {
           <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-flame mb-6">
             /// Chapter v — friction
           </p>
-          <h2 className="font-anton uppercase text-fog leading-[0.78] tracking-[-0.01em] text-[clamp(72px,16vw,260px)]">
+          <h2 className="font-anton uppercase text-fog leading-[0.78] tracking-[-0.01em] text-[clamp(44px,14vw,260px)]">
             Three things
             <br />
             <span className="text-flame">I&nbsp;cannot&nbsp;stand.</span>

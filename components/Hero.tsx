@@ -34,10 +34,11 @@ export default function Hero() {
         <div className="absolute inset-x-0 bottom-0 h-[36vh] bg-gradient-to-b from-transparent to-ink" />
       </div>
 
-      {/* large faint mark — sits behind the dark overlay so it whispers */}
+      {/* large faint mark — hidden on mobile (it crowds the top edge);
+          on tablets+ it whispers behind the dark overlay. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-[10%] -right-[6%] text-[40vw] leading-none font-syne font-bold text-white/[0.015] select-none tracking-tighter z-0"
+        className="hidden md:block pointer-events-none absolute -top-[10%] -right-[6%] text-[40vw] leading-none font-syne font-bold text-white/[0.015] select-none tracking-tighter z-0"
       >
         SF
       </div>

@@ -124,14 +124,15 @@ function SocialRow({ social }: { social: Social }) {
         *
       </span>
 
-      {/* Platform label — pixel font, fixed width-ish */}
-      <span className="font-8bit text-[13px] md:text-[15px] tracking-[0.18em] text-fog group-hover:text-flame transition-colors min-w-[120px] md:min-w-[150px]">
-        {social.label}
-      </span>
-
-      {/* Handle — VT323, larger, readable */}
-      <span className="font-vt323 text-fog-2 text-xl md:text-2xl flex-1 min-w-0 truncate group-hover:text-fog transition-colors">
-        {social.handle}
+      {/* Label + handle — stacked on mobile so the handle isn't squashed
+          to 0px by the flex layout; side-by-side on md+. */}
+      <span className="flex flex-col md:flex-row md:items-baseline md:gap-5 flex-1 min-w-0">
+        <span className="font-8bit text-[11px] md:text-[15px] tracking-[0.18em] text-fog group-hover:text-flame transition-colors md:min-w-[150px]">
+          {social.label}
+        </span>
+        <span className="font-vt323 text-fog-2 text-base md:text-2xl flex-1 min-w-0 truncate group-hover:text-fog transition-colors">
+          {social.handle}
+        </span>
       </span>
 
       {/* CTA chip — [ PRESS ] or [ COPY ] */}

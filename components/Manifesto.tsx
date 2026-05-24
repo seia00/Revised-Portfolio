@@ -23,10 +23,9 @@ const SENTENCES = [
 
 const N = SENTENCES.length;
 const STEPS = N + 1;             // step 0 = chapter eyebrow, 1..N = sentences
-const SECTION_VH = STEPS * 100;  // total vertical scroll length
 
-// Smoothstep — eases linear distance into a soft S-curve so each sentence
-// "breathes" at full opacity instead of snapping at its peak.
+// Smoothstep — eases linear into a soft S-curve so the fade-in/out
+// feels like a held breath, not a snap.
 function smoothstep(x: number): number {
   return x * x * (3 - 2 * x);
 }
@@ -64,13 +63,17 @@ export default function Manifesto() {
     };
   }, []);
 
-  // For each step, peak at its center, fade to 0 at neighbor centers.
-  // smoothstep gives a soft hold around the peak — feels like breathing.
+  // Each step owns its own zone with NO crossfade overlap into neighbours
+  // — overlapping wrapped sentences turn into visual mush on mobile.
+  // Trapezoid: fade in over first 15%, hold flat for 70%, fade out over
+  // final 15%. At zone boundaries both adjacent sentences are at 0 — a
+  // brief film-cut to black, which reads as cinematic.
   const opacities = Array.from({ length: STEPS }, (_, i) => {
-    const center = (i + 0.5) / STEPS;
-    const dist = Math.abs(progress - center) * STEPS;
-    if (dist >= 1) return 0;
-    return smoothstep(1 - dist);
+    const local = (progress - i / STEPS) * STEPS;
+    if (local < 0 || local > 1) return 0;
+    if (local < 0.15) return smoothstep(local / 0.15);
+    if (local > 0.85) return smoothstep((1 - local) / 0.15);
+    return 1;
   });
 
   return (
@@ -78,9 +81,15 @@ export default function Manifesto() {
       ref={sectionRef}
       id="manifesto"
       aria-label="Manifesto"
-      className="relative"
-      style={{ height: `${SECTION_VH}vh`, backgroundColor: "#000" }}
+      className="manifesto-section relative"
+      style={{ backgroundColor: "#000" }}
     >
+      {/* Responsive scroll length — long on desktop for cinematic weight,
+          shorter on mobile so the section isn't a 6000px commitment. */}
+      <style>{`
+        .manifesto-section { height: ${STEPS * 100}vh; }
+        @media (max-width: 768px) { .manifesto-section { height: ${STEPS * 70}vh; } }
+      `}</style>
       {/* Soft seam blends — feathers the section edges into surrounding ink */}
       <div
         aria-hidden
