@@ -47,7 +47,7 @@ export default function MusicPrompt() {
 
   function play() {
     if (!audioRef.current) {
-      audioRef.current = new Audio("/swim.mp3");
+      audioRef.current = new Audio("/NT.mp3");
       audioRef.current.loop = true;
     }
     audioRef.current.play().catch(() => {});
@@ -112,7 +112,7 @@ export default function MusicPrompt() {
           <div className="flex items-center gap-3 mb-8 pb-6 border-b border-edge">
             <Equalizer playing />
             <span className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-2">
-              swim — BTS
+              national treasure — drake
             </span>
           </div>
 
@@ -122,7 +122,7 @@ export default function MusicPrompt() {
               onClick={play}
               className="flex items-center gap-2.5 px-5 py-2.5 rounded-md bg-electric text-ink font-jetbrains text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-electric-soft transition-colors cursor-pointer"
             >
-              <PlayIcon /> Play swim
+              <PlayIcon /> Play national treasure
             </button>
             <button
               onClick={() => setPhase("dismissed")}
@@ -167,7 +167,7 @@ export default function MusicPrompt() {
         {/* Label + progress */}
         <div className="flex flex-col gap-1">
           <span className="font-jetbrains text-[8px] tracking-[0.22em] uppercase text-fog-2">
-            swim — BTS
+            national treasure — drake
           </span>
           <div className="w-24 h-px bg-edge-2 rounded-full overflow-hidden">
             <div

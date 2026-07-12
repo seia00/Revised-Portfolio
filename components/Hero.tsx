@@ -12,7 +12,7 @@ const stats = [
     value: "Studying ML · Finetuning LLMs · Gunpla · Hardware tinkering",
   },
   { label: "Favorite food", value: "Meat" },
-  { label: "On loop", value: "Swim — BTS" },
+  { label: "On loop", value: "National Treasure — Drake" },
 ];
 
 export default function Hero() {
