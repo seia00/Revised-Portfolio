@@ -52,13 +52,21 @@ body {
   color: #e6e8ec;
 }
 
-/* Subtle mesh-gradient backdrop, layered above the flat ink fill */
-body {
+/* Subtle mesh-gradient backdrop, layered above the flat ink fill.
+   Painted on a fixed-position pseudo-element instead of
+   `background-attachment: fixed` — the latter forces the browser to
+   repaint the gradients on every scroll frame; this layer paints once
+   and is composited. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(ellipse 60% 50% at 18% 0%, rgba(91, 141, 255, 0.10), transparent 60%),
     radial-gradient(ellipse 50% 40% at 82% 25%, rgba(255, 107, 61, 0.04), transparent 60%),
     radial-gradient(ellipse 40% 30% at 50% 80%, rgba(91, 141, 255, 0.06), transparent 60%);
-  background-attachment: fixed;
   background-repeat: no-repeat;
 }
 
