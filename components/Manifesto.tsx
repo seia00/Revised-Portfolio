@@ -5,20 +5,17 @@ import { useEffect, useRef } from "react";
 /**
  * Manifesto — Chapter II.
  *
- * Scroll-driven cinematic text reveal. Seven sentences each occupy 100vh of
- * scroll; an extra step at the top is reserved for the chapter eyebrow.
- * Sentences cross-fade via opacity tied to scroll progress (no animation
+ * Scroll-driven cinematic text reveal. Each sentence occupies one scroll
+ * step; an extra step at the top is reserved for the chapter eyebrow.
+ * Sentences fade via opacity tied to scroll progress (no animation
  * library — plain scroll listener throttled with requestAnimationFrame).
  */
 
 const SENTENCES = [
   "My name is Seia Funayama. I'm 15, based in Japan, working at the intersection of AI and software development.",
-  "I'm very opinionated — and I'm never afraid to back it up.",
-  "I love surrounding myself with hungry and extreme people.",
-  "I truly believe that life was made to live on the edge.",
-  "I'm aiming to make $10,000 from my first online business this summer.",
-  "I am so ahead of everyone at my age. I am never afraid to try new things.",
-  "If I sound like someone you'd like to work with — I'm always open.",
+  "I'm an ambitious teenager, constantly pushing the limits in all of my endeavors.",
+  "I'm aiming to reach $10,000 MRR this summer.",
+  "I'm never afraid to try new things. My DMs are always open.",
 ];
 
 const N = SENTENCES.length;
