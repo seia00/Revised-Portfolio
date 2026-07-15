@@ -6,9 +6,6 @@ import {
   JetBrains_Mono,
   Anton,
   Space_Grotesk,
-  Press_Start_2P,
-  VT323,
-  Pixelify_Sans,
 } from "next/font/google";
 import "./globals.css";
 import MusicPrompt from "@/components/MusicPrompt";
@@ -56,27 +53,6 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-const pressStart = Press_Start_2P({
-  variable: "--font-press-start",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-});
-
-const vt323 = VT323({
-  variable: "--font-vt323",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-});
-
-const pixelify = Pixelify_Sans({
-  variable: "--font-pixelify",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "Seia Funayama",
   description:
@@ -89,7 +65,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${playfair.variable} ${inter.variable} ${jetbrains.variable} ${anton.variable} ${spaceGrotesk.variable} ${pressStart.variable} ${vt323.variable} ${pixelify.variable}`}
+      className={`${syne.variable} ${playfair.variable} ${inter.variable} ${jetbrains.variable} ${anton.variable} ${spaceGrotesk.variable}`}
     >
       <body className="min-h-screen bg-ink text-fog antialiased font-inter selection:bg-electric/30 selection:text-white">
         {children}

@@ -7,8 +7,7 @@ const CHAPTERS = [
   { id: "manifesto",  label: "Manifesto",  numeral: "II"  },
   { id: "timeline",   label: "Life",       numeral: "III" },
   { id: "activities", label: "Activities", numeral: "IV"  },
-  { id: "friction",   label: "Friction",   numeral: "V"   },
-  { id: "connect",    label: "Connect",    numeral: "VI"  },
+  { id: "connect",    label: "Connect",    numeral: "V"   },
 ] as const;
 
 export default function ChapterRail() {

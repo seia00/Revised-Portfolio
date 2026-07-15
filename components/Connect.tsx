@@ -3,25 +3,40 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
-const ITEMS = [
+/**
+ * How To Connect — final chapter.
+ *
+ * Inherits the Friction section's visual system: harsh grid backdrop,
+ * violently large Anton headline, slabby /0X items with corner stamps,
+ * and the one-time entrance shake. Each item is a real link; hovering
+ * an item replays the shake on that card only.
+ */
+
+const CHANNELS = [
   {
     n: "01",
-    title: "PEOPLE THAT ARE ALL TALK",
-    body: "If you describe what you'll do more than you do it, the equation is broken.",
+    title: "INSTAGRAM",
+    handle: "@seiafunayama",
+    href: "https://instagram.com/seiafunayama",
+    external: true,
   },
   {
     n: "02",
-    title: "PHONIES",
-    body: "Holden Caulfield was onto something. You can spot it in the eyes before the mouth opens.",
+    title: "EMAIL",
+    handle: "seiafunayama@gmail.com",
+    href: "mailto:seiafunayama@gmail.com",
+    external: false,
   },
   {
     n: "03",
-    title: "VEGETABLES",
-    body: "Sorry.",
+    title: "LINKEDIN",
+    handle: "Seia Funayama",
+    href: "https://www.linkedin.com/in/seiafunayama/",
+    external: true,
   },
 ];
 
-export default function Friction() {
+export default function Connect() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { margin: "-30% 0px -30% 0px", once: true });
   const [shaking, setShaking] = useState(false);
@@ -35,10 +50,10 @@ export default function Friction() {
   }, [inView]);
 
   return (
-    <section
+    <footer
       ref={ref}
-      id="friction"
-      aria-label="What I don't like"
+      id="connect"
+      aria-label="How to connect"
       className={`relative px-6 md:px-10 lg:px-16 py-40 md:py-56 overflow-hidden ${
         shaking ? "friction-shake" : ""
       }`}
@@ -53,12 +68,12 @@ export default function Friction() {
         }}
       />
 
-      {/* red tape strip top-left */}
+      {/* tape strip top-left */}
       <div
         aria-hidden
         className="absolute -left-6 top-32 rotate-[-4deg] bg-flame text-ink font-anton uppercase tracking-[0.18em] text-[11px] px-6 py-1.5 select-none"
       >
-        ※ Caution · raw section ahead ※
+        ※ Signal open · reach out ※
       </div>
 
       <div className="max-w-[1200px] mx-auto relative z-10">
@@ -70,20 +85,20 @@ export default function Friction() {
           className="mb-20 md:mb-28"
         >
           <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-flame mb-6">
-            /// Chapter v — friction
+            /// Chapter v — how to connect
           </p>
           <h2 className="font-anton uppercase text-fog leading-[0.78] tracking-[-0.01em] text-[clamp(44px,14vw,260px)]">
-            Three things
+            How to
             <br />
-            <span className="text-flame">I&nbsp;cannot&nbsp;stand.</span>
+            <span className="text-flame">connect.</span>
           </h2>
         </motion.div>
 
-        {/* items — slabby, hard-edged cards with skewed accents */}
+        {/* channels — slabby, hard-edged link cards */}
         <ul className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y-2 border-fog">
-          {ITEMS.map((it, idx) => (
+          {CHANNELS.map((c, idx) => (
             <motion.li
-              key={it.n}
+              key={c.n}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{
@@ -91,33 +106,40 @@ export default function Friction() {
                 duration: 0.55,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className={`relative p-8 md:p-10 ${
-                idx !== ITEMS.length - 1
+              className={
+                idx !== CHANNELS.length - 1
                   ? "border-r-0 md:border-r-2 border-b-2 md:border-b-0 border-fog"
                   : ""
-              }`}
+              }
             >
-              <span className="font-anton uppercase block text-flame text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
-                /{it.n}
-              </span>
-              <h3 className="font-anton uppercase text-fog text-3xl md:text-4xl leading-[0.95] mb-5 tracking-[-0.005em]">
-                {it.title}
-              </h3>
-              <p className="font-jetbrains text-fog-2 text-[13px] leading-[1.65] max-w-[280px]">
-                {it.body}
-              </p>
-
-              {/* corner stamp */}
-              <span
-                aria-hidden
-                className="absolute top-3 right-3 font-jetbrains text-[9px] tracking-[0.18em] uppercase text-fog-4"
+              <a
+                href={c.href}
+                target={c.external ? "_blank" : undefined}
+                rel={c.external ? "noopener noreferrer" : undefined}
+                className="connect-item relative block p-8 md:p-10 h-full"
               >
-                no.{it.n}
-              </span>
+                <span className="font-anton uppercase block text-flame text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
+                  /{c.n}
+                </span>
+                <h3 className="font-anton uppercase text-fog text-3xl md:text-4xl leading-[0.95] mb-5 tracking-[-0.005em]">
+                  {c.title}
+                </h3>
+                <p className="font-jetbrains text-fog-2 text-[13px] leading-[1.65] max-w-[280px] break-words">
+                  {c.handle}
+                </p>
+
+                {/* corner stamp */}
+                <span
+                  aria-hidden
+                  className="absolute top-3 right-3 font-jetbrains text-[9px] tracking-[0.18em] uppercase text-fog-4"
+                >
+                  no.{c.n}
+                </span>
+              </a>
             </motion.li>
           ))}
         </ul>
       </div>
-    </section>
+    </footer>
   );
 }

@@ -1,4 +1,3 @@
-@import url('https://fonts.cdnfonts.com/css/8-bit-operator');
 @import "tailwindcss";
 
 /* Quffer — locally hosted commercial serif by TasiPas.
@@ -23,10 +22,6 @@
   --font-jetbrains: var(--font-jetbrains);
   --font-anton: var(--font-anton);
   --font-space-grotesk: var(--font-space-grotesk);
-  --font-press-start: var(--font-press-start);
-  --font-vt323: var(--font-vt323);
-  --font-pixelify: var(--font-pixelify);
-  --font-8bit: '8-bit Operator', 'Courier New', monospace;
 
   /* ── Dark palette ── */
   --color-ink: #06070a;
@@ -42,8 +37,6 @@
   --color-electric: #5b8dff;
   --color-electric-soft: #7faaff;
   --color-flame: #ff6b3d;
-  --color-undertale: #ffd900;
-  --color-undertale-soft: #ffe14a;
 }
 
 html,
@@ -109,22 +102,9 @@ body::before {
   animation: friction-shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-/* ── Gamified Connect helpers ─────────────────────────────────── */
-@keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-.blink {
-  animation: blink 1.1s steps(1, end) infinite;
-}
-
-/* Stepped/pixelated outline using two box-shadows (4-corner cross) */
-.pixel-border {
-  box-shadow:
-    0 -2px 0 0 currentColor,
-    0 2px 0 0 currentColor,
-    -2px 0 0 0 currentColor,
-    2px 0 0 0 currentColor;
+/* Connect items replay the shake on hover — per card, not the section. */
+.connect-item:hover {
+  animation: friction-shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 /* ── Minimalist ring cursor ─────────────────────────────────── */
@@ -197,17 +177,6 @@ body::before {
 .eq-bar-3 { animation-name: eq-bar-3; animation-duration: 0.75s; }
 .eq-bar-4 { animation-name: eq-bar-4; animation-duration: 1.15s; }
 .eq-paused .eq-bar { animation-play-state: paused; }
-
-/* Subtle CRT scanlines overlay */
-.crt-scanlines {
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 0.02) 0px,
-    rgba(255, 255, 255, 0.02) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-}
 
 /* Reduced-motion respect */
 @media (prefers-reduced-motion: reduce) {
