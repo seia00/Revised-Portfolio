@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerParent } from "@/lib/motion";
+import { hasFired, onSignal } from "@/lib/boot";
 import SplineHero from "./SplineHero";
 
 const stats = [
@@ -16,6 +18,11 @@ const stats = [
 ];
 
 export default function Hero() {
+  // Hold the entrance cascade until the loading screen has lifted —
+  // otherwise it plays out behind the curtain and the hero just appears.
+  const [revealed, setRevealed] = useState(() => hasFired("reveal"));
+  useEffect(() => onSignal("reveal", () => setRevealed(true)), []);
+
   return (
     <section
       id="hero"
@@ -45,7 +52,7 @@ export default function Hero() {
 
       <motion.div
         initial="hidden"
-        animate="visible"
+        animate={revealed ? "visible" : "hidden"}
         variants={staggerParent}
         className="max-w-[1280px] mx-auto w-full relative z-10"
       >
@@ -103,7 +110,7 @@ export default function Hero() {
       {/* scroll cue */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={{ opacity: revealed ? 1 : 0 }}
         transition={{ delay: 1.2, duration: 0.6 }}
         className="absolute left-6 md:left-10 lg:left-16 bottom-10 flex items-center gap-3 text-fog-3"
         aria-hidden

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Suspense, useEffect, useRef, useState } from "react";
 import type { Application } from "@splinetool/runtime";
+import { signal } from "@/lib/boot";
 
 // Lazy-load Spline so the ~MB-sized three.js runtime doesn't block initial
 // page render. Server-side rendering is disabled because Spline draws on a
@@ -47,11 +48,21 @@ export default function SplineHero() {
       // Static poster: identical look, zero GPU, and the ~1MB runtime
       // chunk is never downloaded.
       setMode("poster");
+      signal("scene");
       return;
     }
 
     const el = wrapRef.current;
-    if (!el) return;
+    if (!el) {
+      signal("scene");
+      return;
+    }
+
+    // Below `md` the hero canvas is display:none, so nothing will ever
+    // boot — release the loading screen right away rather than making
+    // phones sit through its timeout. The observer is still wired up so a
+    // resize past the breakpoint mounts the scene as usual.
+    if (el.getClientRects().length === 0) signal("scene");
 
     let cancelled = false;
     const mount = () => { if (!cancelled) setMode("live"); };
@@ -162,6 +173,7 @@ export default function SplineHero() {
                 }
                 app.setZoom(ZOOM);
                 setReady(true);
+                signal("scene");
                 // Apply current visibility state (user may have scrolled
                 // past the hero before the runtime finished booting).
                 syncRef.current?.();

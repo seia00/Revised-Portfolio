@@ -148,35 +148,145 @@ body::before {
   transform: translate(-50%, -50%) scale(1.1);
 }
 
-/* ── Equalizer animation (used by MusicPrompt) ─────────────── */
-@keyframes eq-bar-1 {
-  0%, 100% { transform: scaleY(0.30); }
-  50%      { transform: scaleY(0.95); }
+/* ── Loading screen ─────────────────────────────────────────────
+   Jet-black curtain with a cobalt script wordmark. The trailing
+   letters sit inside `.ls-slide`, clipped flush with the S's right
+   edge, and are parked underneath the S by a runtime-measured --dx
+   (a script face has no predictable advance widths). Releasing the
+   transition slides each one out into place, one at a time. */
+
+.ls-root {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+  transition: opacity 750ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-@keyframes eq-bar-2 {
-  0%, 100% { transform: scaleY(0.75); }
-  50%      { transform: scaleY(0.20); }
+.ls-root[data-phase="exit"] {
+  opacity: 0;
+  pointer-events: none;
 }
-@keyframes eq-bar-3 {
-  0%, 100% { transform: scaleY(0.50); }
-  25%      { transform: scaleY(0.95); }
-  75%      { transform: scaleY(0.30); }
+
+.ls-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 750ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-@keyframes eq-bar-4 {
-  0%, 100% { transform: scaleY(0.85); }
-  50%      { transform: scaleY(0.40); }
+.ls-root[data-phase="exit"] .ls-inner {
+  transform: scale(1.05);
 }
-.eq-bar {
-  transform-origin: bottom center;
-  animation-duration: 0.9s;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
+
+/* Cobalt bloom behind the wordmark — fades up with the letters. */
+.ls-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(94vw, 820px);
+  height: min(94vw, 820px);
+  translate: -50% -50%;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(0, 71, 171, 0.34),
+    rgba(0, 71, 171, 0) 62%
+  );
+  opacity: 0;
+  transition: opacity 1600ms ease-out;
 }
-.eq-bar-1 { animation-name: eq-bar-1; animation-duration: 0.85s; }
-.eq-bar-2 { animation-name: eq-bar-2; animation-duration: 1.05s; }
-.eq-bar-3 { animation-name: eq-bar-3; animation-duration: 0.75s; }
-.eq-bar-4 { animation-name: eq-bar-4; animation-duration: 1.15s; }
-.eq-paused .eq-bar { animation-play-state: paused; }
+.ls-inner.is-go .ls-glow {
+  opacity: 1;
+}
+
+.ls-word {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
+  font-family: var(--font-great-vibes), "Snell Roundhand", "Apple Chancery", cursive;
+  font-size: clamp(84px, 18vw, 240px);
+  line-height: 1.25;
+  color: #0047ab;
+  text-shadow:
+    0 0 36px rgba(0, 71, 171, 0.6),
+    0 0 96px rgba(0, 71, 171, 0.3);
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+}
+.ls-inner.is-set .ls-word {
+  opacity: 1;
+}
+
+.ls-cap {
+  position: relative;
+  z-index: 5;
+  opacity: 0;
+  transform: translateY(0.06em) scale(0.94);
+  transition:
+    opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ls-inner.is-go .ls-cap {
+  opacity: 1;
+  transform: none;
+}
+
+/* The reveal edge. Left inset is slightly negative so it sits *inside* the
+   S's exit swash rather than at its advance edge — script lowercase carries
+   an entry stroke that starts left of its own box, and clipping flush would
+   shave it off. The other insets are negative purely so ascenders,
+   descenders and the final swash aren't cut. LoadingScreen reads the
+   computed left inset back to decide how far to park each letter. */
+.ls-slide {
+  display: inline-flex;
+  align-items: baseline;
+  clip-path: inset(-0.45em -1.5em -0.45em -0.26em);
+}
+/* Letters are home — pull the edge clear of the wordmark so the clipped
+   bloom stops drawing a seam beside the S. */
+.ls-inner.is-settled .ls-slide {
+  clip-path: inset(-0.45em -1.5em -0.45em -3em);
+  transition: clip-path 450ms ease-out;
+}
+
+/* No transition in the parked state — --dx is written from JS, and a
+   transition here would animate the letter *into* its hiding place instead
+   of out of it. The transition only exists in the is-go style, which is
+   enough for the browser to animate the change into it. */
+.ls-letter {
+  position: relative;
+  transform: translateX(var(--dx, 0px));
+}
+.ls-inner.is-go .ls-letter {
+  transform: translateX(0);
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--d, 0ms);
+}
+
+/* Hairline that draws under the settled wordmark. */
+.ls-rule {
+  width: clamp(140px, 26vw, 320px);
+  height: 1px;
+  margin-top: 0.6rem;
+  background: linear-gradient(
+    to right,
+    rgba(0, 71, 171, 0),
+    #0047ab 22%,
+    #0047ab 78%,
+    rgba(0, 71, 171, 0)
+  );
+  transform: scaleX(0);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 1500ms;
+}
+.ls-inner.is-go .ls-rule {
+  transform: scaleX(1);
+}
 
 /* Reduced-motion respect */
 @media (prefers-reduced-motion: reduce) {
