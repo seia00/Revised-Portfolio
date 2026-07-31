@@ -9,6 +9,7 @@ import SplineHero from "./SplineHero";
 const stats = [
   { label: "Currently", value: "Year 10 · Shibuya Makuhari" },
   { label: "Building", value: "AXYZ · Kythera Ventures" },
+  { label: "ECs", value: "Competitive speech & debate" },
   {
     label: "Hobbies",
     value: "Studying ML · Finetuning LLMs · Gunpla · Hardware tinkering",
@@ -92,7 +93,7 @@ export default function Hero() {
         {/* Stats grid */}
         <motion.dl
           variants={fadeUp}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-edge border border-edge rounded-lg overflow-hidden"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-edge border border-edge rounded-lg overflow-hidden"
         >
           {stats.map((s) => (
             <div key={s.label} className="bg-ink p-5 md:p-6">

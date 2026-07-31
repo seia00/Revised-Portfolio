@@ -27,7 +27,9 @@ export default function DebateAccordion() {
               onClick={() => toggle(year)}
               aria-expanded={isOpen}
               aria-controls={`debate-${year}-panel`}
-              className="w-full flex items-center justify-between gap-6 px-5 md:px-7 py-5 md:py-6 text-left hover:bg-edge/60 transition-colors group"
+              /* px matches the cards' p-7/p-9 so every body text in the
+                 section starts on the same left rail. */
+              className="w-full flex items-center justify-between gap-6 px-7 md:px-9 py-6 md:py-7 text-left hover:bg-edge/60 transition-colors group"
             >
               <div className="flex items-baseline gap-5">
                 <span className="font-syne font-bold text-fog text-2xl md:text-3xl tracking-tight">
@@ -85,7 +87,7 @@ export default function DebateAccordion() {
         );
       })}
     </div>
-    <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-4 mt-4 pl-1">
+    <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-4 mt-4">
       ⋯ and many more across the circuit
     </p>
     </>
@@ -94,7 +96,7 @@ export default function DebateAccordion() {
 
 function AwardRow({ award }: { award: Award }) {
   return (
-    <li className="grid grid-cols-[1fr_auto] items-baseline gap-4 px-5 md:px-7 py-3.5">
+    <li className="grid grid-cols-[1fr_auto] items-baseline gap-4 px-7 md:px-9 py-3.5">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="font-inter font-medium text-fog text-[14.5px]">
           {award.tournament}

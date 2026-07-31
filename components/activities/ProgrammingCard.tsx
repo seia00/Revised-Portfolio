@@ -13,7 +13,7 @@ export default function ProgrammingCard() {
       <motion.div
         whileHover={{ y: -2 }}
         transition={{ duration: 0.3 }}
-        className="group relative border border-edge rounded-xl p-7 md:p-9 bg-ink-2/40 backdrop-blur-sm overflow-hidden"
+        className="group relative flex h-full flex-col border border-edge rounded-xl p-7 md:p-9 bg-ink-2/40 backdrop-blur-sm overflow-hidden"
       >
         {/* faint number watermark */}
         <span
@@ -32,9 +32,13 @@ export default function ProgrammingCard() {
           </span>
         </header>
 
-        <h3 className="font-syne font-extrabold uppercase tracking-[-0.025em] text-fog text-3xl md:text-4xl leading-[0.95] mb-5">
+        {/* Holds 3xl until lg: md turns this into a two-column grid, so the
+            card is at its *narrowest* exactly where md:text-4xl used to kick
+            in — the headline overflowed and overflow-hidden clipped it. No
+            nbsp either; it has to stay breakable at that width. */}
+        <h3 className="font-syne font-extrabold uppercase tracking-[-0.025em] text-fog text-3xl lg:text-4xl leading-[0.95] mb-5">
           Code, shipped &amp;<br />
-          in&nbsp;progress.
+          in progress.
         </h3>
 
         <p className="font-inter text-fog-2 text-[14.5px] leading-[1.7] max-w-[440px] mb-9">
@@ -43,9 +47,11 @@ export default function ProgrammingCard() {
           things like EN2U.
         </p>
 
+        {/* mt-auto pins the CTA to the card floor, so this card and the NPO
+            card beside it share a baseline however their copy lengths differ. */}
         <button
           onClick={() => setOpen(true)}
-          className="relative inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-fog px-5 py-3.5 border border-edge-2 rounded-full hover:border-electric hover:text-electric-soft transition-colors"
+          className="relative mt-auto self-start inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-fog px-5 py-3.5 border border-edge-2 rounded-full hover:border-electric hover:text-electric-soft transition-colors"
         >
           <span>Click to view projects</span>
           <span

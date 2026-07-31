@@ -82,7 +82,7 @@ export default function Connect() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.45 }}
-          className="mb-20 md:mb-28"
+          className="mb-28 md:mb-40"
         >
           <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-flame mb-6">
             /// Chapter v — how to connect

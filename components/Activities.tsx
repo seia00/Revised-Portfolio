@@ -7,6 +7,23 @@ import NpoCard from "./activities/NpoCard";
 import KytheraCard from "./activities/KytheraCard";
 import { fadeUp, staggerParent } from "@/lib/motion";
 
+/*
+ * Vertical rhythm for this section, in one place so the four groups stay
+ * legible as four groups:
+ *
+ *   GAP_IN     label → its own card. Tight, so the pair reads as one unit.
+ *   GAP_OUT    group → next group. ~6x GAP_IN. Anything close to GAP_IN and
+ *              the groups merge into one undifferentiated stack of boxes.
+ *   header → first group is larger still, so the section opening outranks
+ *   the divisions inside it.
+ *
+ * Every box edge, section label and card body also has to land on the same
+ * left rail — that means no horizontal insets out here, and matching inner
+ * padding on the accordion rows and the cards (see DebateAccordion).
+ */
+const GAP_IN = "mb-4";
+const GAP_OUT = "mb-24 md:mb-32";
+
 export default function Activities() {
   return (
     <section
@@ -21,7 +38,7 @@ export default function Activities() {
           whileInView="visible"
           viewport={{ once: true, margin: "-15% 0px" }}
           variants={staggerParent}
-          className="mb-20 md:mb-28 max-w-[720px]"
+          className="mb-28 md:mb-40 max-w-[720px]"
         >
           <motion.p
             variants={fadeUp}
@@ -52,9 +69,9 @@ export default function Activities() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
           transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-6"
+          className={GAP_OUT}
         >
-          <div className="flex items-baseline justify-between mb-5 px-1">
+          <div className={`flex items-baseline justify-between ${GAP_IN}`}>
             <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
               Debate
             </h3>
@@ -66,14 +83,18 @@ export default function Activities() {
         </motion.div>
 
         {/* — Programming card + NPO card row — */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {/* gap-y matches GAP_OUT: below md these two stop being a row and
+            become two more groups in the stack. */}
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 gap-x-6 lg:gap-x-8 gap-y-24 ${GAP_OUT}`}
+        >
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-10% 0px" }}
             transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="flex items-baseline justify-between mb-5 px-1">
+            <div className={`flex items-baseline justify-between ${GAP_IN}`}>
               <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
                 Programming
               </h3>
@@ -89,7 +110,7 @@ export default function Activities() {
             viewport={{ once: true, margin: "-10% 0px" }}
             transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="flex items-baseline justify-between mb-5 px-1">
+            <div className={`flex items-baseline justify-between ${GAP_IN}`}>
               <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
                 NPO Work
               </h3>
@@ -108,7 +129,7 @@ export default function Activities() {
           viewport={{ once: true, margin: "-10% 0px" }}
           transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="flex items-baseline justify-between mb-5 px-1">
+          <div className={`flex items-baseline justify-between ${GAP_IN}`}>
             <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
               Kythera Ventures
             </h3>
