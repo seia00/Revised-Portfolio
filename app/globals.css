@@ -163,7 +163,7 @@ body::before {
   place-items: center;
   overflow: hidden;
   background: #000;
-  transition: opacity 750ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 850ms cubic-bezier(0.7, 0, 0.84, 0);
 }
 .ls-root[data-phase="exit"] {
   opacity: 0;
@@ -175,32 +175,40 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 750ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform 850ms cubic-bezier(0.7, 0, 0.84, 0),
+    filter 850ms cubic-bezier(0.7, 0, 0.84, 0);
 }
+/* Exit: the wordmark rushes the viewer and dissolves. */
 .ls-root[data-phase="exit"] .ls-inner {
-  transform: scale(1.05);
+  transform: scale(1.28);
+  filter: blur(16px);
 }
 
-/* Cobalt bloom behind the wordmark — fades up with the letters. */
+/* Cobalt bloom behind the wordmark — swells open with the letters. */
 .ls-glow {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(94vw, 820px);
-  height: min(94vw, 820px);
+  width: min(96vw, 1100px);
+  height: min(96vw, 1100px);
   translate: -50% -50%;
   border-radius: 9999px;
   pointer-events: none;
   background: radial-gradient(
     circle,
-    rgba(0, 71, 171, 0.34),
+    rgba(0, 71, 171, 0.42),
     rgba(0, 71, 171, 0) 62%
   );
   opacity: 0;
-  transition: opacity 1600ms ease-out;
+  scale: 0.55;
+  transition:
+    opacity 1800ms ease-out,
+    scale 2200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .ls-inner.is-go .ls-glow {
   opacity: 1;
+  scale: 1;
 }
 
 .ls-word {
@@ -209,12 +217,15 @@ body::before {
   align-items: baseline;
   white-space: nowrap;
   font-family: var(--font-great-vibes), "Snell Roundhand", "Apple Chancery", cursive;
-  font-size: clamp(84px, 18vw, 240px);
+  font-size: clamp(120px, 26vw, 360px);
   line-height: 1.25;
   color: #0047ab;
+  /* Great Vibes ships one weight, so weight comes from an outline stroke.
+     Proportional to the font size so it holds up from phone to desktop. */
+  -webkit-text-stroke: 0.013em #0047ab;
   text-shadow:
-    0 0 36px rgba(0, 71, 171, 0.6),
-    0 0 96px rgba(0, 71, 171, 0.3);
+    0 0 44px rgba(0, 71, 171, 0.7),
+    0 0 130px rgba(0, 71, 171, 0.35);
   opacity: 0;
   transition: opacity 400ms ease-out;
 }
@@ -222,18 +233,32 @@ body::before {
   opacity: 1;
 }
 
+/* One pulse of light as the wordmark completes. */
+@keyframes ls-flare {
+  0% { filter: brightness(1); }
+  22% { filter: brightness(1.7); }
+  100% { filter: brightness(1); }
+}
+.ls-inner.is-settled .ls-word {
+  animation: ls-flare 1000ms ease-out both;
+}
+
+/* The S drops in out of a blur, oversized, and pulls back to size. */
 .ls-cap {
   position: relative;
   z-index: 5;
   opacity: 0;
-  transform: translateY(0.06em) scale(0.94);
+  transform: scale(1.55) translateY(0.05em);
+  filter: blur(0.09em);
   transition:
-    opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 800ms ease-out,
+    transform 1200ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 900ms ease-out;
 }
 .ls-inner.is-go .ls-cap {
   opacity: 1;
   transform: none;
+  filter: blur(0);
 }
 
 /* The reveal edge. Left inset is slightly negative so it sits *inside* the
@@ -245,44 +270,52 @@ body::before {
 .ls-slide {
   display: inline-flex;
   align-items: baseline;
-  clip-path: inset(-0.45em -1.5em -0.45em -0.26em);
+  clip-path: inset(-0.6em -1.5em -0.6em -0.26em);
 }
 /* Letters are home — pull the edge clear of the wordmark so the clipped
    bloom stops drawing a seam beside the S. */
 .ls-inner.is-settled .ls-slide {
-  clip-path: inset(-0.45em -1.5em -0.45em -3em);
+  clip-path: inset(-0.6em -1.5em -0.6em -3em);
   transition: clip-path 450ms ease-out;
 }
 
 /* No transition in the parked state — --dx is written from JS, and a
    transition here would animate the letter *into* its hiding place instead
    of out of it. The transition only exists in the is-go style, which is
-   enough for the browser to animate the change into it. */
+   enough for the browser to animate the change into it.
+
+   The letter launches stretched and smeared, overshoots its mark, then
+   snaps back — the overshoot easing carries scaleX below 1 on the way in,
+   which lands as a squash. */
 .ls-letter {
   position: relative;
-  transform: translateX(var(--dx, 0px));
+  transform: translateX(var(--dx, 0px)) scaleX(1.2);
+  filter: blur(0.05em);
 }
 .ls-inner.is-go .ls-letter {
-  transform: translateX(0);
-  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(0) scaleX(1);
+  filter: blur(0);
+  transition:
+    transform 720ms cubic-bezier(0.3, 1.45, 0.5, 1),
+    filter 480ms ease-out;
   transition-delay: var(--d, 0ms);
 }
 
 /* Hairline that draws under the settled wordmark. */
 .ls-rule {
-  width: clamp(140px, 26vw, 320px);
+  width: clamp(180px, 32vw, 440px);
   height: 1px;
-  margin-top: 0.6rem;
+  margin-top: 0.8rem;
   background: linear-gradient(
     to right,
     rgba(0, 71, 171, 0),
-    #0047ab 22%,
-    #0047ab 78%,
+    #4d7fe0 22%,
+    #4d7fe0 78%,
     rgba(0, 71, 171, 0)
   );
   transform: scaleX(0);
-  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: 1500ms;
+  transition: transform 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 1400ms;
 }
 .ls-inner.is-go .ls-rule {
   transform: scaleX(1);

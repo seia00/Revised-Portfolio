@@ -19,19 +19,20 @@ const TRAIL = ["e", "i", "a"];
 // Choreography, in ms. Letters move strictly one at a time — they end at
 // different x, so a later letter always overtakes an earlier one, and
 // overlapping travel reads as a scramble rather than a sequence.
-const S_SETTLE = 260;
-const SLIDE = 600;
-const STAGGER = 460;
-const HOLD = 400;
+const S_SETTLE = 520;
+const SLIDE = 720;
+const STAGGER = 480;
+// Beat to sit on the finished wordmark before the curtain lifts.
+const HOLD = 1000;
 // When the last letter reaches its place.
 const SETTLED = S_SETTLE + STAGGER * (TRAIL.length - 1) + SLIDE;
 const MIN_VISIBLE = SETTLED + HOLD;
 
 // Ceiling on how long we'll wait for the 3D scene before lifting anyway.
-const SCENE_TIMEOUT = 4500;
+const SCENE_TIMEOUT = 5000;
 // Ceiling on how long we'll wait for the script face before measuring.
 const FONT_TIMEOUT = 1500;
-const EXIT = 750;
+const EXIT = 850;
 
 type Phase = "loading" | "exit" | "done";
 
@@ -49,37 +50,51 @@ export default function LoadingScreen() {
     let raf = 0;
     let settle = 0;
 
-    const start = () => {
-      if (cancelled || started) return;
-      const inner = innerRef.current;
+    // Park the trailing letters underneath the S. Re-runnable: the font size
+    // is viewport-derived, so a resize (or a rotation) mid-curtain would
+    // otherwise leave the letters parked against stale metrics — visible,
+    // and short of the S. Harmless once they've left: from then on the is-go
+    // rule pins them at translateX(0) and --dx no longer participates.
+    const measure = () => {
       const word = wordRef.current;
       const cap = capRef.current;
       const slide = trailRefs.current[0]?.parentElement;
-      if (!inner || !word || !cap || !slide) return;
-      started = true;
+      if (!word || !cap || !slide) return;
 
-      // The S carries a settle transform, so its client rect is the *scaled*
-      // box — go through offsetLeft for its true laid-out left edge.
-      const wordLeft = word.getBoundingClientRect().left;
-      const capLeft = wordLeft + cap.offsetLeft;
+      // Everything here works in the word's own coordinate space via
+      // offsetLeft. Client rects would be wrong: the S and the letters both
+      // carry entrance transforms, so their rects are the *transformed*
+      // boxes, not where the type actually sits.
+      const capLeft = cap.offsetLeft;
       // The reveal edge: anything left of this is hidden by `.ls-slide`. Its
       // clip-path leans a little left of the box, so read the resolved inset
       // back rather than assuming the box edge.
       const inset = getComputedStyle(slide).clipPath.match(/-?[\d.]+px/g);
-      const clipLeft =
-        slide.getBoundingClientRect().left + (inset ? parseFloat(inset[3]) : 0);
-      // Slack for the ink a script glyph throws past its own advance width.
-      const bleed = parseFloat(getComputedStyle(word).fontSize) * 0.2;
+      const clipLeft = slide.offsetLeft + (inset ? parseFloat(inset[3]) : 0);
+      // Slack for everything a glyph throws past its own advance width:
+      // script overhang, the launch stretch, the motion blur, the stroke.
+      const bleed = parseFloat(getComputedStyle(word).fontSize) * 0.25;
 
       trailRefs.current.forEach((el, i) => {
         if (!el) return;
-        const box = el.getBoundingClientRect();
         // Park at the S's left edge, but never so far right that any part of
         // the glyph pokes past the reveal edge before it starts moving.
-        const dx = Math.min(capLeft - box.left, clipLeft - box.right - bleed);
+        const dx = Math.min(
+          capLeft - el.offsetLeft,
+          clipLeft - (el.offsetLeft + el.offsetWidth) - bleed
+        );
         el.style.setProperty("--dx", `${dx}px`);
         el.style.setProperty("--d", `${S_SETTLE + i * STAGGER}ms`);
       });
+    };
+
+    const start = () => {
+      if (cancelled || started) return;
+      const inner = innerRef.current;
+      if (!inner) return;
+      started = true;
+
+      measure();
 
       // Reveal the parked layout, let it paint, *then* release the transitions.
       inner.classList.add("is-set");
@@ -105,11 +120,14 @@ export default function LoadingScreen() {
       start();
     });
 
+    window.addEventListener("resize", measure);
+
     return () => {
       cancelled = true;
       clearTimeout(fallback);
       clearTimeout(settle);
       cancelAnimationFrame(raf);
+      window.removeEventListener("resize", measure);
     };
   }, []);
 
