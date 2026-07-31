@@ -301,11 +301,12 @@ body::before {
 }
 
 /* ── Loading screen ─────────────────────────────────────────────
-   Jet-black curtain with a cobalt script wordmark. The trailing
-   letters sit inside `.ls-slide`, clipped flush with the S's right
-   edge, and are parked underneath the S by a runtime-measured --dx
-   (a script face has no predictable advance widths). Releasing the
-   transition slides each one out into place, one at a time.
+   Electric-blue curtain with an acid-green script wordmark. The
+   trailing letters sit inside `.ls-slide`, clipped flush with the
+   S's right edge, and are parked underneath the S by a
+   runtime-measured --dx (a script face has no predictable advance
+   widths). Releasing the transition slides each one out into place,
+   one at a time.
 
    PERFORMANCE CONTRACT: every animated property below is `transform`
    or `opacity`, and every animated element is layer-promoted with
@@ -340,7 +341,9 @@ body::before {
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #000;
+  /* Deep electric curtain — gives the acid wordmark something to bite
+     into. On exit the curtain dissolves to reveal the field page beneath. */
+  background: var(--color-electric-deep);
   /* Even cross-dissolve. easeInExpo held full opacity then dropped it all
      at once, which is the abrupt part you feel at the end. */
   transition: opacity 1000ms cubic-bezier(0.4, 0, 0.3, 1);
@@ -376,7 +379,7 @@ body::before {
   will-change: transform;
 }
 
-/* Cobalt bloom behind the wordmark — swells open with the letters. */
+/* Acid bloom behind the wordmark — swells open with the letters. */
 .ls-glow,
 .ls-flare {
   position: absolute;
@@ -392,8 +395,8 @@ body::before {
 .ls-glow {
   background: radial-gradient(
     circle,
-    rgba(10, 63, 168, 0.52),
-    rgba(10, 63, 168, 0) 62%
+    rgba(198, 242, 78, 0.52),
+    rgba(198, 242, 78, 0) 62%
   );
   transform: translate(-50%, -50%) scale(0.5);
   /* Deliberately outlasts the letters: the bloom is still opening after the
@@ -413,8 +416,8 @@ body::before {
 .ls-flare {
   background: radial-gradient(
     circle,
-    rgba(169, 199, 255, 0.5),
-    rgba(169, 199, 255, 0) 45%
+    rgba(198, 242, 78, 0.5),
+    rgba(198, 242, 78, 0) 45%
   );
   transform: translate(-50%, -50%) scale(0.72);
 }
@@ -436,14 +439,14 @@ body::before {
   font-family: var(--font-great-vibes), "Snell Roundhand", "Apple Chancery", cursive;
   font-size: clamp(120px, 26vw, 360px);
   line-height: 1.25;
-  color: var(--color-electric-deep);
+  color: var(--color-acid);
   /* Great Vibes ships one weight, so weight comes from an outline stroke.
      Proportional to the font size so it holds up from phone to desktop. */
-  -webkit-text-stroke: 0.013em var(--color-electric-deep);
+  -webkit-text-stroke: 0.013em var(--color-acid);
   /* Deliberately tight. A wide halo has to be re-rasterized whenever the
      layer is re-rastered, and its clipped edge is what used to draw a seam
      beside the S. The broad bloom comes from .ls-glow instead. */
-  text-shadow: 0 0 26px rgba(10, 63, 168, 0.85);
+  text-shadow: 0 0 26px rgba(198, 242, 78, 0.85);
   opacity: 0;
 }
 /* No transition — this only hides the single frame between mount and
@@ -468,7 +471,7 @@ body::before {
 /* Warm-up. A fully transparent element isn't painted, so the S's layer —
    a 360px glyph with a stroke and a halo — would otherwise rasterize on the
    first frame of its own fade, and drop it. This paints the layer during the
-   is-set beat instead. Invisible: 1.5% cobalt on black. */
+   is-set beat instead. Invisible: 1.5% acid on electric-deep. */
 .ls-inner.is-set .ls-cap {
   opacity: 0.015;
 }
@@ -530,10 +533,10 @@ body::before {
   margin-top: 0.8rem;
   background: linear-gradient(
     to right,
-    rgba(10, 63, 168, 0),
-    var(--color-electric-dim) 22%,
-    var(--color-electric-dim) 78%,
-    rgba(10, 63, 168, 0)
+    rgba(198, 242, 78, 0),
+    rgba(198, 242, 78, 0.7) 22%,
+    rgba(198, 242, 78, 0.7) 78%,
+    rgba(198, 242, 78, 0)
   );
   transform: scaleX(0);
   transition: transform 1900ms var(--ls-settle);
