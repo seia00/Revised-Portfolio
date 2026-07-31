@@ -581,18 +581,4 @@ body {
   display: none;
 }
 
-/* Custom scrollbar so it doesn't look like white default on dark */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(14, 19, 5, 0.18);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(14, 19, 5, 0.32);
-}
+ 
