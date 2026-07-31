@@ -32,10 +32,10 @@ export default function Hero() {
     >
       {/* Background layers — sun emblem, legibility scrim, bottom fade. */}
       <div aria-hidden className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Rising off the right edge. Centred in the first viewport-height
+        {/* Sun emblem, anchored near the right edge. Centred in the first viewport-height
             rather than in the section — the stats grid makes the hero far
             taller than the screen, so `top-1/2` would sink it below the fold. */}
-        <div className="absolute top-0 h-screen -right-[26%] md:-right-[8%] flex items-center">
+        <div className="absolute top-0 h-screen -right-[18%] md:right-[2%] flex items-center">
           <SunEmblem />
         </div>
         {/* Scrim. Solid under the type, fully clear by the time it reaches
