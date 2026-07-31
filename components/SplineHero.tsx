@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { Suspense, useEffect, useRef, useState } from "react";
 import type { Application } from "@splinetool/runtime";
-import { signal } from "@/lib/boot";
+import { onSignal, signal } from "@/lib/boot";
 
 // Lazy-load Spline so the ~MB-sized three.js runtime doesn't block initial
 // page render. Server-side rendering is disabled because Spline draws on a
@@ -24,6 +24,11 @@ const RENDER_SCALE = 0.5;
 // value is tuned so the orbital geometry fills the hero like the approved
 // design (previously achieved with a wasteful 220% canvas crop).
 const ZOOM = 5.5;
+
+// Longest we'll wait on the loading curtain's "stage" signal before booting
+// anyway. Comfortably past when the curtain fires it, so this only matters if
+// the curtain isn't rendered at all.
+const STAGE_FALLBACK = 3500;
 
 type Mode = "pending" | "live" | "poster";
 
@@ -65,24 +70,43 @@ export default function SplineHero() {
     if (el.getClientRects().length === 0) signal("scene");
 
     let cancelled = false;
+    let offStage = () => {};
     const mount = () => { if (!cancelled) setMode("live"); };
+    // Short leash: the "stage" gate below has already picked the quiet
+    // moment, so idle here is only about yielding to a task already in
+    // flight. A long timeout would just sit on its hands — and the curtain
+    // is waiting on this boot to finish before it lifts.
+    const schedule = () => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(mount, { timeout: 200 });
+      } else {
+        setTimeout(mount, 0);
+      }
+    };
+
+    // Booting the runtime is a long main-thread task — importing the chunk,
+    // decoding the scene, compiling shaders. Held back until the loading
+    // curtain has finished writing its wordmark, otherwise that work lands
+    // mid-animation and stutters it. The timer is a backstop in case the
+    // curtain isn't in the tree; whichever fires first wins, and `mount` is
+    // idempotent.
+    const gate = () => {
+      offStage = onSignal("stage", schedule);
+      setTimeout(schedule, STAGE_FALLBACK);
+    };
 
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           io.disconnect();
-          if ("requestIdleCallback" in window) {
-            window.requestIdleCallback(mount, { timeout: 1200 });
-          } else {
-            setTimeout(mount, 400);
-          }
+          gate();
         }
       },
       { rootMargin: "300px" }
     );
     io.observe(el);
 
-    return () => { cancelled = true; io.disconnect(); };
+    return () => { cancelled = true; io.disconnect(); offStage(); };
   }, []);
 
   // Set by the lifecycle effect below; called from onLoad so a late-booting

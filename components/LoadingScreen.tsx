@@ -47,15 +47,21 @@ export default function LoadingScreen() {
   useEffect(() => {
     let cancelled = false;
     let started = false;
+    let launched = false;
     let raf = 0;
     let settle = 0;
 
-    // Park the trailing letters underneath the S. Re-runnable: the font size
-    // is viewport-derived, so a resize (or a rotation) mid-curtain would
-    // otherwise leave the letters parked against stale metrics — visible,
-    // and short of the S. Harmless once they've left: from then on the is-go
-    // rule pins them at translateX(0) and --dx no longer participates.
+    // Park the trailing letters underneath the S. Re-runnable, because the
+    // font size is viewport-derived: a resize (or a rotation) before the
+    // letters launch would otherwise leave them parked against stale metrics
+    // — visible, and short of the S.
+    //
+    // Strictly before launch, though. Afterwards the is-go rule pins every
+    // letter at translateX(0), so --dx has nothing left to say, and reading
+    // the reveal edge back once is-settled has widened it would compute a
+    // parking spot from the wrong geometry.
     const measure = () => {
+      if (launched) return;
       const word = wordRef.current;
       const cap = capRef.current;
       const slide = trailRefs.current[0]?.parentElement;
@@ -100,25 +106,41 @@ export default function LoadingScreen() {
       inner.classList.add("is-set");
       raf = requestAnimationFrame(() => {
         raf = requestAnimationFrame(() => {
-          if (!cancelled) inner.classList.add("is-go");
+          if (cancelled) return;
+          launched = true;
+          inner.classList.add("is-go");
         });
       });
 
-      // Once everyone's home, widen the reveal edge back out. It cuts the
-      // letters' bloom while it's doing its job, which leaves a seam down the
-      // middle of the finished wordmark.
+      // Once everyone's home: drop the reveal edge (it clips the letters'
+      // halo into a seam beside the S), pulse the flare, and release the
+      // heavy work that's been waiting for a quiet main thread.
       settle = window.setTimeout(() => {
-        if (!cancelled) inner.classList.add("is-settled");
+        if (cancelled) return;
+        inner.classList.add("is-settled");
+        signal("stage");
       }, SETTLED);
     };
 
     // A script face has wildly different metrics from the fallback, so the
-    // measurement is only meaningful once the real font is in.
+    // measurement is only meaningful once the real font is in. Wait on that
+    // one face specifically — `document.fonts.ready` would also block on the
+    // five body faces the curtain doesn't use, which delays the whole
+    // sequence for nothing.
     const fallback = setTimeout(start, FONT_TIMEOUT);
-    document.fonts.ready.then(() => {
-      clearTimeout(fallback);
-      start();
-    });
+    const scriptFace = () => {
+      const word = wordRef.current;
+      if (!word) return Promise.resolve();
+      const cs = getComputedStyle(word);
+      const face = cs.fontFamily.split(",")[0].trim();
+      return document.fonts.load(`${cs.fontSize} ${face}`);
+    };
+    scriptFace()
+      .catch(() => {})
+      .then(() => {
+        clearTimeout(fallback);
+        start();
+      });
 
     window.addEventListener("resize", measure);
 
@@ -188,6 +210,7 @@ export default function LoadingScreen() {
     >
       <div ref={innerRef} className="ls-inner">
         <div className="ls-glow" aria-hidden />
+        <div className="ls-flare" aria-hidden />
 
         <div ref={wordRef} className="ls-word" aria-hidden>
           <span ref={capRef} className="ls-cap">

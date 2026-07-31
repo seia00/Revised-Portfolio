@@ -1,9 +1,12 @@
 /**
  * Boot signalling between the loading screen and the components it waits on.
  *
- * Two one-shot signals, each with a module-level latch so a late subscriber
+ * Three one-shot signals, each with a module-level latch so a late subscriber
  * still fires immediately:
  *
+ *   stage  — the loading screen has finished writing its wordmark. Long
+ *            main-thread work should wait for this: booting WebGL on top of
+ *            the curtain animation is what makes it stutter.
  *   scene  — the Spline hero has finished booting (or has opted out: poster
  *            mode, or the canvas is display:none on mobile). The loader waits
  *            on this so the 3D scene is painted before the curtain lifts.
@@ -12,10 +15,15 @@
  *            cascade isn't wasted behind the curtain.
  */
 
-type Signal = "scene" | "reveal";
+type Signal = "stage" | "scene" | "reveal";
 
-const fired: Record<Signal, boolean> = { scene: false, reveal: false };
+const fired: Record<Signal, boolean> = {
+  stage: false,
+  scene: false,
+  reveal: false,
+};
 const waiting: Record<Signal, Set<() => void>> = {
+  stage: new Set(),
   scene: new Set(),
   reveal: new Set(),
 };
