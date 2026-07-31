@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerParent } from "@/lib/motion";
 import { hasFired, onSignal } from "@/lib/boot";
-import SplineHero from "./SplineHero";
+import SunEmblem from "./SunEmblem";
 
 const stats = [
   { label: "Currently", value: "Year 10 · Shibuya Makuhari" },
@@ -30,25 +30,26 @@ export default function Hero() {
       aria-label="Hero"
       className="relative min-h-screen flex flex-col justify-center px-6 md:px-10 lg:px-16 py-32 overflow-hidden"
     >
-      {/* Background layers — Spline scene, dark tint, bottom fade. */}
-      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
-        {/* Spline (desktop/tablet only) */}
-        <div className="hidden md:block absolute inset-0">
-          <SplineHero />
+      {/* Background layers — sun emblem, legibility scrim, bottom fade. */}
+      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Rising off the right edge. Centred in the first viewport-height
+            rather than in the section — the stats grid makes the hero far
+            taller than the screen, so `top-1/2` would sink it below the fold. */}
+        <div className="absolute top-0 h-screen -right-[26%] md:-right-[8%] flex items-center">
+          <SunEmblem />
         </div>
-        {/* Subtle dark overlay over the scene so text stays legible */}
-        <div className="absolute inset-0 bg-ink/30" />
-        {/* Bottom fade into ink — smooth transition to the next section */}
-        <div className="absolute inset-x-0 bottom-0 h-[36vh] bg-gradient-to-b from-transparent to-ink" />
-      </div>
-
-      {/* large faint mark — hidden on mobile (it crowds the top edge);
-          on tablets+ it whispers behind the dark overlay. */}
-      <div
-        aria-hidden
-        className="hidden md:block pointer-events-none absolute -top-[10%] -right-[6%] text-[40vw] leading-none font-syne font-bold text-white/[0.015] select-none tracking-tighter z-0"
-      >
-        SF
+        {/* Scrim. Solid under the type, fully clear by the time it reaches
+            the emblem — a gradient that lingers across the sun greys the
+            indigo out and makes it look dirty rather than distant. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to right, var(--color-field) 0%, var(--color-field) 36%, transparent 72%)",
+          }}
+        />
+        {/* Bottom fade into the field — seam into the next chapter. */}
+        <div className="absolute inset-x-0 bottom-0 h-[36vh] bg-gradient-to-b from-transparent to-field" />
       </div>
 
       <motion.div
@@ -60,33 +61,33 @@ export default function Hero() {
         {/* Eyebrow */}
         <motion.p
           variants={fadeUp}
-          className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-fog-3 mb-10"
+          className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-ink-3 mb-10"
         >
-          <span className="text-flame">◣</span> Seia Funayama · Chiba, Japan
+          <span className="text-electric-deep">◣</span> Seia Funayama · Chiba, Japan
         </motion.p>
 
         {/* Name — broken across three lines for compact cascading. */}
         <motion.h1
           variants={fadeUp}
-          className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-fog text-[clamp(56px,11vw,160px)] mb-16"
+          className="font-syne font-extrabold uppercase leading-[0.86] tracking-[-0.04em] text-ink text-[clamp(56px,11vw,160px)] mb-16"
         >
           <span className="block">Seia</span>
-          <span className="block text-fog/30 -mt-1">Funa</span>
-          <span className="block text-fog/30 -mt-1">yama<span className="text-flame">.</span></span>
+          <span className="block text-ink/30 -mt-1">Funa</span>
+          <span className="block text-ink/30 -mt-1">yama<span className="text-electric-deep">.</span></span>
         </motion.h1>
 
         {/* Centerpiece quote */}
         <motion.figure
           variants={fadeUp}
-          className="border-l-2 border-electric/80 pl-6 md:pl-10 mb-20 max-w-[920px]"
+          className="border-l-2 border-electric-deep pl-6 md:pl-10 mb-20 max-w-[920px]"
         >
-          <blockquote className="font-syne font-extrabold uppercase italic text-fog leading-[0.95] tracking-[-0.03em] text-[clamp(36px,5.5vw,68px)]">
+          <blockquote className="font-syne font-extrabold uppercase italic text-ink leading-[0.95] tracking-[-0.03em] text-[clamp(36px,5.5vw,68px)]">
             “Stay hungry,
             <br />
             stay foolish.”
           </blockquote>
-          <figcaption className="mt-5 font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3">
-            <span className="text-flame">—</span> Steve Jobs
+          <figcaption className="mt-5 font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ink-3">
+            <span className="text-ink-3">—</span> Steve Jobs
           </figcaption>
         </motion.figure>
 
@@ -96,11 +97,11 @@ export default function Hero() {
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-edge border border-edge rounded-lg overflow-hidden"
         >
           {stats.map((s) => (
-            <div key={s.label} className="bg-ink p-5 md:p-6">
-              <dt className="font-jetbrains text-[9.5px] tracking-[0.18em] uppercase text-fog-3 mb-2">
+            <div key={s.label} className="bg-field-2 p-5 md:p-6">
+              <dt className="font-jetbrains text-[9.5px] tracking-[0.18em] uppercase text-ink-3 mb-2">
                 {s.label}
               </dt>
-              <dd className="font-syne font-semibold uppercase tracking-tight text-fog text-[14px] md:text-[15px] leading-snug">
+              <dd className="font-syne font-semibold uppercase tracking-tight text-ink text-[14px] md:text-[15px] leading-snug">
                 {s.value}
               </dd>
             </div>
@@ -113,10 +114,10 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: revealed ? 1 : 0 }}
         transition={{ delay: 1.2, duration: 0.6 }}
-        className="absolute left-6 md:left-10 lg:left-16 bottom-10 flex items-center gap-3 text-fog-3"
+        className="absolute left-6 md:left-10 lg:left-16 bottom-10 flex items-center gap-3 text-ink-3"
         aria-hidden
       >
-        <span className="block h-px w-8 bg-flame" />
+        <span className="block h-px w-8 bg-electric-deep" />
         <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase">
           Scroll
         </span>

@@ -80,15 +80,15 @@ export default function Timeline() {
       <div className="px-6 md:px-10 lg:px-16 pt-40 md:pt-56 pb-24 md:pb-32">
         <div className="max-w-[1080px] mx-auto">
           <div className="max-w-[680px]">
-            <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 mb-6">
+            <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ink-3 mb-6">
               ◇ Chapter iii
             </p>
-            <h2 className="font-playfair italic font-medium text-fog leading-[1.02] tracking-[-0.02em] text-[clamp(46px,7vw,88px)]">
+            <h2 className="font-playfair italic font-medium text-ink leading-[1.02] tracking-[-0.02em] text-[clamp(46px,7vw,88px)]">
               My life,
               <br />
-              <span className="text-fog/40">thus far.</span>
+              <span className="text-ink/40">thus far.</span>
             </h2>
-            <p className="font-playfair text-fog-2 mt-8 text-lg md:text-xl leading-[1.6] max-w-[560px]">
+            <p className="font-playfair text-ink-2 mt-8 text-lg md:text-xl leading-[1.6] max-w-[560px]">
               Six waypoints that explain how I got here — and where I&apos;m
               pointed next. Keep scrolling to advance the chapters.
             </p>
@@ -104,7 +104,7 @@ export default function Timeline() {
         className="relative"
         style={{ height: `${N * 100}vh` }}
       >
-        <div className="sticky top-0 h-screen w-screen overflow-hidden bg-ink">
+        <div className="sticky top-0 h-screen w-screen overflow-hidden bg-field">
           {/* Moving rail of panels */}
           <motion.ol
             style={{ x }}
@@ -179,7 +179,7 @@ function ChapterPanel({ milestone, index, progress }: PanelProps) {
       <motion.span
         aria-hidden
         style={{ opacity: watermarkOpacity }}
-        className="absolute -bottom-6 md:-bottom-12 left-4 md:left-8 font-syne font-extrabold uppercase tracking-tighter text-fog leading-[0.8] select-none pointer-events-none"
+        className="absolute -bottom-6 md:-bottom-12 left-4 md:left-8 font-syne font-extrabold uppercase tracking-tighter text-ink leading-[0.8] select-none pointer-events-none"
       >
         <span className="block text-[28vw] md:text-[24vw]">{watermark}</span>
       </motion.span>
@@ -190,25 +190,25 @@ function ChapterPanel({ milestone, index, progress }: PanelProps) {
         className="relative z-10 max-w-[1100px] w-full"
       >
         {/* Chapter label */}
-        <p className="font-jetbrains text-[11px] md:text-[12px] tracking-[0.24em] uppercase text-fog-3 mb-8 md:mb-10">
+        <p className="font-jetbrains text-[11px] md:text-[12px] tracking-[0.24em] uppercase text-ink-3 mb-8 md:mb-10">
           ※ Chapter · {String(index + 1).padStart(2, "0")} ·{" "}
-          <span className="text-electric-soft">{milestone.place}</span>
+          <span className="text-electric-deep">{milestone.place}</span>
         </p>
 
         {/* Headline — Playfair italic, big-and-quiet editorial energy */}
-        <h3 className="font-playfair italic font-medium text-fog leading-[0.96] tracking-[-0.025em] mb-8 md:mb-10 text-[clamp(56px,10vw,148px)]">
+        <h3 className="font-playfair italic font-medium text-ink leading-[0.96] tracking-[-0.025em] mb-8 md:mb-10 text-[clamp(56px,10vw,148px)]">
           {milestone.title.replace(/\.$/, "")}
-          <span className="text-electric-soft">.</span>
+          <span className="text-electric-deep">.</span>
         </h3>
 
         {/* Body */}
-        <p className="font-playfair text-fog-2 leading-[1.55] max-w-[720px] text-[clamp(15px,1.5vw,22px)]">
+        <p className="font-playfair text-ink-2 leading-[1.55] max-w-[720px] text-[clamp(15px,1.5vw,22px)]">
           {milestone.body}
         </p>
 
         {/* Year tag (only when an actual year exists) */}
         {milestone.year && milestone.year !== "—" && (
-          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-fog-4 mt-10">
+          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-ink-3 mt-10">
             ◆ {milestone.year}
           </p>
         )}
@@ -236,25 +236,25 @@ function FixedOverlay({ chapter, percent, progress }: OverlayProps) {
       {/* Top bar */}
       <div className="flex items-start justify-between p-6 md:p-8 lg:p-10">
         {/* Brand mark */}
-        <span className="font-syne font-extrabold uppercase text-fog tracking-tighter text-base md:text-lg">
-          SF<span className="text-electric-soft">.</span>
+        <span className="font-syne font-extrabold uppercase text-ink tracking-tighter text-base md:text-lg">
+          SF<span className="text-electric-deep">.</span>
         </span>
 
         {/* Chapter counter + progress bar */}
         <div className="flex items-center gap-4 md:gap-5">
-          <span className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-2">
-            <span className="text-fog">
+          <span className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ink-2">
+            <span className="text-ink">
               {String(chapter + 1).padStart(2, "0")}
             </span>
-            <span className="text-fog-4"> / {String(N).padStart(2, "0")}</span>
+            <span className="text-ink-3"> / {String(N).padStart(2, "0")}</span>
           </span>
           <div className="hidden sm:block w-[120px] md:w-[160px] h-px bg-edge relative overflow-hidden">
             <motion.div
               style={{ width: barWidth }}
-              className="absolute inset-y-0 left-0 bg-electric shadow-[0_0_10px_rgba(91,141,255,0.7)]"
+              className="absolute inset-y-0 left-0 bg-electric-deep shadow-[0_0_10px_rgba(10,63,168,0.5)]"
             />
           </div>
-          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-4 tabular-nums">
+          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-4 tabular-nums">
             {String(percent).padStart(2, "0")}%
           </span>
         </div>
@@ -262,10 +262,10 @@ function FixedOverlay({ chapter, percent, progress }: OverlayProps) {
 
       {/* Bottom cue */}
       <div className="mt-auto flex items-end justify-between p-6 md:p-8 lg:p-10">
-        <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-fog-4">
+        <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-ink-4">
           ◇ My life · chapter iii
         </span>
-        <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-fog-3 flex items-center gap-2">
+        <span className="font-jetbrains text-[10px] tracking-[0.24em] uppercase text-ink-3 flex items-center gap-2">
           Scroll
           <span aria-hidden className="text-base">↓</span>
         </span>

@@ -13,21 +13,21 @@ export default function ProgrammingCard() {
       <motion.div
         whileHover={{ y: -2 }}
         transition={{ duration: 0.3 }}
-        className="group relative flex h-full flex-col border border-edge rounded-xl p-7 md:p-9 bg-ink-2/40 backdrop-blur-sm overflow-hidden"
+        className="group relative flex h-full flex-col border border-edge rounded-xl p-7 md:p-9 bg-field-2/40 backdrop-blur-sm overflow-hidden"
       >
         {/* faint number watermark */}
         <span
           aria-hidden
-          className="absolute -bottom-8 -right-2 font-syne font-extrabold text-[200px] leading-none text-white/[0.02] select-none"
+          className="absolute -bottom-8 -right-2 font-syne font-extrabold text-[200px] leading-none text-ink/[0.05] select-none"
         >
           /0
         </span>
 
         <header className="flex items-center justify-between mb-8">
-          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
+          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
             ◆ Programming · {PROJECTS.length} projects
           </span>
-          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric-soft">
+          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric-deep">
             archive
           </span>
         </header>
@@ -36,12 +36,12 @@ export default function ProgrammingCard() {
             card is at its *narrowest* exactly where md:text-4xl used to kick
             in — the headline overflowed and overflow-hidden clipped it. No
             nbsp either; it has to stay breakable at that width. */}
-        <h3 className="font-syne font-extrabold uppercase tracking-[-0.025em] text-fog text-3xl lg:text-4xl leading-[0.95] mb-5">
+        <h3 className="font-syne font-extrabold uppercase tracking-[-0.025em] text-ink text-3xl lg:text-4xl leading-[0.95] mb-5">
           Code, shipped &amp;<br />
           in progress.
         </h3>
 
-        <p className="font-inter text-fog-2 text-[14.5px] leading-[1.7] max-w-[440px] mb-9">
+        <p className="font-inter text-ink-2 text-[14.5px] leading-[1.7] max-w-[440px] mb-9">
           A small but deliberate stack of tools — AI for debaters, an
           open-source motion archive, and the infrastructure under
           things like EN2U.
@@ -51,12 +51,12 @@ export default function ProgrammingCard() {
             card beside it share a baseline however their copy lengths differ. */}
         <button
           onClick={() => setOpen(true)}
-          className="relative mt-auto self-start inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-fog px-5 py-3.5 border border-edge-2 rounded-full hover:border-electric hover:text-electric-soft transition-colors"
+          className="relative mt-auto self-start inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-ink px-5 py-3.5 border border-edge-2 rounded-full hover:border-electric-deep hover:text-electric-deep transition-colors"
         >
           <span>Click to view projects</span>
           <span
             aria-hidden
-            className="block w-1.5 h-1.5 rounded-full bg-electric shadow-[0_0_10px_rgba(91,141,255,0.8)]"
+            className="block w-1.5 h-1.5 rounded-full bg-electric-deep shadow-[0_0_10px_rgba(10,63,168,0.55)]"
           />
         </button>
       </motion.div>

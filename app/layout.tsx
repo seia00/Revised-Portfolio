@@ -78,7 +78,7 @@ export default function RootLayout({
       lang="en"
       className={`${syne.variable} ${playfair.variable} ${inter.variable} ${jetbrains.variable} ${anton.variable} ${spaceGrotesk.variable} ${greatVibes.variable}`}
     >
-      <body className="min-h-screen bg-ink text-fog antialiased font-inter selection:bg-electric/30 selection:text-white">
+      <body className="min-h-screen bg-field text-ink antialiased font-inter selection:bg-electric-deep selection:text-acid">
         <LoadingScreen />
         {children}
         <ChapterRail />

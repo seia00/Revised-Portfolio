@@ -47,7 +47,10 @@ export default function ChapterRail() {
   return (
     <nav
       aria-label="Chapter navigation"
-      className={`fixed top-6 right-6 md:top-8 md:right-8 z-40 hidden md:flex flex-col gap-3 transition-opacity duration-300 ${
+      /* Carries its own backdrop now. On the acid field it floats over
+         whatever a section puts behind it — the hero's indigo sunburst
+         especially — and unbacked mono at this weight disappears into it. */
+      className={`fixed top-6 right-6 md:top-8 md:right-8 z-40 hidden md:flex flex-col gap-3 rounded-lg border border-edge bg-field/70 px-4 py-3 backdrop-blur-md transition-opacity duration-300 ${
         hidden ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
@@ -66,14 +69,14 @@ export default function ChapterRail() {
               aria-hidden
               className={`h-px transition-all duration-300 ${
                 isActive
-                  ? "w-4 bg-electric-soft"
-                  : "w-2 bg-fog-4 group-hover:w-3 group-hover:bg-fog-3"
+                  ? "w-4 bg-electric-deep"
+                  : "w-2 bg-ink-3 group-hover:w-3 group-hover:bg-ink-2"
               }`}
             />
             {/* numeral */}
             <span
               className={`font-jetbrains text-[10px] tracking-[0.22em] uppercase tabular-nums transition-colors duration-200 ${
-                isActive ? "text-fog" : "text-fog-4 group-hover:text-fog-2"
+                isActive ? "text-ink" : "text-ink-3 group-hover:text-ink"
               }`}
             >
               {c.numeral.padEnd(3, " ")}
@@ -81,7 +84,7 @@ export default function ChapterRail() {
             {/* label */}
             <span
               className={`font-jetbrains text-[10px] tracking-[0.22em] uppercase transition-colors duration-200 ${
-                isActive ? "text-fog-2" : "text-fog-4 group-hover:text-fog-3"
+                isActive ? "text-ink-2" : "text-ink-3 group-hover:text-ink-2"
               }`}
             >
               {c.label}

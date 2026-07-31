@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { onSignal, signal } from "@/lib/boot";
+import { signal } from "@/lib/boot";
 
 /**
- * Full-bleed curtain that holds the page until the Spline hero has booted.
+ * Full-bleed curtain over the page while the wordmark writes itself.
  *
  * The wordmark writes itself: the capital S settles first, then e, i and a
  * slide out from behind it one at a time. The trailing letters live inside
@@ -16,25 +16,36 @@ import { onSignal, signal } from "@/lib/boot";
 
 const TRAIL = ["e", "i", "a"];
 
-// Choreography, in ms. Letters move strictly one at a time — they end at
-// different x, so a later letter always overtakes an earlier one, and
-// overlapping travel reads as a scramble rather than a sequence.
-const S_SETTLE = 520;
-const SLIDE = 720;
-const STAGGER = 480;
+// Choreography, in ms. Must stay in step with the durations in globals.css.
+//
+// The stagger is deliberately shorter than the slide, so a letter is always
+// launching while the one before it is still decelerating — there's no beat
+// where the wordmark is completely static. It can't shrink much further
+// though: all three start stacked behind the S and finish at different x, so
+// too much overlap has them visibly crossing each other.
+const S_SETTLE = 700;
+const SLIDE = 900;
+const STAGGER = 520;
 // Beat to sit on the finished wordmark before the curtain lifts.
 const HOLD = 1000;
-// When the last letter reaches its place.
+// When the last letter reaches its place, measured from the moment motion
+// starts — not from mount. Font loading and the warm-up sit in between.
 const SETTLED = S_SETTLE + STAGGER * (TRAIL.length - 1) + SLIDE;
-const MIN_VISIBLE = SETTLED + HOLD;
+// Paint-to-raster grace before releasing the first transition.
+const WARMUP = 120;
 
-// Ceiling on how long we'll wait for the 3D scene before lifting anyway.
-const SCENE_TIMEOUT = 5000;
+// Hard backstop in case measurement never runs — the page is frozen
+// behind the curtain until it lifts, so it must always lift.
+const STUCK_TIMEOUT = 6000;
 // Ceiling on how long we'll wait for the script face before measuring.
 const FONT_TIMEOUT = 1500;
-const EXIT = 850;
+const EXIT = 1000;
 
 type Phase = "loading" | "exit" | "done";
+
+function prefersReduced() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 export default function LoadingScreen() {
   const [phase, setPhase] = useState<Phase>("loading");
@@ -50,6 +61,23 @@ export default function LoadingScreen() {
     let launched = false;
     let raf = 0;
     let settle = 0;
+    let warmup = 0;
+    let exitTimer = 0;
+    let doneTimer = 0;
+    let lifted = false;
+
+    // Hold for `wait`, dissolve, unmount, then release the page.
+    const lift = (wait: number) => {
+      if (lifted || cancelled) return;
+      lifted = true;
+      exitTimer = window.setTimeout(() => {
+        setPhase("exit");
+        doneTimer = window.setTimeout(() => {
+          setPhase("done");
+          signal("reveal");
+        }, EXIT);
+      }, wait);
+    };
 
     // Park the trailing letters underneath the S. Re-runnable, because the
     // font size is viewport-derived: a resize (or a rotation) before the
@@ -102,24 +130,37 @@ export default function LoadingScreen() {
 
       measure();
 
-      // Reveal the parked layout, let it paint, *then* release the transitions.
+      // Reveal the parked layout, then hold for a warm-up beat before
+      // releasing the transitions. Two frames is enough to guarantee the
+      // start state has been *painted*, but not to guarantee the promoted
+      // layers have been rasterized — and the first frame of a move that
+      // still has to raster a 360px glyph is the frame that gets dropped.
+      // The screen is black throughout, so the wait costs nothing to look at.
       inner.classList.add("is-set");
-      raf = requestAnimationFrame(() => {
+      warmup = window.setTimeout(() => {
         raf = requestAnimationFrame(() => {
           if (cancelled) return;
           launched = true;
           inner.classList.add("is-go");
-        });
-      });
 
-      // Once everyone's home: drop the reveal edge (it clips the letters'
-      // halo into a seam beside the S), pulse the flare, and release the
-      // heavy work that's been waiting for a quiet main thread.
-      settle = window.setTimeout(() => {
-        if (cancelled) return;
-        inner.classList.add("is-settled");
-        signal("stage");
-      }, SETTLED);
+          // Everything downstream is timed from the moment motion actually
+          // starts, not from measurement — otherwise the warm-up eats into
+          // the hold and the flare fires while letters are still moving.
+          settle = window.setTimeout(
+            () => {
+              if (cancelled) return;
+              inner.classList.add("is-settled");
+              // Wordmark complete: hold on it, then lift. Nothing else to
+              // wait for — the hero is CSS now, so there's no scene boot to
+              // gate on the way there used to be.
+              lift(prefersReduced() ? 250 : HOLD);
+            },
+            // Under reduced motion the CSS durations collapse to nothing, so
+            // the wordmark is already complete — don't sit on a static screen.
+            prefersReduced() ? 0 : SETTLED
+          );
+        });
+      }, WARMUP);
     };
 
     // A script face has wildly different metrics from the fallback, so the
@@ -144,46 +185,20 @@ export default function LoadingScreen() {
 
     window.addEventListener("resize", measure);
 
+    // Backstop. If measurement never happens the curtain would sit there
+    // forever with the page frozen behind it, so lift regardless.
+    const cap = window.setTimeout(() => lift(0), STUCK_TIMEOUT);
+
     return () => {
       cancelled = true;
       clearTimeout(fallback);
       clearTimeout(settle);
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
-
-  // Lift the curtain once the scene is up (or we've waited long enough),
-  // never before the wordmark has finished writing itself.
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const floor = reduced ? 600 : MIN_VISIBLE;
-    const t0 = performance.now();
-    let claimed = false;
-    let exitTimer = 0;
-    let doneTimer = 0;
-
-    const lift = () => {
-      if (claimed) return;
-      claimed = true;
-      const wait = Math.max(0, floor - (performance.now() - t0));
-      exitTimer = window.setTimeout(() => {
-        setPhase("exit");
-        doneTimer = window.setTimeout(() => {
-          setPhase("done");
-          signal("reveal");
-        }, EXIT);
-      }, wait);
-    };
-
-    const off = onSignal("scene", lift);
-    const cap = setTimeout(lift, SCENE_TIMEOUT);
-
-    return () => {
-      off();
+      clearTimeout(warmup);
       clearTimeout(cap);
       clearTimeout(exitTimer);
       clearTimeout(doneTimer);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", measure);
     };
   }, []);
 
@@ -209,30 +224,35 @@ export default function LoadingScreen() {
       aria-label="Loading"
     >
       <div ref={innerRef} className="ls-inner">
-        <div className="ls-glow" aria-hidden />
-        <div className="ls-flare" aria-hidden />
+        {/* .ls-stage carries the constant camera push, separately from the
+            exit scale on .ls-inner — one element can't run an animation and
+            a transition on the same property. */}
+        <div className="ls-stage">
+          <div className="ls-glow" aria-hidden />
+          <div className="ls-flare" aria-hidden />
 
-        <div ref={wordRef} className="ls-word" aria-hidden>
-          <span ref={capRef} className="ls-cap">
-            S
-          </span>
-          <span className="ls-slide">
-            {TRAIL.map((ch, i) => (
-              <span
-                key={ch}
-                ref={(el) => {
-                  trailRefs.current[i] = el;
-                }}
-                className="ls-letter"
-                style={{ zIndex: TRAIL.length - i }}
-              >
-                {ch}
-              </span>
-            ))}
-          </span>
+          <div ref={wordRef} className="ls-word" aria-hidden>
+            <span ref={capRef} className="ls-cap">
+              S
+            </span>
+            <span className="ls-slide">
+              {TRAIL.map((ch, i) => (
+                <span
+                  key={ch}
+                  ref={(el) => {
+                    trailRefs.current[i] = el;
+                  }}
+                  className="ls-letter"
+                  style={{ zIndex: TRAIL.length - i }}
+                >
+                  {ch}
+                </span>
+              ))}
+            </span>
+          </div>
+
+          <div className="ls-rule" aria-hidden />
         </div>
-
-        <div className="ls-rule" aria-hidden />
       </div>
     </div>
   );

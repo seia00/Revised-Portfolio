@@ -15,7 +15,7 @@ export default function DebateAccordion() {
 
   return (
     <>
-    <div className="border border-edge rounded-xl overflow-hidden bg-ink-2/40 backdrop-blur-sm">
+    <div className="border border-edge rounded-xl overflow-hidden bg-field-2/40 backdrop-blur-sm">
       {YEARS_DESC.map((year) => {
         const items = DEBATE[year];
         const uniqTournaments = new Set(items.map((i) => i.tournament)).size;
@@ -32,10 +32,10 @@ export default function DebateAccordion() {
               className="w-full flex items-center justify-between gap-6 px-7 md:px-9 py-6 md:py-7 text-left hover:bg-edge/60 transition-colors group"
             >
               <div className="flex items-baseline gap-5">
-                <span className="font-syne font-bold text-fog text-2xl md:text-3xl tracking-tight">
+                <span className="font-syne font-bold text-ink text-2xl md:text-3xl tracking-tight">
                   {year}
                 </span>
-                <span className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-fog-3">
+                <span className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-ink-3">
                   {uniqTournaments} tournament{uniqTournaments !== 1 ? "s" : ""} ·{" "}
                   {items.length} results
                 </span>
@@ -44,7 +44,7 @@ export default function DebateAccordion() {
                 aria-hidden
                 animate={{ rotate: isOpen ? 45 : 0 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="text-fog-2 text-2xl leading-none font-thin group-hover:text-fog"
+                className="text-ink-2 text-2xl leading-none font-thin group-hover:text-ink"
               >
                 +
               </motion.span>
@@ -87,7 +87,7 @@ export default function DebateAccordion() {
         );
       })}
     </div>
-    <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-4 mt-4">
+    <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3 mt-4">
       ⋯ and many more across the circuit
     </p>
     </>
@@ -98,16 +98,16 @@ function AwardRow({ award }: { award: Award }) {
   return (
     <li className="grid grid-cols-[1fr_auto] items-baseline gap-4 px-7 md:px-9 py-3.5">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="font-inter font-medium text-fog text-[14.5px]">
+        <span className="font-inter font-medium text-ink text-[14.5px]">
           {award.tournament}
         </span>
-        <span className="text-fog-3 text-[14px]">— {award.award}</span>
+        <span className="text-ink-3 text-[14px]">— {award.award}</span>
       </div>
       <span
         className={`font-jetbrains text-[9.5px] tracking-[0.16em] uppercase px-2 py-1 rounded border whitespace-nowrap ${
           award.type === "team"
-            ? "border-electric/30 text-electric-soft bg-electric/5"
-            : "border-flame/30 text-flame bg-flame/5"
+            ? "border-electric-deep/30 text-electric-deep bg-electric-deep/8"
+            : "border-edge-2 text-ink-2"
         }`}
       >
         {award.type === "team" ? "Team" : "Speaker"}

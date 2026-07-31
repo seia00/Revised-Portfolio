@@ -88,7 +88,7 @@ export default function Manifesto() {
       id="manifesto"
       aria-label="Manifesto"
       className="manifesto-section relative"
-      style={{ backgroundColor: "#000" }}
+      style={{ backgroundColor: "var(--color-field)" }}
     >
       {/* Responsive scroll length — long on desktop for cinematic weight,
           shorter on mobile so the section isn't a 6000px commitment. */}
@@ -102,7 +102,7 @@ export default function Manifesto() {
         className="absolute inset-x-0 top-0 h-20 z-10 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to bottom, var(--color-ink), transparent)",
+            "linear-gradient(to bottom, var(--color-field), transparent)",
         }}
       />
       <div
@@ -110,7 +110,7 @@ export default function Manifesto() {
         className="absolute inset-x-0 bottom-0 h-20 z-10 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to top, var(--color-ink), transparent)",
+            "linear-gradient(to top, var(--color-field), transparent)",
         }}
       />
 
@@ -119,7 +119,7 @@ export default function Manifesto() {
         {/* Top-left "// manifesto" label, visible only while section is in view */}
         <span
           aria-hidden
-          className="absolute top-6 left-6 md:top-8 md:left-10 font-jetbrains text-[10px] tracking-[0.22em] text-fog-3 z-20"
+          className="absolute top-6 left-6 md:top-8 md:left-10 font-jetbrains text-[10px] tracking-[0.22em] text-ink-3 z-20"
         >
           // manifesto
         </span>
@@ -127,7 +127,7 @@ export default function Manifesto() {
         {/* Chapter eyebrow — fades in first, then yields to the sentences */}
         <p
           ref={(el) => { layersRef.current[0] = el; }}
-          className="absolute left-0 right-0 text-center font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 z-20"
+          className="absolute left-0 right-0 text-center font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ink-3 z-20"
           style={{ top: "38vh", opacity: 0, visibility: "hidden" }}
         >
           ◇ Chapter ii · manifesto
@@ -182,8 +182,11 @@ function ManifestoLine({
       >
         <span
           style={{
+            // Runs down the *dark* end of the blue ramp. The old stops were
+            // light blues tuned for a black background — on the acid field
+            // they sat around 2:1 and vanished.
             backgroundImage:
-              "linear-gradient(135deg, #4a6fa5 0%, #6b93d6 50%, #8ab4f8 100%)",
+              "linear-gradient(135deg, var(--color-electric-ink) 0%, var(--color-electric-deep) 55%, var(--color-electric-dim) 100%)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             color: "transparent",
@@ -193,11 +196,13 @@ function ManifestoLine({
           {body}
         </span>
         {hasPeriod && (
+          /* The period stays a different colour from its sentence — that's
+             the motif. Here the sentence is indigo, so the mark goes near
+             black rather than the other way round. */
           <span
             style={{
-              color: "#ff6b2b",
+              color: "var(--color-ink)",
               fontSize: "1.1em",
-              textShadow: "0 0 12px rgba(255, 107, 43, 0.6)",
               marginLeft: "0.02em",
             }}
           >

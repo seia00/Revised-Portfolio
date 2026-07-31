@@ -32,8 +32,8 @@ function Divider({ label, tone = "default" }: { label: string; tone?: "default" 
       className="relative h-px bg-edge mx-6 md:mx-10 lg:mx-16 max-w-[1200px] xl:mx-auto"
     >
       <span
-        className={`absolute -top-2 left-0 px-2 py-1 -translate-y-1/2 font-jetbrains text-[9.5px] tracking-[0.22em] uppercase bg-ink ${
-          tone === "warn" ? "text-flame" : "text-fog-3"
+        className={`absolute -top-2 left-0 px-2 py-1 -translate-y-1/2 font-jetbrains text-[9.5px] tracking-[0.22em] uppercase bg-field ${
+          tone === "warn" ? "text-electric-deep" : "text-ink-3"
         }`}
       >
         ※ {label}

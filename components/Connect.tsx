@@ -64,14 +64,14 @@ export default function Connect() {
         className="absolute inset-0 opacity-[0.07] pointer-events-none"
         style={{
           backgroundImage:
-            "repeating-linear-gradient(0deg, transparent 0 23px, rgba(255,255,255,0.5) 23px 24px), repeating-linear-gradient(90deg, transparent 0 23px, rgba(255,255,255,0.5) 23px 24px)",
+            "repeating-linear-gradient(0deg, transparent 0 23px, rgba(14,19,5,0.5) 23px 24px), repeating-linear-gradient(90deg, transparent 0 23px, rgba(14,19,5,0.5) 23px 24px)",
         }}
       />
 
       {/* tape strip top-left */}
       <div
         aria-hidden
-        className="absolute -left-6 top-32 rotate-[-4deg] bg-flame text-ink font-anton uppercase tracking-[0.18em] text-[11px] px-6 py-1.5 select-none"
+        className="absolute -left-6 top-32 rotate-[-4deg] bg-electric-deep text-acid font-anton uppercase tracking-[0.18em] text-[11px] px-6 py-1.5 select-none"
       >
         ※ Signal open · reach out ※
       </div>
@@ -84,18 +84,18 @@ export default function Connect() {
           transition={{ duration: 0.45 }}
           className="mb-28 md:mb-40"
         >
-          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-flame mb-6">
+          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-electric-deep mb-6">
             /// Chapter v — how to connect
           </p>
-          <h2 className="font-anton uppercase text-fog leading-[0.78] tracking-[-0.01em] text-[clamp(44px,14vw,260px)]">
+          <h2 className="font-anton uppercase text-ink leading-[0.78] tracking-[-0.01em] text-[clamp(44px,14vw,260px)]">
             How to
             <br />
-            <span className="text-flame">connect.</span>
+            <span className="text-electric-deep">connect<span className="text-electric-deep">.</span></span>
           </h2>
         </motion.div>
 
         {/* channels — slabby, hard-edged link cards */}
-        <ul className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y-2 border-fog">
+        <ul className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y-2 border-ink">
           {CHANNELS.map((c, idx) => (
             <motion.li
               key={c.n}
@@ -108,7 +108,7 @@ export default function Connect() {
               }}
               className={
                 idx !== CHANNELS.length - 1
-                  ? "border-r-0 md:border-r-2 border-b-2 md:border-b-0 border-fog"
+                  ? "border-r-0 md:border-r-2 border-b-2 md:border-b-0 border-ink"
                   : ""
               }
             >
@@ -118,20 +118,20 @@ export default function Connect() {
                 rel={c.external ? "noopener noreferrer" : undefined}
                 className="connect-item relative block p-8 md:p-10 h-full"
               >
-                <span className="font-anton uppercase block text-flame text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
+                <span className="font-anton uppercase block text-electric-deep text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
                   /{c.n}
                 </span>
-                <h3 className="font-anton uppercase text-fog text-3xl md:text-4xl leading-[0.95] mb-5 tracking-[-0.005em]">
+                <h3 className="font-anton uppercase text-ink text-3xl md:text-4xl leading-[0.95] mb-5 tracking-[-0.005em]">
                   {c.title}
                 </h3>
-                <p className="font-jetbrains text-fog-2 text-[13px] leading-[1.65] max-w-[280px] break-words">
+                <p className="font-jetbrains text-ink-2 text-[13px] leading-[1.65] max-w-[280px] break-words">
                   {c.handle}
                 </p>
 
                 {/* corner stamp */}
                 <span
                   aria-hidden
-                  className="absolute top-3 right-3 font-jetbrains text-[9px] tracking-[0.18em] uppercase text-fog-4"
+                  className="absolute top-3 right-3 font-jetbrains text-[9px] tracking-[0.18em] uppercase text-ink-4"
                 >
                   no.{c.n}
                 </span>

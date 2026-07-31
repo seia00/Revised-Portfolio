@@ -61,7 +61,7 @@ export default function ProjectModal({ open, onClose }: Props) {
               visible: { y: "-100%" },
             }}
             transition={{ duration: 0.7, ease: [0.7, 0, 0.16, 1], delay: 0.05 }}
-            className="absolute inset-x-0 top-0 h-1/2 bg-ink z-10"
+            className="absolute inset-x-0 top-0 h-1/2 bg-field z-10"
           />
           <motion.div
             aria-hidden
@@ -70,7 +70,7 @@ export default function ProjectModal({ open, onClose }: Props) {
               visible: { y: "100%" },
             }}
             transition={{ duration: 0.7, ease: [0.7, 0, 0.16, 1], delay: 0.05 }}
-            className="absolute inset-x-0 bottom-0 h-1/2 bg-ink z-10"
+            className="absolute inset-x-0 bottom-0 h-1/2 bg-field z-10"
           />
 
           {/* Content */}
@@ -86,7 +86,7 @@ export default function ProjectModal({ open, onClose }: Props) {
             <button
               onClick={onClose}
               aria-label="Close projects view"
-              className="fixed top-6 right-6 md:top-8 md:right-8 z-30 w-11 h-11 flex items-center justify-center rounded-full border border-edge bg-ink-2/80 backdrop-blur text-fog-2 hover:text-fog hover:border-edge-2 transition-colors"
+              className="fixed top-6 right-6 md:top-8 md:right-8 z-30 w-11 h-11 flex items-center justify-center rounded-full border border-edge bg-field-2/80 backdrop-blur text-ink-2 hover:text-ink hover:border-edge-2 transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path
@@ -100,10 +100,10 @@ export default function ProjectModal({ open, onClose }: Props) {
 
             <div className="max-w-[1200px] mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-32 pb-24">
               <div className="mb-14 md:mb-20">
-                <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-electric-soft mb-5">
+                <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-electric-deep mb-5">
                   /// Project archive
                 </p>
-                <h2 className="font-syne font-extrabold uppercase tracking-[-0.03em] text-fog text-[clamp(48px,8vw,112px)] leading-[0.88]">
+                <h2 className="font-syne font-extrabold uppercase tracking-[-0.03em] text-ink text-[clamp(48px,8vw,112px)] leading-[0.88]">
                   Things I&apos;ve built.
                 </h2>
               </div>
@@ -131,30 +131,30 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         duration: 0.6,
         ease: [0.16, 1, 0.3, 1],
       }}
-      className="bg-ink p-7 md:p-9 flex flex-col gap-5 hover:bg-ink-2 transition-colors"
+      className="bg-field p-7 md:p-9 flex flex-col gap-5 hover:bg-field-2 transition-colors"
     >
       <header className="flex items-baseline justify-between gap-4">
-        <span className="font-jetbrains text-[10px] tracking-[0.18em] uppercase text-fog-3">
+        <span className="font-jetbrains text-[10px] tracking-[0.18em] uppercase text-ink-3">
           /{String(index + 1).padStart(2, "0")} · {project.category}
         </span>
         <span
           className={`font-jetbrains text-[9.5px] tracking-[0.18em] uppercase px-2 py-0.5 rounded border ${
             project.status === "shipped"
-              ? "border-electric/40 text-electric-soft bg-electric/5"
+              ? "border-electric-deep/40 text-electric-deep bg-electric-deep/8"
               : project.status === "building"
-              ? "border-flame/40 text-flame bg-flame/5"
-              : "border-edge-2 text-fog-2"
+              ? "border-edge-2 text-ink bg-ink/[0.06]"
+              : "border-edge-2 text-ink-2"
           }`}
         >
           {project.status}
         </span>
       </header>
 
-      <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-2xl md:text-3xl leading-tight">
+      <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-ink text-2xl md:text-3xl leading-tight">
         {project.title}
       </h3>
 
-      <p className="font-inter text-fog-2 text-[14.5px] leading-[1.65]">
+      <p className="font-inter text-ink-2 text-[14.5px] leading-[1.65]">
         {project.description}
       </p>
 
@@ -162,7 +162,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         {project.stack.map((s) => (
           <li
             key={s}
-            className="font-jetbrains text-[10px] text-fog-3 px-2 py-1 border border-edge rounded"
+            className="font-jetbrains text-[10px] text-ink-3 px-2 py-1 border border-edge rounded"
           >
             {s}
           </li>
@@ -174,7 +174,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           href={project.link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto inline-flex items-center gap-2 font-jetbrains text-[11px] tracking-[0.16em] uppercase text-fog hover:text-electric-soft transition-colors"
+          className="mt-auto inline-flex items-center gap-2 font-jetbrains text-[11px] tracking-[0.16em] uppercase text-ink hover:text-electric-deep transition-colors"
         >
           {project.link.label}
           <span aria-hidden>↗</span>

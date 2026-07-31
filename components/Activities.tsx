@@ -42,21 +42,21 @@ export default function Activities() {
         >
           <motion.p
             variants={fadeUp}
-            className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-fog-3 mb-6"
+            className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ink-3 mb-6"
           >
             ◇ Chapter iv / activities
           </motion.p>
           <motion.h2
             variants={fadeUp}
-            className="font-space-grotesk font-bold text-fog leading-[0.95] tracking-[-0.04em] text-[clamp(48px,7.5vw,92px)]"
+            className="font-space-grotesk font-bold text-ink leading-[0.95] tracking-[-0.04em] text-[clamp(48px,7.5vw,92px)]"
           >
             The four
             <br />
-            <span className="text-fog/40 italic">things I actually do.</span>
+            <span className="text-ink/40 italic">things I actually do.</span>
           </motion.h2>
           <motion.p
             variants={fadeUp}
-            className="font-inter text-fog-2 mt-7 text-base md:text-lg leading-[1.65] max-w-[540px]"
+            className="font-inter text-ink-2 mt-7 text-base md:text-lg leading-[1.65] max-w-[540px]"
           >
             Debate, code, mentorship, and an early-stage CTO role. Each one
             feeds the others.
@@ -72,10 +72,10 @@ export default function Activities() {
           className={GAP_OUT}
         >
           <div className={`flex items-baseline justify-between ${GAP_IN}`}>
-            <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
+            <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-ink text-xl md:text-2xl">
               Debate
             </h3>
-            <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
+            <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
               /01 — competitive results
             </span>
           </div>
@@ -95,10 +95,10 @@ export default function Activities() {
             transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className={`flex items-baseline justify-between ${GAP_IN}`}>
-              <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
+              <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-ink text-xl md:text-2xl">
                 Programming
               </h3>
-              <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
+              <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
                 /02
               </span>
             </div>
@@ -111,10 +111,10 @@ export default function Activities() {
             transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className={`flex items-baseline justify-between ${GAP_IN}`}>
-              <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
+              <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-ink text-xl md:text-2xl">
                 NPO Work
               </h3>
-              <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
+              <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
                 /03
               </span>
             </div>
@@ -130,10 +130,10 @@ export default function Activities() {
           transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className={`flex items-baseline justify-between ${GAP_IN}`}>
-            <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-fog text-xl md:text-2xl">
+            <h3 className="font-syne font-bold uppercase tracking-[-0.02em] text-ink text-xl md:text-2xl">
               Kythera Ventures
             </h3>
-            <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-fog-3">
+            <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
               /04 — exec
             </span>
           </div>

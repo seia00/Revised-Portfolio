@@ -23,26 +23,64 @@
   --font-anton: var(--font-anton);
   --font-space-grotesk: var(--font-space-grotesk);
 
-  /* ── Dark palette ── */
-  --color-ink: #06070a;
-  --color-ink-2: #0c0e14;
-  --color-ink-3: #14171f;
-  --color-ink-4: #1e222c;
-  --color-fog: #e6e8ec;
-  --color-fog-2: #a8acb6;
-  --color-fog-3: #6b6f7a;
-  --color-fog-4: #3a3d46;
-  --color-edge: rgba(255, 255, 255, 0.07);
-  --color-edge-2: rgba(255, 255, 255, 0.12);
-  --color-electric: #5b8dff;
-  --color-electric-soft: #7faaff;
-  --color-flame: #ff6b3d;
+  /* ══ LIGHT PALETTE — the site runs on acid, not on black ══════
+     `field` is the background scale, `ink` is the text scale. They
+     were named the other way round when this was a dark site; the
+     names now describe the roles they actually serve.
+
+     Everything here is calibrated against `field`, and measured
+     rather than eyeballed — a light background is much less
+     forgiving than the near-black this replaced, and the mono
+     labels all over this site run at 10–11px.
+       ink    15.6:1
+       ink-2   8.1:1
+       ink-3   5.7:1  — passes AA at small sizes
+       ink-4   3.6:1  — decorative marks only, never information */
+
+  /* Surfaces. Toned a step below full-strength acid — a saturated
+     accent doesn't survive being scaled up to a full viewport, and
+     over a ~17,000px scroll the raw colour is fatiguing. */
+  --color-field: #bce24a;   /* page */
+  --color-field-2: #c9ec5e; /* raised — cards lift by getting lighter */
+  --color-field-3: #a9cf3f; /* recessed bands */
+  --color-field-4: #93b636; /* deepest */
+
+  /* Text. Near-black carrying a green cast, so it sits in the same
+     family as the field instead of looking punched out of it. */
+  --color-ink: #0e1305;
+  --color-ink-2: #2f3a17;
+  --color-ink-3: #46521f;
+  --color-ink-4: #64713a;
+
+  --color-edge: rgba(14, 19, 5, 0.16);
+  --color-edge-2: rgba(14, 19, 5, 0.3);
+
+  /* ── Blue: one ramp, one hue family ──────────────────────────
+     On a light field only the deep end is legible — `electric`
+     itself is 2.4:1 on `field` and fails everything. The upper
+     steps survive only on dark chips (the emblem, the curtain).
+     Don't reach past -dim for anything sitting on the page. */
+  --color-electric-deep: #0a3fa8;  /* THE accent. 7.1:1 on field. */
+  --color-electric-ink: #071f5c;   /* deepest — gradient anchor */
+  --color-electric-dim: #3c6fe0;   /* borderline; large text only */
+  --color-electric: #5b8dff;       /* dark chips only */
+  --color-electric-soft: #7faaff;  /* dark chips only */
+  --color-electric-pale: #a9c7ff;  /* dark chips only */
+
+  /* ── Acid at full strength ───────────────────────────────────
+     Now that the page *is* acid, this can't mark anything on it —
+     it's invisible against its own background. It survives only as
+     a foreground on indigo: the SF inside the sun, text on an
+     electric-deep chip. The role it used to play (the terminal
+     period, the active rail marker, the hover ring) belongs to
+     electric-deep now. */
+  --color-acid: #c6f24e;
 }
 
 html,
 body {
-  background: #06070a;
-  color: #e6e8ec;
+  background: #bce24a;
+  color: #0e1305;
 }
 
 /* Subtle mesh-gradient backdrop, layered above the flat ink fill.
@@ -56,10 +94,12 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  /* Indigo washes, not light ones — on a light field a bright wash
+     does nothing and a dark one gives the page depth. */
   background-image:
-    radial-gradient(ellipse 60% 50% at 18% 0%, rgba(91, 141, 255, 0.10), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 82% 25%, rgba(255, 107, 61, 0.04), transparent 60%),
-    radial-gradient(ellipse 40% 30% at 50% 80%, rgba(91, 141, 255, 0.06), transparent 60%);
+    radial-gradient(ellipse 60% 50% at 18% 0%, rgba(10, 63, 168, 0.10), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 82% 25%, rgba(14, 19, 5, 0.07), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 80%, rgba(10, 63, 168, 0.07), transparent 60%);
   background-repeat: no-repeat;
 }
 
@@ -118,12 +158,13 @@ body::before {
 .cursor-ring-wrap { left: 0; top: 0; }
 .cursor-ring-hidden { opacity: 0; }
 
+/* Dark by default so the ring reads on the acid field at all. */
 .cursor-ring-dot {
   width: 22px;
   height: 22px;
   border-radius: 9999px;
   background: transparent;
-  border: 1.5px solid var(--color-electric);
+  border: 1.5px solid var(--color-ink);
   transform: translate(-50%, -50%) scale(1);
   transition:
     border-color   180ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -132,13 +173,15 @@ body::before {
     background     180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Indigo on hover — the mark colour. Acid can't do this job any more;
+   it's the background now. */
 .cursor-ring-hover .cursor-ring-dot {
-  border-color: var(--color-flame);
-  background: rgba(255, 107, 61, 0.08);
+  border-color: var(--color-electric-deep);
+  background: rgba(10, 63, 168, 0.12);
   transform: translate(-50%, -50%) scale(1.35);
   box-shadow:
-    0 0 14px 0 rgba(255, 107, 61, 0.55),
-    inset 0 0 6px 0 rgba(255, 107, 61, 0.35);
+    0 0 14px 0 rgba(10, 63, 168, 0.45),
+    inset 0 0 6px 0 rgba(10, 63, 168, 0.3);
 }
 
 .cursor-ring-press .cursor-ring-dot {
@@ -146,6 +189,115 @@ body::before {
 }
 .cursor-ring-hover.cursor-ring-press .cursor-ring-dot {
   transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* ── Sun emblem (hero) ──────────────────────────────────────────
+   Replaces the Spline scene. Pure CSS, so it costs nothing to boot
+   — no 549KB runtime, no WebGL context, no scene decode — and it
+   obeys the same compositor rule as the curtain: the only animated
+   properties are `transform` on the two ray rings and the corona.
+   The rays are repeating-conic-gradients cut into annuli with a
+   radial mask; masks rasterize once and ride along with the layer. */
+
+.sun {
+  position: relative;
+  width: min(86vmin, 760px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.sun-corona,
+.sun-rays,
+.sun-rays-fine,
+.sun-ring,
+.sun-disc {
+  position: absolute;
+  border-radius: 9999px;
+}
+
+/* Haze. Slow breath keeps the frame alive without drawing the eye. */
+.sun-corona {
+  inset: -14%;
+  background: radial-gradient(
+    circle,
+    rgba(10, 63, 168, 0.28) 0 34%,
+    rgba(10, 63, 168, 0) 66%
+  );
+  animation: sun-breathe 11s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Bold outer rays. */
+.sun-rays {
+  inset: 0;
+  background: repeating-conic-gradient(
+    from 0deg,
+    var(--color-electric-deep) 0deg 2.4deg,
+    transparent 2.4deg 11deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 45%, #000 47%);
+  mask: radial-gradient(circle, transparent 0 45%, #000 47%);
+  animation: sun-spin 150s linear infinite;
+  will-change: transform;
+}
+
+/* Fine inner tick ring, counter-rotating — two rates read as depth. */
+.sun-rays-fine {
+  inset: 0;
+  background: repeating-conic-gradient(
+    from 0deg,
+    var(--color-electric-deep) 0deg 0.55deg,
+    transparent 0.55deg 4.4deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 36%, #000 38% 43%, transparent 44%);
+  mask: radial-gradient(circle, transparent 0 36%, #000 38% 43%, transparent 44%);
+  opacity: 0.55;
+  animation: sun-spin 230s linear infinite reverse;
+  will-change: transform;
+}
+
+.sun-ring {
+  inset: 27%;
+  border: 2px solid var(--color-electric-deep);
+  opacity: 0.35;
+}
+
+.sun-disc {
+  inset: 31%;
+  background: var(--color-electric-deep);
+  display: grid;
+  place-items: center;
+}
+
+/* Full-strength acid, on indigo — the one place it still works. */
+.sun-mark {
+  font-family: var(--font-syne), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  font-size: min(15vmin, 132px);
+  line-height: 1;
+  color: var(--color-acid);
+  user-select: none;
+}
+
+@keyframes sun-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes sun-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+/* The global reduced-motion rule only clamps duration, which would
+   leave an infinite spin resolving every 0.001ms. Kill the names. */
+@media (prefers-reduced-motion: reduce) {
+  .sun-rays,
+  .sun-rays-fine,
+  .sun-corona {
+    animation: none;
+  }
 }
 
 /* ── Loading screen ─────────────────────────────────────────────
@@ -166,9 +318,22 @@ body::before {
    frames the moment it has to queue behind that work. Static filters
    and shadows are fine — they rasterize once. Animated ones are not.
    Nothing in this block should start animating a new property
-   without re-checking that. */
+   without re-checking that.
+
+   MOTION CHARACTER: filmic, not springy. Two rules.
+   1. No overshoot anywhere. A back-out curve snaps and rebounds, which
+      reads as UI feedback; a title sequence decelerates and stays put.
+      --ls-move is slow-in/slow-out — the animator's "slow in, slow out",
+      and also how a real dolly actually moves.
+   2. The frame is never completely still. .ls-stage holds a constant,
+      linear push that runs the whole time the curtain is up, so even
+      between letters there's camera drift. Stillness between beats is
+      what made this read as a series of separate jumps. */
 
 .ls-root {
+  --ls-move: cubic-bezier(0.6, 0, 0.15, 1);
+  --ls-settle: cubic-bezier(0.16, 1, 0.3, 1);
+
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -176,7 +341,9 @@ body::before {
   place-items: center;
   overflow: hidden;
   background: #000;
-  transition: opacity 850ms cubic-bezier(0.7, 0, 0.84, 0);
+  /* Even cross-dissolve. easeInExpo held full opacity then dropped it all
+     at once, which is the abrupt part you feel at the end. */
+  transition: opacity 1000ms cubic-bezier(0.4, 0, 0.3, 1);
   will-change: opacity;
 }
 .ls-root[data-phase="exit"] {
@@ -186,15 +353,27 @@ body::before {
 
 .ls-inner {
   position: relative;
+  transition: transform 1000ms cubic-bezier(0.45, 0, 0.55, 1);
+  will-change: transform;
+}
+/* Exit continues the push rather than starting a new move — this scale
+   multiplies the drift already running on .ls-stage. */
+.ls-root[data-phase="exit"] .ls-inner {
+  transform: scale(1.22);
+}
+
+/* The camera. Constant rate, no easing: a push-in doesn't accelerate. */
+@keyframes ls-push {
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
+}
+.ls-stage {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 850ms cubic-bezier(0.7, 0, 0.84, 0);
+  animation: ls-push 9000ms linear both;
   will-change: transform;
-}
-/* Exit: the wordmark rushes the viewer as the curtain dissolves. */
-.ls-root[data-phase="exit"] .ls-inner {
-  transform: scale(1.3);
 }
 
 /* Cobalt bloom behind the wordmark — swells open with the letters. */
@@ -213,13 +392,15 @@ body::before {
 .ls-glow {
   background: radial-gradient(
     circle,
-    rgba(0, 71, 171, 0.52),
-    rgba(0, 71, 171, 0) 62%
+    rgba(10, 63, 168, 0.52),
+    rgba(10, 63, 168, 0) 62%
   );
   transform: translate(-50%, -50%) scale(0.5);
+  /* Deliberately outlasts the letters: the bloom is still opening after the
+     last one lands, so the frame keeps breathing into the hold. */
   transition:
-    opacity 1600ms ease-out,
-    transform 2000ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 2400ms ease-out,
+    transform 3200ms var(--ls-settle);
 }
 .ls-inner.is-go .ls-glow {
   opacity: 1;
@@ -232,18 +413,19 @@ body::before {
 .ls-flare {
   background: radial-gradient(
     circle,
-    rgba(120, 170, 255, 0.5),
-    rgba(120, 170, 255, 0) 45%
+    rgba(169, 199, 255, 0.5),
+    rgba(169, 199, 255, 0) 45%
   );
   transform: translate(-50%, -50%) scale(0.72);
 }
 @keyframes ls-flare-pulse {
   0% { opacity: 0; }
-  16% { opacity: 1; }
+  30% { opacity: 0.85; }
   100% { opacity: 0; }
 }
+/* Long and shallow. A short bright spike is a blink; this is a bloom. */
 .ls-inner.is-settled .ls-flare {
-  animation: ls-flare-pulse 1100ms ease-out both;
+  animation: ls-flare-pulse 1800ms cubic-bezier(0.33, 0, 0.2, 1) both;
 }
 
 .ls-word {
@@ -254,14 +436,14 @@ body::before {
   font-family: var(--font-great-vibes), "Snell Roundhand", "Apple Chancery", cursive;
   font-size: clamp(120px, 26vw, 360px);
   line-height: 1.25;
-  color: #0047ab;
+  color: var(--color-electric-deep);
   /* Great Vibes ships one weight, so weight comes from an outline stroke.
      Proportional to the font size so it holds up from phone to desktop. */
-  -webkit-text-stroke: 0.013em #0047ab;
+  -webkit-text-stroke: 0.013em var(--color-electric-deep);
   /* Deliberately tight. A wide halo has to be re-rasterized whenever the
      layer is re-rastered, and its clipped edge is what used to draw a seam
      beside the S. The broad bloom comes from .ls-glow instead. */
-  text-shadow: 0 0 26px rgba(0, 71, 171, 0.85);
+  text-shadow: 0 0 26px rgba(10, 63, 168, 0.85);
   opacity: 0;
 }
 /* No transition — this only hides the single frame between mount and
@@ -270,16 +452,25 @@ body::before {
   opacity: 1;
 }
 
-/* The S drops in oversized and pulls back to size. */
+/* The S resolves out of an oversized ghost. Gentler start scale and a much
+   longer settle than before — it should still be perceptibly moving when
+   the first letter begins, so the two moves overlap instead of queueing. */
 .ls-cap {
   position: relative;
   z-index: 5;
   opacity: 0;
-  transform: scale(1.6) translateY(0.04em);
+  transform: scale(1.34) translateY(0.03em);
   transition:
-    opacity 700ms ease-out,
-    transform 1150ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 1100ms ease-out,
+    transform 1900ms var(--ls-settle);
   will-change: opacity, transform;
+}
+/* Warm-up. A fully transparent element isn't painted, so the S's layer —
+   a 360px glyph with a stroke and a halo — would otherwise rasterize on the
+   first frame of its own fade, and drop it. This paints the layer during the
+   is-set beat instead. Invisible: 1.5% cobalt on black. */
+.ls-inner.is-set .ls-cap {
+  opacity: 0.015;
 }
 .ls-inner.is-go .ls-cap {
   opacity: 1;
@@ -310,37 +501,43 @@ body::before {
    of out of it. The transition only exists in the is-go style, which is
    enough for the browser to animate the change into it.
 
-   The letter launches stretched, overshoots its mark, then snaps back —
-   the overshoot easing carries scaleX below 1 on the way in, which lands
-   as a squash. The stretch doubles as the smear: scaling a promoted layer
-   stretches its texture, so the glyph softens along the axis it's
-   travelling for free. */
+   The letter eases out from behind the S and decelerates onto its mark —
+   no overshoot, so it never rebounds or squashes. A light scaleX carries
+   the smear: stretching a promoted layer stretches its texture, so the
+   glyph softens along its direction of travel for free. Kept mild, because
+   over a slow move the distortion is legible rather than subliminal.
+
+   Duration/stagger must stay roughly 900/520. All three letters start
+   stacked at the S and finish at different x, so a later letter has to
+   pass through an earlier one's resting place — widen the overlap much
+   beyond this and they visibly cross, which reads as a scramble. */
 .ls-letter {
   position: relative;
-  transform: translateX(var(--dx, 0px)) scaleX(1.22);
+  transform: translateX(var(--dx, 0px)) scaleX(1.1);
   will-change: transform;
 }
 .ls-inner.is-go .ls-letter {
   transform: translateX(0) scaleX(1);
-  transition: transform 720ms cubic-bezier(0.3, 1.45, 0.5, 1);
+  transition: transform 900ms var(--ls-move);
   transition-delay: var(--d, 0ms);
 }
 
-/* Hairline that draws under the settled wordmark. */
+/* Hairline that draws under the settled wordmark — slow, so it's still
+   drawing as the last letter lands and on into the hold. */
 .ls-rule {
   width: clamp(180px, 32vw, 440px);
   height: 1px;
   margin-top: 0.8rem;
   background: linear-gradient(
     to right,
-    rgba(0, 71, 171, 0),
-    #4d7fe0 22%,
-    #4d7fe0 78%,
-    rgba(0, 71, 171, 0)
+    rgba(10, 63, 168, 0),
+    var(--color-electric-dim) 22%,
+    var(--color-electric-dim) 78%,
+    rgba(10, 63, 168, 0)
   );
   transform: scaleX(0);
-  transition: transform 1100ms cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: 1400ms;
+  transition: transform 1900ms var(--ls-settle);
+  transition-delay: 1500ms;
   will-change: transform;
 }
 .ls-inner.is-go .ls-rule {
@@ -390,9 +587,9 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(14, 19, 5, 0.18);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(14, 19, 5, 0.32);
 }
