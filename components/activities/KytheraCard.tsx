@@ -21,12 +21,12 @@ export default function KytheraCard() {
         <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
           ◆ Executive · 2026 —
         </span>
-        <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric-deep">
+        <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ember">
           Active role
         </span>
       </header>
 
-      <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric-deep mb-3">
+      <p className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ember mb-3">
         Chief Technology Officer
       </p>
 

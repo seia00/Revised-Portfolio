@@ -63,7 +63,7 @@ export default function Hero() {
           variants={fadeUp}
           className="font-jetbrains text-[11px] tracking-[0.18em] uppercase text-ink-3 mb-10"
         >
-          <span className="text-electric-deep">◣</span> Seia Funayama · Chiba, Japan
+          <span className="text-ember">◣</span> Seia Funayama · Chiba, Japan
         </motion.p>
 
         {/* Name — broken across three lines for compact cascading. */}
@@ -73,13 +73,13 @@ export default function Hero() {
         >
           <span className="block">Seia</span>
           <span className="block text-ink/30 -mt-1">Funa</span>
-          <span className="block text-ink/30 -mt-1">yama<span className="text-electric-deep">.</span></span>
+          <span className="block text-ink/30 -mt-1">yama<span className="text-ember">.</span></span>
         </motion.h1>
 
         {/* Centerpiece quote */}
         <motion.figure
           variants={fadeUp}
-          className="border-l-2 border-electric-deep pl-6 md:pl-10 mb-20 max-w-[920px]"
+          className="border-l-2 border-ember pl-6 md:pl-10 mb-20 max-w-[920px]"
         >
           <blockquote className="font-syne font-extrabold uppercase italic text-ink leading-[0.95] tracking-[-0.03em] text-[clamp(36px,5.5vw,68px)]">
             “Stay hungry,
@@ -117,7 +117,7 @@ export default function Hero() {
         className="absolute left-6 md:left-10 lg:left-16 bottom-10 flex items-center gap-3 text-ink-3"
         aria-hidden
       >
-        <span className="block h-px w-8 bg-electric-deep" />
+        <span className="block h-px w-8 bg-ember" />
         <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase">
           Scroll
         </span>

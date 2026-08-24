@@ -192,13 +192,13 @@ function ChapterPanel({ milestone, index, progress }: PanelProps) {
         {/* Chapter label */}
         <p className="font-jetbrains text-[11px] md:text-[12px] tracking-[0.24em] uppercase text-ink-3 mb-8 md:mb-10">
           ※ Chapter · {String(index + 1).padStart(2, "0")} ·{" "}
-          <span className="text-electric-deep">{milestone.place}</span>
+          <span className="text-ember">{milestone.place}</span>
         </p>
 
         {/* Headline — Playfair italic, big-and-quiet editorial energy */}
         <h3 className="font-playfair italic font-medium text-ink leading-[0.96] tracking-[-0.025em] mb-8 md:mb-10 text-[clamp(56px,10vw,148px)]">
           {milestone.title.replace(/\.$/, "")}
-          <span className="text-electric-deep">.</span>
+          <span className="text-ember">.</span>
         </h3>
 
         {/* Body */}
@@ -237,7 +237,7 @@ function FixedOverlay({ chapter, percent, progress }: OverlayProps) {
       <div className="flex items-start justify-between p-6 md:p-8 lg:p-10">
         {/* Brand mark */}
         <span className="font-syne font-extrabold uppercase text-ink tracking-tighter text-base md:text-lg">
-          SF<span className="text-electric-deep">.</span>
+          SF<span className="text-ember">.</span>
         </span>
 
         {/* Chapter counter + progress bar */}
@@ -251,7 +251,7 @@ function FixedOverlay({ chapter, percent, progress }: OverlayProps) {
           <div className="hidden sm:block w-[120px] md:w-[160px] h-px bg-edge relative overflow-hidden">
             <motion.div
               style={{ width: barWidth }}
-              className="absolute inset-y-0 left-0 bg-electric-deep shadow-[0_0_10px_rgba(10,63,168,0.5)]"
+              className="absolute inset-y-0 left-0 bg-ember shadow-[0_0_10px_rgba(178,58,0,0.5)]"
             />
           </div>
           <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-4 tabular-nums">

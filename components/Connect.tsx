@@ -64,14 +64,14 @@ export default function Connect() {
         className="absolute inset-0 opacity-[0.07] pointer-events-none"
         style={{
           backgroundImage:
-            "repeating-linear-gradient(0deg, transparent 0 23px, rgba(14,19,5,0.5) 23px 24px), repeating-linear-gradient(90deg, transparent 0 23px, rgba(14,19,5,0.5) 23px 24px)",
+            "repeating-linear-gradient(0deg, transparent 0 23px, rgba(10, 10, 10,0.5) 23px 24px), repeating-linear-gradient(90deg, transparent 0 23px, rgba(10, 10, 10,0.5) 23px 24px)",
         }}
       />
 
       {/* tape strip top-left */}
       <div
         aria-hidden
-        className="absolute -left-6 top-32 rotate-[-4deg] bg-electric-deep text-acid font-anton uppercase tracking-[0.18em] text-[11px] px-6 py-1.5 select-none"
+        className="absolute -left-6 top-32 rotate-[-4deg] bg-ember text-field font-anton uppercase tracking-[0.18em] text-[11px] px-6 py-1.5 select-none"
       >
         ※ Signal open · reach out ※
       </div>
@@ -84,13 +84,13 @@ export default function Connect() {
           transition={{ duration: 0.45 }}
           className="mb-28 md:mb-40"
         >
-          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-electric-deep mb-6">
+          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-ember mb-6">
             /// Chapter v — how to connect
           </p>
           <h2 className="font-anton uppercase text-ink leading-[0.78] tracking-[-0.01em] text-[clamp(44px,14vw,260px)]">
             How to
             <br />
-            <span className="text-electric-deep">connect<span className="text-electric-deep">.</span></span>
+            <span className="text-ember">connect<span className="text-ink">.</span></span>
           </h2>
         </motion.div>
 
@@ -118,7 +118,7 @@ export default function Connect() {
                 rel={c.external ? "noopener noreferrer" : undefined}
                 className="connect-item relative block p-8 md:p-10 h-full"
               >
-                <span className="font-anton uppercase block text-electric-deep text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
+                <span className="font-anton uppercase block text-ember text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
                   /{c.n}
                 </span>
                 <h3 className="font-anton uppercase text-ink text-3xl md:text-4xl leading-[0.95] mb-5 tracking-[-0.005em]">

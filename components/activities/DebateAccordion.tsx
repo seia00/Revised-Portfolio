@@ -106,7 +106,7 @@ function AwardRow({ award }: { award: Award }) {
       <span
         className={`font-jetbrains text-[9.5px] tracking-[0.16em] uppercase px-2 py-1 rounded border whitespace-nowrap ${
           award.type === "team"
-            ? "border-electric-deep/30 text-electric-deep bg-electric-deep/8"
+            ? "border-ember/30 text-ember bg-ember/8"
             : "border-edge-2 text-ink-2"
         }`}
       >

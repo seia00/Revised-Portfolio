@@ -47,7 +47,7 @@ export default function ChapterRail() {
   return (
     <nav
       aria-label="Chapter navigation"
-      /* Carries its own backdrop now. On the acid field it floats over
+      /* Carries its own backdrop now. On the white page it floats over
          whatever a section puts behind it — the hero's indigo sunburst
          especially — and unbacked mono at this weight disappears into it. */
       className={`fixed top-6 right-6 md:top-8 md:right-8 z-40 hidden md:flex flex-col gap-3 rounded-lg border border-edge bg-field/70 px-4 py-3 backdrop-blur-md transition-opacity duration-300 ${
@@ -69,7 +69,7 @@ export default function ChapterRail() {
               aria-hidden
               className={`h-px transition-all duration-300 ${
                 isActive
-                  ? "w-4 bg-electric-deep"
+                  ? "w-4 bg-ember"
                   : "w-2 bg-ink-3 group-hover:w-3 group-hover:bg-ink-2"
               }`}
             />

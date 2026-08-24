@@ -27,7 +27,7 @@ export default function ProgrammingCard() {
           <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
             ◆ Programming · {PROJECTS.length} projects
           </span>
-          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric-deep">
+          <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ember">
             archive
           </span>
         </header>
@@ -51,12 +51,12 @@ export default function ProgrammingCard() {
             card beside it share a baseline however their copy lengths differ. */}
         <button
           onClick={() => setOpen(true)}
-          className="relative mt-auto self-start inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-ink px-5 py-3.5 border border-edge-2 rounded-full hover:border-electric-deep hover:text-electric-deep transition-colors"
+          className="relative mt-auto self-start inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-ink px-5 py-3.5 border border-edge-2 rounded-full hover:border-ember hover:text-ember transition-colors"
         >
           <span>Click to view projects</span>
           <span
             aria-hidden
-            className="block w-1.5 h-1.5 rounded-full bg-electric-deep shadow-[0_0_10px_rgba(10,63,168,0.55)]"
+            className="block w-1.5 h-1.5 rounded-full bg-ember shadow-[0_0_10px_rgba(178,58,0,0.55)]"
           />
         </button>
       </motion.div>

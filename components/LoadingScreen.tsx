@@ -8,10 +8,10 @@ import { signal } from "@/lib/boot";
  *
  * The wordmark writes itself: the capital S settles first, then e, i and a
  * slide out from behind it one at a time. The trailing letters live inside
- * `.ls-slide`, a container clipped flush with the S's right edge — so their
- * starting offsets (measured at runtime, since a script face gives no
- * predictable advance widths) park them out of sight underneath the S until
- * they travel out.
+ * `.ls-slide`, whose left edge carries a feathered mask — so their starting
+ * offsets (measured at runtime, since a script face gives no predictable
+ * advance widths) park them out of sight underneath the S, and each one
+ * dissolves into view as it crosses the ramp rather than being cut by it.
  */
 
 const TRAIL = ["e", "i", "a"];
@@ -85,9 +85,8 @@ export default function LoadingScreen() {
     // — visible, and short of the S.
     //
     // Strictly before launch, though. Afterwards the is-go rule pins every
-    // letter at translateX(0), so --dx has nothing left to say, and reading
-    // the reveal edge back once is-settled has widened it would compute a
-    // parking spot from the wrong geometry.
+    // letter at translateX(0), so --dx has nothing left to say, and moving a
+    // letter mid-flight would only jerk it.
     const measure = () => {
       if (launched) return;
       const word = wordRef.current;
@@ -100,22 +99,23 @@ export default function LoadingScreen() {
       // carry entrance transforms, so their rects are the *transformed*
       // boxes, not where the type actually sits.
       const capLeft = cap.offsetLeft;
-      // The reveal edge: anything left of this is hidden by `.ls-slide`. Its
-      // clip-path leans a little left of the box, so read the resolved inset
-      // back rather than assuming the box edge.
-      const inset = getComputedStyle(slide).clipPath.match(/-?[\d.]+px/g);
-      const clipLeft = slide.offsetLeft + (inset ? parseFloat(inset[3]) : 0);
+      // The reveal edge is now `.ls-slide`'s own border-box left: its mask
+      // ramps from fully transparent exactly there. The box already sits
+      // 0.3em left of where the letters start (padding out, negative margin
+      // back), so this needs no correction — it used to parse the value out
+      // of the clip-path that the mask replaced.
+      const hideLeft = slide.offsetLeft;
       // Slack for everything a glyph throws past its own advance width:
-      // script overhang, the launch stretch, the motion blur, the stroke.
+      // script overhang, the launch stretch, the halo, the stroke.
       const bleed = parseFloat(getComputedStyle(word).fontSize) * 0.25;
 
       trailRefs.current.forEach((el, i) => {
         if (!el) return;
         // Park at the S's left edge, but never so far right that any part of
-        // the glyph pokes past the reveal edge before it starts moving.
+        // the glyph pokes into the ramp before it starts moving.
         const dx = Math.min(
           capLeft - el.offsetLeft,
-          clipLeft - (el.offsetLeft + el.offsetWidth) - bleed
+          hideLeft - (el.offsetLeft + el.offsetWidth) - bleed
         );
         el.style.setProperty("--dx", `${dx}px`);
         el.style.setProperty("--d", `${S_SETTLE + i * STAGGER}ms`);

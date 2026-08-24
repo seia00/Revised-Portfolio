@@ -9,7 +9,7 @@ export default function AppleIcon() {
     (
       <div
         style={{
-          background: "#06070a",
+          background: "#ffffff",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -17,13 +17,13 @@ export default function AppleIcon() {
           justifyContent: "center",
           fontWeight: 900,
           fontSize: 110,
-          color: "#e6e8ec",
+          color: "#0a0a0a",
           letterSpacing: "-0.06em",
           fontFamily: "system-ui, -apple-system, sans-serif",
         }}
       >
         SF
-        <span style={{ color: "#c6f24e", marginLeft: "-0.04em" }}>.</span>
+        <span style={{ color: "#b23a00", marginLeft: "-0.04em" }}>.</span>
       </div>
     ),
     size

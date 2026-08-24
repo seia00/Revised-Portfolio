@@ -33,7 +33,7 @@ function Divider({ label, tone = "default" }: { label: string; tone?: "default" 
     >
       <span
         className={`absolute -top-2 left-0 px-2 py-1 -translate-y-1/2 font-jetbrains text-[9.5px] tracking-[0.22em] uppercase bg-field ${
-          tone === "warn" ? "text-electric-deep" : "text-ink-3"
+          tone === "warn" ? "text-ember" : "text-ink-3"
         }`}
       >
         ※ {label}

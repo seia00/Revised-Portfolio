@@ -16,7 +16,7 @@ export default function NpoCard() {
         <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ink-3">
           ◆ Non-profit
         </span>
-        <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-electric-deep">
+        <span className="font-jetbrains text-[10px] tracking-[0.22em] uppercase text-ember">
           en2u.vercel.app
         </span>
       </header>
@@ -32,7 +32,7 @@ export default function NpoCard() {
         built the platform.
       </p>
 
-      <span className="mt-auto inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-ink group-hover:text-electric-deep transition-colors">
+      <span className="mt-auto inline-flex items-center gap-3 font-jetbrains text-[11px] tracking-[0.2em] uppercase text-ink group-hover:text-ember transition-colors">
         Visit site
         <span aria-hidden className="text-base">
           ↗

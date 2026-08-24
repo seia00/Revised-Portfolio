@@ -100,7 +100,7 @@ export default function ProjectModal({ open, onClose }: Props) {
 
             <div className="max-w-[1200px] mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-32 pb-24">
               <div className="mb-14 md:mb-20">
-                <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-electric-deep mb-5">
+                <p className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ember mb-5">
                   /// Project archive
                 </p>
                 <h2 className="font-syne font-extrabold uppercase tracking-[-0.03em] text-ink text-[clamp(48px,8vw,112px)] leading-[0.88]">
@@ -140,7 +140,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         <span
           className={`font-jetbrains text-[9.5px] tracking-[0.18em] uppercase px-2 py-0.5 rounded border ${
             project.status === "shipped"
-              ? "border-electric-deep/40 text-electric-deep bg-electric-deep/8"
+              ? "border-ember/40 text-ember bg-ember/8"
               : project.status === "building"
               ? "border-edge-2 text-ink bg-ink/[0.06]"
               : "border-edge-2 text-ink-2"
@@ -174,7 +174,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           href={project.link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto inline-flex items-center gap-2 font-jetbrains text-[11px] tracking-[0.16em] uppercase text-ink hover:text-electric-deep transition-colors"
+          className="mt-auto inline-flex items-center gap-2 font-jetbrains text-[11px] tracking-[0.16em] uppercase text-ink hover:text-ember transition-colors"
         >
           {project.link.label}
           <span aria-hidden>↗</span>

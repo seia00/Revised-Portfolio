@@ -182,11 +182,10 @@ function ManifestoLine({
       >
         <span
           style={{
-            // Runs down the *dark* end of the blue ramp. The old stops were
-            // light blues tuned for a black background — on the acid field
-            // they sat around 2:1 and vanished.
+            // Runs down the dark end of the orange ramp. Anything brighter
+            // than -mid drops under 3:1 on white and stops being readable.
             backgroundImage:
-              "linear-gradient(135deg, var(--color-electric-ink) 0%, var(--color-electric-deep) 55%, var(--color-electric-dim) 100%)",
+              "linear-gradient(135deg, var(--color-ember-deep) 0%, var(--color-ember) 55%, var(--color-ember-mid) 100%)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             color: "transparent",
@@ -197,8 +196,8 @@ function ManifestoLine({
         </span>
         {hasPeriod && (
           /* The period stays a different colour from its sentence — that's
-             the motif. Here the sentence is indigo, so the mark goes near
-             black rather than the other way round. */
+             the motif. Here the sentence is orange, so the mark goes black
+             rather than the other way round. */
           <span
             style={{
               color: "var(--color-ink)",

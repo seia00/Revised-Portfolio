@@ -23,64 +23,54 @@
   --font-anton: var(--font-anton);
   --font-space-grotesk: var(--font-space-grotesk);
 
-  /* ══ LIGHT PALETTE — the site runs on acid, not on black ══════
-     `field` is the background scale, `ink` is the text scale. They
-     were named the other way round when this was a dark site; the
-     names now describe the roles they actually serve.
+  /* ══ WHITE / BLACK / ORANGE ══════════════════════════════════
+     `field` is the background scale, `ink` is the text scale.
 
-     Everything here is calibrated against `field`, and measured
-     rather than eyeballed — a light background is much less
-     forgiving than the near-black this replaced, and the mono
-     labels all over this site run at 10–11px.
-       ink    15.6:1
-       ink-2   8.1:1
-       ink-3   5.7:1  — passes AA at small sizes
+     Everything is measured against `field` (pure white), not
+     eyeballed — the mono labels all over this site run at 10-11px,
+     where a light ground is unforgiving:
+       ink    19.7:1
+       ink-2  12.0:1
+       ink-3   5.9:1  — passes AA at small sizes
        ink-4   3.6:1  — decorative marks only, never information */
 
-  /* Surfaces. Toned a step below full-strength acid — a saturated
-     accent doesn't survive being scaled up to a full viewport, and
-     over a ~17,000px scroll the raw colour is fatiguing. */
-  --color-field: #bce24a;   /* page */
-  --color-field-2: #c9ec5e; /* raised — cards lift by getting lighter */
-  --color-field-3: #a9cf3f; /* recessed bands */
-  --color-field-4: #93b636; /* deepest */
+  /* Surfaces. The page is pure white; the deeper steps carry a faint
+     warm tint so raised panels separate from it without going grey,
+     and so the neutrals sit in the same family as the orange. */
+  --color-field: #ffffff;   /* page */
+  --color-field-2: #faf7f3; /* raised — cards read as warm-white on white */
+  --color-field-3: #f2ece4; /* recessed bands */
+  --color-field-4: #e6dccf; /* deepest */
 
-  /* Text. Near-black carrying a green cast, so it sits in the same
-     family as the field instead of looking punched out of it. */
-  --color-ink: #0e1305;
-  --color-ink-2: #2f3a17;
-  --color-ink-3: #46521f;
-  --color-ink-4: #64713a;
+  /* Text. Near-black, very slightly warm below the top step. */
+  --color-ink: #0a0a0a;
+  --color-ink-2: #3a3632;
+  --color-ink-3: #6b635b;
+  --color-ink-4: #8f857d;
 
-  --color-edge: rgba(14, 19, 5, 0.16);
-  --color-edge-2: rgba(14, 19, 5, 0.3);
+  --color-edge: rgba(10, 10, 10, 0.12);
+  --color-edge-2: rgba(10, 10, 10, 0.24);
 
-  /* ── Blue: one ramp, one hue family ──────────────────────────
-     On a light field only the deep end is legible — `electric`
-     itself is 2.4:1 on `field` and fails everything. The upper
-     steps survive only on dark chips (the emblem, the curtain).
-     Don't reach past -dim for anything sitting on the page. */
-  --color-electric-deep: #0a3fa8;  /* THE accent. 7.1:1 on field. */
-  --color-electric-ink: #071f5c;   /* deepest — gradient anchor */
-  --color-electric-dim: #3c6fe0;   /* borderline; large text only */
-  --color-electric: #5b8dff;       /* dark chips only */
-  --color-electric-soft: #7faaff;  /* dark chips only */
-  --color-electric-pale: #a9c7ff;  /* dark chips only */
-
-  /* ── Acid at full strength ───────────────────────────────────
-     Now that the page *is* acid, this can't mark anything on it —
-     it's invisible against its own background. It survives only as
-     a foreground on indigo: the SF inside the sun, text on an
-     electric-deep chip. The role it used to play (the terminal
-     period, the active rail marker, the hover ring) belongs to
-     electric-deep now. */
-  --color-acid: #c6f24e;
+  /* ── Orange: one ramp ────────────────────────────────────────
+     Orange is brutal on white — the vivid end of any orange ramp
+     lands around 3:1 and fails as body text. So the ramp splits by
+     job, not by taste:
+       ember       the only step safe for text on white (6.0:1)
+       ember-mid   fills, large type, UI chrome (3.5:1)
+       everything brighter is for glows, washes, and dark chips —
+       the curtain and the sun — never for type on the page. */
+  --color-ember-deep: #7a2600;   /* darkest — gradient anchor */
+  --color-ember: #b23a00;        /* THE accent. 6.0:1 on white. */
+  --color-ember-mid: #e85d04;    /* fills / large only, 3.5:1 */
+  --color-ember-bright: #ff7a1a; /* glows and hues; on dark grounds */
+  --color-ember-soft: #ffa25c;   /* dark chips only */
+  --color-ember-pale: #ffd9b0;   /* washes and tints */
 }
 
 html,
 body {
-  background: #bce24a;
-  color: #0e1305;
+  background: #ffffff;
+  color: #0a0a0a;
 }
 
 /* Subtle mesh-gradient backdrop, layered above the flat ink fill.
@@ -94,12 +84,13 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  /* Indigo washes, not light ones — on a light field a bright wash
-     does nothing and a dark one gives the page depth. */
+  /* Warm washes. On pure white these are the only "shading" the page
+     gets — a bright tint would do nothing, so these are orange and grey
+     at low alpha, giving depth without becoming a colour block. */
   background-image:
-    radial-gradient(ellipse 60% 50% at 18% 0%, rgba(10, 63, 168, 0.10), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 82% 25%, rgba(14, 19, 5, 0.07), transparent 60%),
-    radial-gradient(ellipse 40% 30% at 50% 80%, rgba(10, 63, 168, 0.07), transparent 60%);
+    radial-gradient(ellipse 60% 50% at 18% 0%, rgba(178, 58, 0, 0.10), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 82% 25%, rgba(10, 10, 10, 0.07), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 80%, rgba(178, 58, 0, 0.07), transparent 60%);
   background-repeat: no-repeat;
 }
 
@@ -158,7 +149,7 @@ body::before {
 .cursor-ring-wrap { left: 0; top: 0; }
 .cursor-ring-hidden { opacity: 0; }
 
-/* Dark by default so the ring reads on the acid field at all. */
+/* Black by default so the ring reads against the white page. */
 .cursor-ring-dot {
   width: 22px;
   height: 22px;
@@ -176,12 +167,12 @@ body::before {
 /* Indigo on hover — the mark colour. Acid can't do this job any more;
    it's the background now. */
 .cursor-ring-hover .cursor-ring-dot {
-  border-color: var(--color-electric-deep);
-  background: rgba(10, 63, 168, 0.12);
+  border-color: var(--color-ember);
+  background: rgba(178, 58, 0, 0.12);
   transform: translate(-50%, -50%) scale(1.35);
   box-shadow:
-    0 0 14px 0 rgba(10, 63, 168, 0.45),
-    inset 0 0 6px 0 rgba(10, 63, 168, 0.3);
+    0 0 14px 0 rgba(178, 58, 0, 0.45),
+    inset 0 0 6px 0 rgba(178, 58, 0, 0.3);
 }
 
 .cursor-ring-press .cursor-ring-dot {
@@ -221,8 +212,8 @@ body::before {
   inset: -14%;
   background: radial-gradient(
     circle,
-    rgba(10, 63, 168, 0.28) 0 34%,
-    rgba(10, 63, 168, 0) 66%
+    rgba(255, 122, 26, 0.34) 0 34%,
+    rgba(255, 122, 26, 0) 66%
   );
   animation: sun-breathe 11s ease-in-out infinite;
   will-change: transform;
@@ -233,7 +224,7 @@ body::before {
   inset: 0;
   background: repeating-conic-gradient(
     from 0deg,
-    var(--color-electric-deep) 0deg 2.4deg,
+    var(--color-ember-mid) 0deg 2.4deg,
     transparent 2.4deg 11deg
   );
   -webkit-mask: radial-gradient(circle, transparent 0 45%, #000 47%);
@@ -247,7 +238,7 @@ body::before {
   inset: 0;
   background: repeating-conic-gradient(
     from 0deg,
-    var(--color-electric-deep) 0deg 0.55deg,
+    var(--color-ember) 0deg 0.55deg,
     transparent 0.55deg 4.4deg
   );
   -webkit-mask: radial-gradient(circle, transparent 0 36%, #000 38% 43%, transparent 44%);
@@ -259,25 +250,26 @@ body::before {
 
 .sun-ring {
   inset: 27%;
-  border: 2px solid var(--color-electric-deep);
+  border: 2px solid var(--color-ember);
   opacity: 0.35;
 }
 
 .sun-disc {
   inset: 31%;
-  background: var(--color-electric-deep);
+  background: var(--color-ember);
   display: grid;
   place-items: center;
 }
 
-/* Full-strength acid, on indigo — the one place it still works. */
+/* White on the orange disc — 6.0:1, and the only white-on-colour pairing
+   in the design. */
 .sun-mark {
   font-family: var(--font-syne), system-ui, sans-serif;
   font-weight: 800;
   letter-spacing: -0.05em;
   font-size: min(15vmin, 132px);
   line-height: 1;
-  color: var(--color-acid);
+  color: var(--color-field);
   user-select: none;
 }
 
@@ -301,7 +293,7 @@ body::before {
 }
 
 /* ── Loading screen ─────────────────────────────────────────────
-   Electric-blue curtain with an acid-green script wordmark. The
+   Black curtain with a glowing orange script wordmark. The
    trailing letters sit inside `.ls-slide`, clipped flush with the
    S's right edge, and are parked underneath the S by a
    runtime-measured --dx (a script face has no predictable advance
@@ -341,9 +333,10 @@ body::before {
   display: grid;
   place-items: center;
   overflow: hidden;
-  /* Deep electric curtain — gives the acid wordmark something to bite
-     into. On exit the curtain dissolves to reveal the field page beneath. */
-  background: var(--color-electric-deep);
+  /* Black ground. The whole curtain is built on glow — bloom layers, a
+     flare pulse, a haloed wordmark — and glow needs something dark to read
+     against. On exit it cross-dissolves to the white page. */
+  background: var(--color-ink);
   /* Even cross-dissolve. easeInExpo held full opacity then dropped it all
      at once, which is the abrupt part you feel at the end. */
   transition: opacity 1000ms cubic-bezier(0.4, 0, 0.3, 1);
@@ -395,8 +388,8 @@ body::before {
 .ls-glow {
   background: radial-gradient(
     circle,
-    rgba(198, 242, 78, 0.52),
-    rgba(198, 242, 78, 0) 62%
+    rgba(255, 122, 26, 0.52),
+    rgba(255, 122, 26, 0) 62%
   );
   transform: translate(-50%, -50%) scale(0.5);
   /* Deliberately outlasts the letters: the bloom is still opening after the
@@ -416,8 +409,8 @@ body::before {
 .ls-flare {
   background: radial-gradient(
     circle,
-    rgba(198, 242, 78, 0.5),
-    rgba(198, 242, 78, 0) 45%
+    rgba(255, 122, 26, 0.5),
+    rgba(255, 122, 26, 0) 45%
   );
   transform: translate(-50%, -50%) scale(0.72);
 }
@@ -439,14 +432,16 @@ body::before {
   font-family: var(--font-great-vibes), "Snell Roundhand", "Apple Chancery", cursive;
   font-size: clamp(120px, 26vw, 360px);
   line-height: 1.25;
-  color: var(--color-acid);
+  color: var(--color-ember-bright);
   /* Great Vibes ships one weight, so weight comes from an outline stroke.
      Proportional to the font size so it holds up from phone to desktop. */
-  -webkit-text-stroke: 0.013em var(--color-acid);
-  /* Deliberately tight. A wide halo has to be re-rasterized whenever the
-     layer is re-rastered, and its clipped edge is what used to draw a seam
-     beside the S. The broad bloom comes from .ls-glow instead. */
-  text-shadow: 0 0 26px rgba(198, 242, 78, 0.85);
+  -webkit-text-stroke: 0.013em var(--color-ember-bright);
+  /* Proportional, not a fixed 26px. The reveal ramp above is specified in
+     em, so a fixed-pixel halo would out-grow it at the small end of the
+     font clamp — the ramp would stop being wide enough to dissolve the
+     glow and the hard edge would come back on phones. At 0.07em the ramp
+     stays a little over 2x the halo at every size. */
+  text-shadow: 0 0 0.07em rgba(255, 122, 26, 0.85);
   opacity: 0;
 }
 /* No transition — this only hides the single frame between mount and
@@ -471,7 +466,7 @@ body::before {
 /* Warm-up. A fully transparent element isn't painted, so the S's layer —
    a 360px glyph with a stroke and a halo — would otherwise rasterize on the
    first frame of its own fade, and drop it. This paints the layer during the
-   is-set beat instead. Invisible: 1.5% acid on electric-deep. */
+   is-set beat instead. Invisible: 1.5% orange on black. */
 .ls-inner.is-set .ls-cap {
   opacity: 0.015;
 }
@@ -480,23 +475,36 @@ body::before {
   transform: scale(1) translateY(0);
 }
 
-/* The reveal edge. Left inset is slightly negative so it sits *inside* the
-   S's exit swash rather than at its advance edge — script lowercase carries
-   an entry stroke that starts left of its own box, and clipping flush would
-   shave it off. The other insets are negative purely so ascenders,
-   descenders and the final swash aren't cut. LoadingScreen reads the
-   computed left inset back to decide how far to park each letter. */
+/* The reveal edge — a feathered mask, not a clip.
+
+   This was `clip-path: inset(...)`, which cut on a razor-straight vertical
+   line. That line slices the glyph *and* its halo, and watching a hard edge
+   travel across a glowing letter is exactly what reads as cheap. A gradient
+   mask dissolves the letter in instead.
+
+   Geometry, all in em so it holds at every clamp step:
+     · the box is padded 0.30em further left than the letters start (and
+       pulled back with a matching negative margin, so layout is untouched)
+     · the ramp runs transparent → opaque over the first 0.16em of that box,
+       i.e. it finishes 0.14em LEFT of where the first letter comes to rest
+
+   The second point is what removes the seam entirely: every letter — and
+   the 0.07em halo it carries — sits in fully opaque territory once it's
+   home, so there's nothing left to clean up afterwards. The old code needed
+   an is-settled rule to yank the clip out of the way; that discrete swap
+   was itself a visible pop, and it's now gone.
+
+   The rest of the padding is headroom: mask-clip is the border box, and the
+   script's ascenders, descenders and exit swash all paint outside it. */
 .ls-slide {
   display: inline-flex;
   align-items: baseline;
-  clip-path: inset(-0.6em -1.5em -0.6em -0.26em);
-}
-/* Letters are home — drop the edge clear of the wordmark so the clipped
-   halo stops drawing a seam beside the S. Switched, not transitioned: an
-   animated clip-path repaints the glyphs every frame, and with the halo
-   now tight the step is imperceptible under the flare. */
-.ls-inner.is-settled .ls-slide {
-  clip-path: inset(-0.6em -1.5em -0.6em -3em);
+  padding: 0.65em 1.6em 0.65em 0.3em;
+  margin: -0.65em -1.6em -0.65em -0.3em;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 0.16em);
+  mask-image: linear-gradient(to right, transparent 0, #000 0.16em);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 /* No transition in the parked state — --dx is written from JS, and a
@@ -533,10 +541,10 @@ body::before {
   margin-top: 0.8rem;
   background: linear-gradient(
     to right,
-    rgba(198, 242, 78, 0),
-    rgba(198, 242, 78, 0.7) 22%,
-    rgba(198, 242, 78, 0.7) 78%,
-    rgba(198, 242, 78, 0)
+    rgba(255, 122, 26, 0),
+    rgba(255, 122, 26, 0.7) 22%,
+    rgba(255, 122, 26, 0.7) 78%,
+    rgba(255, 122, 26, 0)
   );
   transform: scaleX(0);
   transition: transform 1900ms var(--ls-settle);
