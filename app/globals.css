@@ -19,6 +19,9 @@
   --color-ink-3: #717171;   /* 4.9:1 on white — passes AA at small sizes */
   --color-ink-4: #a6a6a6;   /* decorative marks only, never information */
 
+  /* The ground the hands plate was drawn on — a third neutral, used only there. */
+  --color-plate: #c8cac8;
+
   --color-edge: rgba(10, 10, 10, 0.12);
   --color-edge-2: rgba(10, 10, 10, 0.3);
 }
@@ -66,6 +69,172 @@ body::after {
   mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, transparent 45%, #000 95%);
 }
 
+/* ── Hero centrepiece ───────────────────────────────────────────────
+   The shatter plate is printed, not pasted. `invert` makes a negative of
+   the near-black source so its bright fractures become ink, and `multiply`
+   drops the resulting white field away so only the marks sit on the paper.
+   The mask keeps that ink inside the frame — clear of the crop marks and
+   the mono metadata running along the top and bottom. */
+.shatter-plate {
+  mix-blend-mode: multiply;
+  --plate-mask:
+    radial-gradient(ellipse 56% 44% at 50% 38%, #000 10%, rgba(0, 0, 0, 0.45) 52%, transparent 82%);
+  -webkit-mask-image: var(--plate-mask);
+  mask-image: var(--plate-mask);
+}
+
+.shatter-ink {
+  filter: grayscale(1) invert(1) contrast(2.1) brightness(1.1);
+}
+
+/* Framing. `object-fit: cover` puts the point of impact off to the lower left,
+   so the image is enlarged and shifted until that point sits under the seal and
+   the fractures read as radiating from the monogram. A portrait frame already
+   crops hard to fill, so it needs far less of both. */
+.shatter-frame {
+  --plate-x: 26%;
+  --plate-y: -8%;
+  --plate-scale: 1.05;
+  transform: translate(var(--plate-x), var(--plate-y)) scale(var(--plate-scale));
+}
+
+@media (min-width: 768px) {
+  .shatter-frame {
+    --plate-x: 13.5%;
+    --plate-y: -13%;
+    --plate-scale: 1.5;
+  }
+}
+
+/* ── Hands plate ────────────────────────────────────────────────────
+   The sliced layers are positioned as percentages of the 1280x720 source,
+   so the box has to stay exactly 16:9 for them to line up — hence the ratio
+   here rather than a height. The cap keeps it inside the viewport it is
+   pinned in on short, wide screens. */
+.hands-plate {
+  aspect-ratio: 16 / 9;
+  width: min(100%, calc(92svh * 16 / 9));
+}
+
+/* ── Liquid metal ───────────────────────────────────────────────────
+   A conic ramp through the greys is the specular core of the look; two
+   soft pools ride over it out of phase so the highlights never land in
+   the same place twice. The layers are oversized so the conic's centre
+   singularity stays off screen, and blurred once — only `transform`
+   animates, so the blurred texture is rasterised once and then moved. */
+.liquid-metal {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.liquid-metal > span {
+  position: absolute;
+  display: block;
+  will-change: transform;
+}
+
+/* The cone's apex is pushed well outside the frame by the translate in
+   `lm-ground-turn`: left at the centre it reads as a starburst, but seen from
+   off the corner the same stops arrive as broad bands raking across the
+   surface, which is what poured metal actually looks like. */
+.lm-sweep {
+  inset: -70%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #9ca1a0 0deg, #f7f8f4 34deg, #7c8183 86deg, #e4e6e2 136deg,
+    #717678 194deg, #fafbf7 246deg, #8e9392 300deg, #9ca1a0 360deg
+  );
+  filter: blur(28px);
+  opacity: 0.85;
+  animation: lm-ground-turn 38s linear infinite;
+}
+
+.lm-pool-a {
+  inset: -30%;
+  background: radial-gradient(42% 38% at 34% 36%, #f6f7f4 0%, rgba(246, 247, 244, 0) 70%);
+  filter: blur(26px);
+  opacity: 0.75;
+  animation: lm-drift-a 27s ease-in-out infinite alternate;
+}
+
+.lm-pool-b {
+  inset: -30%;
+  background: radial-gradient(46% 42% at 68% 68%, #848a8b 0%, rgba(132, 138, 139, 0) 72%);
+  filter: blur(30px);
+  opacity: 0.65;
+  animation: lm-drift-b 33s ease-in-out infinite alternate;
+}
+
+@keyframes lm-turn {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes lm-ground-turn {
+  from { transform: translate3d(-17%, -21%, 0) rotate(0deg); }
+  to   { transform: translate3d(-17%, -21%, 0) rotate(360deg); }
+}
+
+@keyframes lm-drift-a {
+  from { transform: translate3d(-6%, -5%, 0) scale(1); }
+  to   { transform: translate3d(8%, 6%, 0) scale(1.16); }
+}
+
+@keyframes lm-drift-b {
+  from { transform: translate3d(7%, 5%, 0) scale(1.12); }
+  to   { transform: translate3d(-7%, -6%, 0) scale(1); }
+}
+
+/* ── Title card ─────────────────────────────────────────────────────
+   The mark prints left to right, then the rule under it fills while the
+   panels are held. Both halves of the mark run the same animation off the
+   same mount, so they stay in lockstep across the join. */
+@keyframes mark-print {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+/* The mark is cast in the same metal as the ground it introduces. The sweep is
+   multiplied into it over the card's own black: black times anything stays
+   black, so the panel swallows everything outside the mark and only the white
+   letterforms take the metal. Multiplying rather than masking also means the
+   card never flashes a bare rectangle in the moment before the mark loads. */
+.loader-mark {
+  position: relative;
+  isolation: isolate;
+  width: clamp(140px, 30vw, 320px);
+  overflow: hidden;
+  background: #0a0a0a; /* --color-ink; @theme inline does not emit it as a variable */
+  animation: mark-print 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.loader-mark-metal {
+  position: absolute;
+  inset: -70%;
+  mix-blend-mode: multiply;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #8d9290 0deg, #ffffff 30deg, #6e7375 72deg, #e9ebe6 118deg,
+    #5f6466 170deg, #ffffff 214deg, #7f8482 268deg, #f2f3ef 312deg, #8d9290 360deg
+  );
+  filter: blur(10px);
+  animation: lm-turn 11s linear infinite;
+}
+
+@keyframes rule-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.loader-rule {
+  animation: rule-fill 1.25s cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+/* Held while the title card is up, so the page cannot be scrolled behind it. */
+.is-loading,
+.is-loading body {
+  overflow: hidden;
+}
+
 @keyframes spin-slow {
   to { transform: rotate(360deg); }
 }
@@ -104,9 +273,14 @@ body {
 /* The global rule below only clamps duration, which would leave infinite
    loops resolving every 0.001ms. Kill them outright. */
 @media (prefers-reduced-motion: reduce) {
+  /* Hidden in CSS as well as in JS so it never paints before hydration. */
+  .loader {
+    display: none;
+  }
   .seal-spin,
   .marquee,
-  .scroll-cue {
+  .scroll-cue,
+  .liquid-metal > span {
     animation: none;
   }
   * {

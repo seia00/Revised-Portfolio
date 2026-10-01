@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { reveal, revealViewport } from "@/lib/motion";
 import { SectionHeader } from "./ornaments";
 
 const WORDS = [
@@ -48,10 +49,11 @@ export default function ThreeWords() {
           {WORDS.map((w, i) => (
             <motion.li
               key={w.word}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-10% 0px" }}
-              transition={{ duration: 0.8, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+              variants={reveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+              custom={i}
               className="grid grid-cols-12 gap-x-4 gap-y-5 items-end py-9 md:py-12 border-b border-edge"
             >
               <span className="col-span-2 md:col-span-1 self-start font-serif italic text-ink-3 text-2xl md:text-3xl leading-none">

@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLenis } from "lenis/react";
+import { reveal, revealViewport } from "@/lib/motion";
 import { SectionHeader, Serif } from "./ornaments";
 
 const CHANNELS = [
@@ -28,6 +30,8 @@ const CHANNELS = [
 ];
 
 export default function Connect() {
+  const lenis = useLenis();
+
   return (
     <footer
       id="connect"
@@ -43,10 +47,11 @@ export default function Connect() {
           {CHANNELS.map((c, i) => (
             <motion.li
               key={c.n}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-10% 0px" }}
-              transition={{ duration: 0.7, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+              variants={reveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+              custom={i}
               className="border-b border-ink"
             >
               <a
@@ -83,7 +88,11 @@ export default function Connect() {
           <span>© 2026 Seia Funayama</span>
           <span className="md:text-center">Set in Instrument Serif, Inter Tight &amp; JetBrains Mono</span>
           <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={() =>
+              lenis
+                ? lenis.scrollTo(0)
+                : window.scrollTo({ top: 0, behavior: "smooth" })
+            }
             className="md:justify-self-end text-left uppercase tracking-[0.18em] hover:text-ink transition-colors cursor-pointer"
           >
             Back to top ↑

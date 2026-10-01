@@ -1,6 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import { motion, useScroll, useSpring } from "framer-motion";
+import { useLenis } from "lenis/react";
+import { scrollSpring } from "@/lib/motion";
 
 const LINKS = [
   { id: "hero", label: "Index" },
@@ -10,6 +14,9 @@ const LINKS = [
   { id: "connect", label: "Contact" },
 ] as const;
 
+/** The fixed header's own height — a jump has to clear it to land square. */
+const HEADER = 64;
+
 const clock = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Asia/Tokyo",
   hour: "2-digit",
@@ -18,6 +25,12 @@ const clock = new Intl.DateTimeFormat("en-GB", {
 
 export default function Nav() {
   const [active, setActive] = useState<string>("hero");
+  const lenis = useLenis();
+
+  // A measure rule across the foot of the header. Sprung so it eases to a stop
+  // with the page rather than twitching on every wheel notch.
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, scrollSpring);
   // Null until mounted so server and client render the same markup.
   const [time, setTime] = useState<string | null>(null);
 
@@ -51,18 +64,37 @@ export default function Nav() {
   }, []);
 
   function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Through Lenis where it is driving, so a jump uses the same easing as a
+    // scroll; natively otherwise, which is also the reduced-motion path.
+    if (lenis) lenis.scrollTo(el, { offset: -HEADER });
+    else el.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   return (
     <header className="fixed top-0 inset-x-0 z-40 h-16 bg-field/85 backdrop-blur-md border-b border-edge">
+      <motion.span
+        aria-hidden
+        style={{ scaleX: progress }}
+        className="absolute bottom-0 inset-x-0 h-px bg-ink origin-left"
+      />
       <div className="h-full grid grid-cols-2 md:grid-cols-3 items-center px-5 md:px-10">
         <button
           onClick={() => scrollTo("hero")}
           className="justify-self-start flex items-baseline gap-3 cursor-pointer"
           aria-label="Back to top"
         >
-          <span className="font-serif italic text-[26px] leading-none text-ink">SF</span>
+          {/* The mark ships white on transparent, so it inverts to ink on paper. */}
+          <Image
+            src="/logo.png"
+            alt="Seia Funayama"
+            width={851}
+            height={523}
+            sizes="40px"
+            loading="eager"
+            className="h-[19px] w-auto invert"
+          />
           <span className="hidden lg:inline font-mono text-[10px] tracking-[0.2em] uppercase text-ink-3">
             Seia Funayama
           </span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { reveal, revealViewport } from "@/lib/motion";
 import { TIMELINE } from "@/data/timeline";
 import { SectionHeader, Serif } from "./ornaments";
 
@@ -25,10 +26,10 @@ export default function Timeline() {
           {TIMELINE.map((m, i) => (
             <motion.li
               key={m.title}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12% 0px" }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              variants={reveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
               className="group relative grid grid-cols-12 gap-x-4 md:gap-x-8 gap-y-4 py-12 md:py-16 border-t border-edge last:border-b"
             >
               <div className="col-span-12 md:col-span-3 flex md:block items-end gap-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeUp, staggerParent } from "@/lib/motion";
+import { reveal, revealViewport, staggerParent } from "@/lib/motion";
 
 export function Star({ className = "w-2.5 h-2.5" }: { className?: string }) {
   return (
@@ -59,12 +59,12 @@ export function SectionHeader({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-15% 0px" }}
+      viewport={revealViewport}
       variants={staggerParent}
       className="border-t border-ink pt-4 mb-16 md:mb-24"
     >
       <motion.div
-        variants={fadeUp}
+        variants={reveal}
         className="flex items-baseline justify-between gap-4 font-mono text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-ink-3"
       >
         <span>
@@ -74,7 +74,7 @@ export function SectionHeader({
       </motion.div>
       {children && (
         <motion.h2
-          variants={fadeUp}
+          variants={reveal}
           className="mt-10 md:mt-14 font-sans font-semibold uppercase tracking-[-0.045em] leading-[0.88] text-ink text-[clamp(48px,8.5vw,128px)]"
         >
           {children}
