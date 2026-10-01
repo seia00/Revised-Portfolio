@@ -23,7 +23,7 @@ export default function AppleIcon() {
         }}
       >
         SF
-        <span style={{ color: "#b23a00", marginLeft: "-0.04em" }}>.</span>
+        <span style={{ color: "#717171", marginLeft: "-0.04em" }}>.</span>
       </div>
     ),
     size

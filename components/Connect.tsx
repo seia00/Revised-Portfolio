@@ -1,35 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
-
-/**
- * How To Connect — final chapter.
- *
- * Inherits the Friction section's visual system: harsh grid backdrop,
- * violently large Anton headline, slabby /0X items with corner stamps,
- * and the one-time entrance shake. Each item is a real link; hovering
- * an item replays the shake on that card only.
- */
+import { motion } from "framer-motion";
+import { fadeUp, staggerParent } from "@/lib/motion";
 
 const CHANNELS = [
   {
     n: "01",
-    title: "INSTAGRAM",
+    title: "Instagram",
     handle: "@seiafunayama",
     href: "https://instagram.com/seiafunayama",
     external: true,
   },
   {
     n: "02",
-    title: "EMAIL",
+    title: "Email",
     handle: "seiafunayama@gmail.com",
     href: "mailto:seiafunayama@gmail.com",
     external: false,
   },
   {
     n: "03",
-    title: "LINKEDIN",
+    title: "LinkedIn",
     handle: "Seia Funayama",
     href: "https://www.linkedin.com/in/seiafunayama/",
     external: true,
@@ -37,104 +28,57 @@ const CHANNELS = [
 ];
 
 export default function Connect() {
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { margin: "-30% 0px -30% 0px", once: true });
-  const [shaking, setShaking] = useState(false);
-
-  // Trigger the shake exactly once when the section first enters the viewport.
-  useEffect(() => {
-    if (!inView) return;
-    setShaking(true);
-    const t = window.setTimeout(() => setShaking(false), 600);
-    return () => window.clearTimeout(t);
-  }, [inView]);
-
   return (
     <footer
-      ref={ref}
       id="connect"
       aria-label="How to connect"
-      className={`relative px-6 md:px-10 lg:px-16 py-40 md:py-56 overflow-hidden ${
-        shaking ? "friction-shake" : ""
-      }`}
+      className="relative px-6 md:px-10 lg:px-16 py-32 md:py-44"
     >
-      {/* harsh grid backdrop */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.07] pointer-events-none"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent 0 23px, rgba(10, 10, 10,0.5) 23px 24px), repeating-linear-gradient(90deg, transparent 0 23px, rgba(10, 10, 10,0.5) 23px 24px)",
-        }}
-      />
-
-      {/* tape strip top-left */}
-      <div
-        aria-hidden
-        className="absolute -left-6 top-32 rotate-[-4deg] bg-ember text-field font-anton uppercase tracking-[0.18em] text-[11px] px-6 py-1.5 select-none"
-      >
-        ※ Signal open · reach out ※
-      </div>
-
-      <div className="max-w-[1200px] mx-auto relative z-10">
-        {/* heading — VIOLENTLY large Anton */}
+      <div className="max-w-[1200px] mx-auto">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.45 }}
-          className="mb-28 md:mb-40"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-15% 0px" }}
+          variants={staggerParent}
+          className="mb-20 md:mb-28 max-w-[640px]"
         >
-          <p className="font-jetbrains text-[11px] tracking-[0.24em] uppercase text-ember mb-6">
-            /// Chapter v — how to connect
-          </p>
-          <h2 className="font-anton uppercase text-ink leading-[0.78] tracking-[-0.01em] text-[clamp(44px,14vw,260px)]">
-            How to
-            <br />
-            <span className="text-ember">connect<span className="text-ink">.</span></span>
-          </h2>
+          <motion.p
+            variants={fadeUp}
+            className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ink-3 mb-6"
+          >
+            Get in touch
+          </motion.p>
+          <motion.h2
+            variants={fadeUp}
+            className="font-syne font-extrabold uppercase leading-[0.95] tracking-[-0.03em] text-ink text-[clamp(36px,6vw,72px)]"
+          >
+            How to connect.
+          </motion.h2>
         </motion.div>
 
-        {/* channels — slabby, hard-edged link cards */}
-        <ul className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y-2 border-ink">
+        <ul className="grid grid-cols-1 md:grid-cols-3 border-t border-l border-edge">
           {CHANNELS.map((c, idx) => (
             <motion.li
               key={c.n}
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                delay: 0.15 + idx * 0.12,
-                duration: 0.55,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className={
-                idx !== CHANNELS.length - 1
-                  ? "border-r-0 md:border-r-2 border-b-2 md:border-b-0 border-ink"
-                  : ""
-              }
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-10% 0px" }}
+              transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              className="border-r border-b border-edge"
             >
               <a
                 href={c.href}
                 target={c.external ? "_blank" : undefined}
                 rel={c.external ? "noopener noreferrer" : undefined}
-                className="connect-item relative block p-8 md:p-10 h-full"
+                className="group block p-8 md:p-10 h-full transition-colors hover:bg-field-2"
               >
-                <span className="font-anton uppercase block text-ember text-5xl md:text-6xl leading-none mb-6 tracking-tighter">
-                  /{c.n}
-                </span>
-                <h3 className="font-anton uppercase text-ink text-3xl md:text-4xl leading-[0.95] mb-5 tracking-[-0.005em]">
+                <span className="font-jetbrains text-ink-3 text-sm block mb-6">/{c.n}</span>
+                <h3 className="font-syne font-extrabold uppercase text-ink text-2xl md:text-3xl mb-4 tracking-[-0.015em] group-hover:underline underline-offset-4">
                   {c.title}
                 </h3>
-                <p className="font-jetbrains text-ink-2 text-[13px] leading-[1.65] max-w-[280px] break-words">
+                <p className="font-jetbrains text-ink-3 text-[13px] leading-[1.65] break-words">
                   {c.handle}
                 </p>
-
-                {/* corner stamp */}
-                <span
-                  aria-hidden
-                  className="absolute top-3 right-3 font-jetbrains text-[9px] tracking-[0.18em] uppercase text-ink-4"
-                >
-                  no.{c.n}
-                </span>
               </a>
             </motion.li>
           ))}
