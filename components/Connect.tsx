@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeUp, staggerParent } from "@/lib/motion";
+import { SectionHeader, Serif } from "./ornaments";
 
 const CHANNELS = [
   {
@@ -32,58 +32,76 @@ export default function Connect() {
     <footer
       id="connect"
       aria-label="How to connect"
-      className="relative px-6 md:px-10 lg:px-16 py-32 md:py-44"
+      className="relative px-5 md:px-10 lg:px-16 pt-28 md:pt-40 pb-10"
     >
-      <div className="max-w-[1200px] mx-auto">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-15% 0px" }}
-          variants={staggerParent}
-          className="mb-20 md:mb-28 max-w-[640px]"
-        >
-          <motion.p
-            variants={fadeUp}
-            className="font-jetbrains text-[11px] tracking-[0.22em] uppercase text-ink-3 mb-6"
-          >
-            Get in touch
-          </motion.p>
-          <motion.h2
-            variants={fadeUp}
-            className="font-syne font-extrabold uppercase leading-[0.95] tracking-[-0.03em] text-ink text-[clamp(36px,6vw,72px)]"
-          >
-            How to connect.
-          </motion.h2>
-        </motion.div>
+      <div className="max-w-[1280px] mx-auto">
+        <SectionHeader index="04" label="Contact" aside="DMs open">
+          How to <Serif>connect.</Serif>
+        </SectionHeader>
 
-        <ul className="grid grid-cols-1 md:grid-cols-3 border-t border-l border-edge">
-          {CHANNELS.map((c, idx) => (
+        <ul className="border-t border-ink">
+          {CHANNELS.map((c, i) => (
             <motion.li
               key={c.n}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10% 0px" }}
-              transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              className="border-r border-b border-edge"
+              transition={{ duration: 0.7, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+              className="border-b border-ink"
             >
               <a
                 href={c.href}
                 target={c.external ? "_blank" : undefined}
                 rel={c.external ? "noopener noreferrer" : undefined}
-                className="group block p-8 md:p-10 h-full transition-colors hover:bg-field-2"
+                className="group grid grid-cols-12 items-center gap-x-4 gap-y-2 py-7 md:py-9 px-1 md:px-4 transition-colors duration-300 hover:bg-ink hover:text-field"
               >
-                <span className="font-jetbrains text-ink-3 text-sm block mb-6">/{c.n}</span>
-                <h3 className="font-syne font-extrabold uppercase text-ink text-2xl md:text-3xl mb-4 tracking-[-0.015em] group-hover:underline underline-offset-4">
+                <span className="col-span-2 md:col-span-1 font-mono text-[11px] tracking-[0.15em] text-ink-3 group-hover:text-field/60">
+                  {c.n}
+                </span>
+                <span className="col-span-8 md:col-span-5 font-serif text-[clamp(40px,6vw,88px)] leading-none tracking-[-0.02em] group-hover:italic">
                   {c.title}
-                </h3>
-                <p className="font-jetbrains text-ink-3 text-[13px] leading-[1.65] break-words">
+                </span>
+                <span className="col-span-2 md:col-span-1 md:col-start-12 md:row-start-1 justify-self-end">
+                  <Arrow />
+                </span>
+                <span className="col-span-10 col-start-3 md:col-span-5 md:col-start-7 md:row-start-1 font-mono text-[12px] md:text-[13px] text-ink-3 group-hover:text-field/70 break-all">
                   {c.handle}
-                </p>
+                </span>
               </a>
             </motion.li>
           ))}
         </ul>
+
+        <p
+          aria-hidden
+          className="mt-24 md:mt-36 font-serif italic text-ink text-center whitespace-nowrap leading-[0.9] tracking-[-0.03em] text-[clamp(56px,14.5vw,232px)]"
+        >
+          Seia Funayama
+        </p>
+
+        <div className="mt-10 md:mt-14 grid grid-cols-1 md:grid-cols-3 gap-3 border-t border-edge pt-5 font-mono text-[10px] md:text-[11px] tracking-[0.18em] uppercase text-ink-3">
+          <span>© 2026 Seia Funayama</span>
+          <span className="md:text-center">Set in Instrument Serif, Inter Tight &amp; JetBrains Mono</span>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="md:justify-self-end text-left uppercase tracking-[0.18em] hover:text-ink transition-colors cursor-pointer"
+          >
+            Back to top ↑
+          </button>
+        </div>
       </div>
     </footer>
+  );
+}
+
+function Arrow() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="w-6 h-6 md:w-8 md:h-8 -rotate-45 transition-transform duration-300 group-hover:rotate-0"
+      aria-hidden
+    >
+      <path d="M3 12h17M14 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="1.25" />
+    </svg>
   );
 }

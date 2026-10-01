@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Syne, Inter, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 
-const syne = Syne({
-  variable: "--font-syne",
+const serif = Instrument_Serif({
+  variable: "--font-instrument-serif",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: "400",
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const sans = Inter_Tight({
+  variable: "--font-inter-tight",
   subsets: ["latin"],
   display: "swap",
 });
 
-const jetbrains = JetBrains_Mono({
+const mono = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
   display: "swap",
@@ -32,8 +33,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${inter.variable} ${jetbrains.variable}`}>
-      <body className="min-h-screen bg-field text-ink antialiased font-inter selection:bg-ink selection:text-field">
+    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
+      <body className="min-h-screen bg-field text-ink antialiased font-sans selection:bg-ink selection:text-field">
         <Nav />
         {children}
       </body>

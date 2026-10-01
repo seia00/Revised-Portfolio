@@ -2,17 +2,17 @@
 
 @theme inline {
   /* ── Font families (variables come from next/font in layout.tsx) ── */
-  --font-syne: var(--font-syne);
-  --font-inter: var(--font-inter);
-  --font-jetbrains: var(--font-jetbrains);
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
   /* ══ BLACK / WHITE ═══════════════════════════════════════════
      `field` is the background scale, `ink` is the text scale.
      No accent colour — contrast and type do all the work. */
 
-  --color-field: #ffffff;   /* page */
-  --color-field-2: #f7f7f7; /* raised panels */
-  --color-field-3: #eeeeee; /* recessed bands */
+  --color-field: #ffffff;
+  --color-field-2: #f6f6f4;
+  --color-field-3: #ececea;
 
   --color-ink: #0a0a0a;
   --color-ink-2: #3d3d3d;
@@ -29,6 +29,67 @@ body {
   color: #0a0a0a;
 }
 
+/* Fixed nav is 64px tall — keep anchored sections clear of it. */
+[id] {
+  scroll-margin-top: 64px;
+}
+
+/* Paper grain. Static noise on a fixed layer: rasterized once, then
+   composited, so it costs nothing on scroll. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Hollow type — fill drops out, stroke follows the text colour. */
+.text-outline {
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1.5px currentColor;
+}
+
+/* Column guides behind the hero at 20/40/60/80% — no centre line, so
+   nothing runs through the seal — and faded out under the name. */
+.hero-grid {
+  --rule: linear-gradient(var(--color-edge), var(--color-edge));
+  background:
+    var(--rule) 20% 0 / 1px 100% no-repeat,
+    var(--rule) 40% 0 / 1px 100% no-repeat,
+    var(--rule) 60% 0 / 1px 100% no-repeat,
+    var(--rule) 80% 0 / 1px 100% no-repeat;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, transparent 45%, #000 95%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, transparent 45%, #000 95%);
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.seal-spin {
+  animation: spin-slow 28s linear infinite;
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 45s linear infinite;
+}
+
+@keyframes scroll-cue {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+.scroll-cue {
+  animation: scroll-cue 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
 /* Hide horizontal overflow caused by motion offsets.
  *
  * NOTE: use `overflow-x: clip` rather than `overflow-x: hidden`.
@@ -40,16 +101,14 @@ body {
   overflow-x: clip;
 }
 
-/* Per-element scrollbar hiding (used by horizontal scroll-snap rails) */
-.no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
+/* The global rule below only clamps duration, which would leave infinite
+   loops resolving every 0.001ms. Kill them outright. */
 @media (prefers-reduced-motion: reduce) {
+  .seal-spin,
+  .marquee,
+  .scroll-cue {
+    animation: none;
+  }
   * {
     transition-duration: 0.001ms !important;
     animation-duration: 0.001ms !important;
