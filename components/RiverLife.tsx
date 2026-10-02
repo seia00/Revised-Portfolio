@@ -19,10 +19,10 @@ import { Serif } from "./ornaments";
 
 /* ── The shape of the chapter ──────────────────────────────────────────────
    The section is measured in screens: one of overture (the panel darkening,
-   then the light opening in it), a screen and a half per milestone, and one to
-   run out in. The half is what keeps it a story rather than a ride: the river
-   takes longer over each bend, so it swings bank to bank more gently, and the
-   milestones either side of the one being read sit fully off screen.
+   then the light opening in it), a little over a screen per milestone, and one
+   to run out in. The extra is what keeps it a story rather than a ride: the
+   river takes longer over each bend, so it swings bank to bank more gently,
+   and the milestones either side of the one being read sit fully off screen.
 
    The river runs *down* it, not across. The path is laid out in the section's
    own coordinates rather than inside the viewport, so it is not a picture of a
@@ -33,7 +33,7 @@ const OVERTURE = 1;
 const CODA = 1;
 const CHAPTERS = TIMELINE.length;
 /** Screens of river per milestone. */
-const SPAN = 1.5;
+const SPAN = 1.125;
 const SCREENS = OVERTURE + CHAPTERS * SPAN + CODA;
 
 /** Section progress after `screens` of scrolling. */
@@ -192,7 +192,7 @@ export default function RiverLife() {
   const [active, setActive] = useState(-1);
 
   // The course is drawn in the section's own pixels rather than in a scaled
-  // viewBox: the section is eight screens tall and one wide, so any fixed
+  // viewBox: the section is six and a half screens tall and one wide, so any fixed
   // viewBox would have to be stretched to fit, and a stretched viewBox gives
   // a stroke that is thicker across than it is down.
   const [box, setBox] = useState({ w: 0, h: 0 });
@@ -228,7 +228,7 @@ export default function RiverLife() {
   }, [box.w, box.h, course, screenPx]);
 
   // Sampled once per shape so the draw can be read off depth. 512 samples over
-  // eight screens is finer than a pixel at any size this runs at.
+  // six and a half screens is finer than a pixel at any size this runs at.
   const [depths, setDepths] = useState<Float64Array | null>(null);
 
   useEffect(() => {
@@ -270,7 +270,7 @@ export default function RiverLife() {
   // The light: a bloom that opens in the dark at the head of the course, then
   // falls back to a trace once the current is running — it is the source the
   // river came out of, not a second light competing with its head.
-  const dawn = useTransform(progress, [at(0.72), at(1.44), at(2.64)], [0, 1, 0.13]);
+  const dawn = useTransform(progress, [at(0.72), at(1.44), at(2.3)], [0, 1, 0.13]);
   // Reaches down the way the river does: the bloom draws out along the course
   // rather than across it.
   const dawnDown = useTransform(progress, [at(1.08), at(2.04)], [0.34, 1.9]);

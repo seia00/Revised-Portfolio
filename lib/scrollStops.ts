@@ -52,7 +52,6 @@ function allStops(): number[] {
   return stops.sort((a, b) => a - b);
 }
 
-
 /** The first stop a move from `from` to `to` would cross, if any. */
 function crossed(from: number, to: number): number | undefined {
   const stops = allStops();

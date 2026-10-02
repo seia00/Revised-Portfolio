@@ -37,9 +37,11 @@ type Layer = {
 
 /**
  * The section's height, in screens. Progress runs across all of it (see
- * `useScroll` below), and the plate is pinned from the end of the first.
+ * `useScroll` below), and the plate is pinned from the end of the first —
+ * so the first screen is the plate rising into view, and the rest is the
+ * pinned shot.
  */
-const SCREENS = 3.8;
+const SCREENS = 2.4;
 
 /** Section progress after `screens` of scrolling. */
 const at = (screens: number) => screens / SCREENS;
@@ -51,16 +53,16 @@ const at = (screens: number) => screens / SCREENS;
  * it is pinned, and the plate fills the screen one screen in. The hands are set
  * against that: the left lands as the ground takes over and the right is still
  * crossing to meet it, so the reader arrives at a picture already in motion
- * rather than at an empty field. Each piece gets most of a screen to travel, so
- * the assembly reads as something being put together rather than a flicker.
+ * rather than at an empty field. The panels follow in quick succession once
+ * the plate is pinned.
  */
 const LAYERS: readonly Layer[] = [
-  { name: "hand-left",  left: 0,      top: 28.75,  width: 51.563, height: 42.778, enter: [at(0.15), at(1)],    from: "left" },
-  { name: "hand-right", left: 51.563, top: 30.694, width: 48.438, height: 42.361, enter: [at(0.3), at(1.3)],   from: "right" },
-  { name: "residue",    left: 1.25,   top: 30.833, width: 8.516,  height: 6.806,  enter: [at(1.25), at(1.6)],  from: "left" },
-  { name: "latency",    left: 36.719, top: 25.972, width: 12.578, height: 18.333, enter: [at(1.4), at(1.75)],  from: "left" },
-  { name: "echo",       left: 55.625, top: 67.083, width: 10,     height: 10.972, enter: [at(1.55), at(1.9)],  from: "right" },
-  { name: "corner",     left: 89.531, top: 55.972, width: 9.531,  height: 12.5,   enter: [at(1.7), at(2.05)],  from: "right" },
+  { name: "hand-left",  left: 0,      top: 28.75,  width: 51.563, height: 42.778, enter: [at(0.15), at(1)],     from: "left" },
+  { name: "hand-right", left: 51.563, top: 30.694, width: 48.438, height: 42.361, enter: [at(0.3), at(1.15)],   from: "right" },
+  { name: "residue",    left: 1.25,   top: 30.833, width: 8.516,  height: 6.806,  enter: [at(1.125), at(1.3)],  from: "left" },
+  { name: "latency",    left: 36.719, top: 25.972, width: 12.578, height: 18.333, enter: [at(1.2), at(1.375)],  from: "left" },
+  { name: "echo",       left: 55.625, top: 67.083, width: 10,     height: 10.972, enter: [at(1.275), at(1.45)], from: "right" },
+  { name: "corner",     left: 89.531, top: 55.972, width: 9.531,  height: 12.5,   enter: [at(1.35), at(1.525)], from: "right" },
 ];
 
 /**
@@ -68,17 +70,17 @@ const LAYERS: readonly Layer[] = [
  * overlap, so the line builds as one gesture rather than three separate ones.
  */
 const READOUTS: readonly Window[] = [
-  [at(2.3), at(2.7)],
-  [at(2.45), at(2.85)],
-  [at(2.6), at(3)],
+  [at(1.65), at(1.85)],
+  [at(1.725), at(1.925)],
+  [at(1.8), at(2)],
 ];
 
 /**
  * Where the page comes to rest: once on the finished picture, and once on the
- * three words. After the second there is most of a screen of stillness before
- * the river takes over, so the words are left standing rather than chased off.
+ * three words. A short stillness follows the second before the river takes
+ * over, so the words are left standing rather than chased off.
  */
-const STOPS = [2.15, 3.1] as const;
+const STOPS = [1.575, 2.05] as const;
 
 /** The outline filters and their rim widths in px — see `Hollow`. */
 const HOLLOW = [
