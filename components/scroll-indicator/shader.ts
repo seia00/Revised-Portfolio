@@ -258,8 +258,8 @@ float flow(vec2 q, float t, float len) {
   return h + 0.08 * noise(vec2(q.x * 0.45 - t * 0.02, q.y * 1.2 + t * 0.03));
 }
 
-// Height of the liquid at c (channel px, x from the left wall): crowned across
-// the channel, swelling with the flow, and rising sharply at its front edge.
+// How much liquid there is at c (channel px, x from the left wall): crowned
+// across the channel, gathered by the flow, and thinning out behind its front.
 float liquid(vec2 c, float t, float hc, float wc) {
   float ahead = frontEdge(c.y, t, hc, wc) - c.x;
   if (ahead <= 0.0) return 0.0;
@@ -267,43 +267,60 @@ float liquid(vec2 c, float t, float hc, float wc) {
   float head = 1.0 - k * k * k;
   float yn = c.y / (hc * 0.5);
   float crown = 1.0 - yn * yn;
-  return head * (0.2 * crown + flow(c / hc, t, wc / hc));
+  return head * (0.12 * crown + flow(c / hc, t, wc / hc));
 }
+
+// Where there is enough of it, the liquid stands up off the floor: past THRESHOLD
+// it rises over RISE to its full depth, steeply at first, so every blob and
+// ribbon has a rounded rim that catches the light, like mercury on a plate.
+const float THRESHOLD = 0.42;
+const float RISE = 0.3;
 
 vec3 channel(vec2 p, vec2 chHalf, float rCh, float u, vec3 v, float px) {
   float hc = chHalf.y * 2.0;
   float wc = chHalf.x * 2.0;
   float t = u_time;
   vec2 c = vec2(p.x + chHalf.x, p.y);
+  vec2 g = vec2(c.x / wc, p.y / hc + 0.5);
 
   float eps = max(0.6, hc * 0.012);
-  float h0 = liquid(c, t, hc, wc);
-  float hx = liquid(c + vec2(eps, 0.0), t, hc, wc);
-  float hy = liquid(c + vec2(0.0, eps), t, hc, wc);
+  float f0 = liquid(c, t, hc, wc);
+  float fx = liquid(c + vec2(eps, 0.0), t, hc, wc);
+  float fy = liquid(c + vec2(0.0, eps), t, hc, wc);
+  vec2 grad = vec2(fx - f0, fy - f0) / eps;
+
+  // The edge is antialiased off the field's own gradient, so it stays one
+  // pixel soft however steep or shallow the liquid is there.
+  float cover = clamp((f0 - THRESHOLD) / max(length(grad) * px, 1e-4) + 0.5, 0.0, 1.0);
+
+  float rise = clamp((f0 - THRESHOLD) / RISE, 0.0, 1.0);
+  float k = 1.0 - rise;
+  float rim = rise > 0.0 && rise < 1.0 ? 3.0 * k * k / RISE : 0.0;
   float lift = hc * 0.16;
-  vec3 n = normalize(vec3(-(hx - h0) / eps * lift, -(hy - h0) / eps * lift, 1.0));
+  vec2 slope = grad * (rim * 0.6 + 0.4) * lift;
+  vec3 n = normalize(vec3(-slope, 1.0));
 
   // Black, and almost a mirror: what reads is the light it throws back,
-  // strongest where the surface turns away at its crests.
+  // strongest where the surface turns away at its rims and crests.
   float fres = 0.04 + 0.96 * pow(1.0 - clamp(dot(n, v), 0.0, 1.0), 5.0);
   vec3 wet = vec3(0.006, 0.007, 0.009)
            + gloss(reflect(-v, n)) * mix(0.35, 1.0, fres) * vec3(0.9, 0.93, 0.97)
            + fres * 0.12;
 
-  // The empty channel ahead of it: dark smoked metal, a shade lighter.
-  vec3 dry = vec3(0.028, 0.029, 0.032) + env(reflect(-v, vec3(0.0, 0.0, 1.0))) * 0.04;
+  // The floor: a grey plate under the glass, lit from above, with a soft
+  // shadow gathering wherever the liquid is about to rise from it.
+  vec3 plate = vec3(mix(0.42, 0.54, g.y)) * vec3(0.97, 0.98, 1.0);
+  plate *= 1.0 - 0.45 * smoothstep(THRESHOLD - 0.28, THRESHOLD, f0);
 
-  float cover = clamp((frontEdge(c.y, t, hc, wc) - c.x) / px + 0.5, 0.0, 1.0);
-  vec3 col = mix(dry, wet, cover);
+  vec3 col = mix(plate, wet, cover);
 
-  // Recessed: dark along the walls, and in the shadow of the upper lip.
+  // Recessed: shaded along the walls, and in the shadow of the upper lip.
   float inset = -sdBox(p, chHalf, rCh);
-  col *= mix(0.3, 1.0, smoothstep(0.0, 6.0 * u, inset));
-  col *= mix(0.55, 1.0, smoothstep(0.0, 14.0 * u, chHalf.y - p.y));
+  col *= mix(0.5, 1.0, smoothstep(0.0, 6.0 * u, inset));
+  col *= mix(0.75, 1.0, smoothstep(0.0, 14.0 * u, chHalf.y - p.y));
 
   // The glass over it: one soft diagonal sheen, a finer one beside it, and a
   // hairline catching the light just inside the walls.
-  vec2 g = vec2(c.x / wc, p.y / hc + 0.5);
   float sheen = exp(-pow((g.x - g.y * 0.3 - 0.64) / 0.05, 2.0)) * 0.05
               + exp(-pow((g.x - g.y * 0.3 - 0.71) / 0.012, 2.0)) * 0.035;
   float hairline = exp(-pow((inset - 1.2 * u) / (0.7 * u), 2.0)) * 0.1;
