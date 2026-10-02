@@ -2,34 +2,8 @@
 
 import { motion } from "framer-motion";
 import { reveal, revealViewport } from "@/lib/motion";
+import { WORDS } from "@/data/words";
 import { SectionHeader } from "./ornaments";
-
-const WORDS = [
-  {
-    word: "Relentless",
-    numeral: "i.",
-    syllables: "re·lent·less",
-    ipa: "/rɪˈlɛnt.ləs/",
-    definition: "Unyielding in pursuit; refusing to slow down or give up.",
-    style: "font-sans font-extrabold uppercase tracking-[-0.035em]",
-  },
-  {
-    word: "Curious",
-    numeral: "ii.",
-    syllables: "cu·ri·ous",
-    ipa: "/ˈkjʊə.ri.əs/",
-    definition: "Eager to know or learn something; compelled to ask why.",
-    style: "font-serif italic tracking-[-0.02em]",
-  },
-  {
-    word: "Driven",
-    numeral: "iii.",
-    syllables: "driv·en",
-    ipa: "/ˈdrɪv.ən/",
-    definition: "Propelled by an inner need to reach a goal.",
-    style: "font-sans font-extrabold uppercase tracking-[-0.035em] text-outline",
-  },
-];
 
 export default function ThreeWords() {
   return (

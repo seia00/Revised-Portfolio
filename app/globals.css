@@ -114,6 +114,31 @@ body::after {
 .hands-plate {
   aspect-ratio: 16 / 9;
   width: min(100%, calc(92svh * 16 / 9));
+  /* The readouts live inside the plate, so they are measured against it rather
+     than the viewport: on a short, wide screen the plate is capped by height
+     and viewport units would walk straight off its edges. */
+  container-type: inline-size;
+}
+
+/* ── Plate readouts ─────────────────────────────────────────────────
+   Set in container units so the three words hold the same proportion of the
+   composition at every size, with a floor so they stay legible on a phone,
+   where the plate is only a band across the middle of the screen. */
+.plate-word {
+  font-size: clamp(13px, 4.6cqw, 104px);
+  line-height: 0.88;
+}
+
+/* The outline treatment carries a fixed 1.5px stroke, which at plate sizes
+   would close up the counters on a phone and look thin on a wide display. */
+.plate-word.text-outline {
+  -webkit-text-stroke-width: clamp(1px, 0.14cqw, 3px);
+}
+
+.plate-tag {
+  font-size: clamp(8px, 1.05cqw, 13px);
+  letter-spacing: 0.2em;
+  line-height: 1;
 }
 
 /* ── Liquid metal ───────────────────────────────────────────────────
