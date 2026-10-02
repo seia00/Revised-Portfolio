@@ -5,8 +5,8 @@
  * Everything is shaded the same way — a surface normal reflected into a
  * procedural studio — and both materials share its key light and strips, so
  * the frame's bevels and the liquid's crests read as parts of one physical
- * thing. The chrome sees the studio bright and blown out, which is what makes
- * it shine; the liquid sees the same lights as narrow strips on a dark ground.
+ * thing. The chrome sees the studio bright, which is what makes it shine; the
+ * liquid sees the same lights as narrow strips on a dark ground.
  * Units are CSS pixels, scaled from a design height of 110 (`u`), so the object
  * keeps its proportions at any size.
  */
@@ -55,24 +55,27 @@ float strip(float x, float from, float to) {
   return smoothstep(from - 0.04, from + 0.02, x) * (1.0 - smoothstep(to - 0.02, to + 0.06, x));
 }
 
-// Polished chrome: a mirror in a bright white studio. What makes metal read as
-// shiny rather than grey is contrast, so the sky is blown nearly to white and
-// the horizon is a hard, nearly black line just below eye level, with a mid
-// grey floor beneath it. Two crisp light strips and a hot key glint sit on
-// top. Any surface turning through the horizon draws a sharp dark line, and
-// any facing up or toward a strip flashes white.
+// Polished chrome: a mirror in a bright white studio, lighter overhead and
+// toward the right, with no dark band anywhere in it — so the metal is silver
+// from end to end. It shines by contrast within that: each band runs from
+// light silver where it turns down to white where it turns up, with a thin,
+// crisp gleam along its whole length, two light strips off to either side
+// and a hot key glint.
 float mirror(vec3 r) {
-  float sky = smoothstep(-0.2, 0.05, r.y);
-  float lit = mix(0.12 + 0.4 * smoothstep(-0.9, -0.3, r.y),
-                  1.9 + 0.9 * smoothstep(0.2, 0.9, r.y) + 0.5 * smoothstep(-0.3, 0.4, r.x), sky);
-  lit *= 1.0 - 0.92 * exp(-pow((r.y + 0.22) / 0.11, 2.0));
-  lit += strip(r.x, 0.34, 0.41) * 2.5 + strip(-r.x, 0.52, 0.58) * 1.6;
+  float lit = 0.8 + 1.1 * smoothstep(-0.6, 0.7, r.y) + 0.3 * smoothstep(-0.4, 0.5, r.x);
+  lit += strip(r.y, 0.3, 0.36) * 1.6;
+  lit += strip(r.x, 0.58, 0.66) * 2.2 + strip(-r.x, 0.58, 0.64) * 1.5;
   lit += pow(max(dot(r, normalize(vec3(0.5, 0.62, 0.6))), 0.0), 120.0) * 8.0;
   return lit;
 }
 
+// Where the surface turns nearly edge-on it sees past the studio into the dark
+// room around it, so every rounded edge draws one thin, even dark line right
+// round the object. Measured off the surface itself rather than the reflection,
+// so the line is the same width along the whole length.
 vec3 mirrorOf(vec3 n, vec3 v) {
-  return vec3(mirror(reflect(-v, n))) * vec3(0.95, 0.97, 1.0);
+  float edgeOn = smoothstep(0.42, 0.18, n.z);
+  return vec3(mirror(reflect(-v, n)) * mix(1.0, 0.15, edgeOn)) * vec3(0.95, 0.97, 1.0);
 }
 
 // The black liquid's studio: the same lights, resolved into narrow strips on a
@@ -150,8 +153,8 @@ vec3 frame(vec2 p, vec2 hs, float u, float rOut, float bead, float face,
     return mirrorOf(tilt(-sdBoxGrad(p, chHalf, rCh), slope), v);
   }
 
-  // The face: crowned, so as it turns across its width it runs from white
-  // through the studio's dark horizon line — the banding that reads as chrome.
+  // The face: crowned, so as it turns across its width it sweeps through the
+  // studio's gradients rather than reading as one flat tone.
   float w = (e - bead) / max(e - bead + dCh - bevel, 1e-3);
   vec3 col = mirrorOf(tilt(sdBoxGrad(p, hs, rOut), 0.5 * cos(PI * w)), v);
   col = notches(p, 1.0, hs, u, bead, face, col, v, px);
