@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Serif, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
+import ScrollIndicator from "@/components/scroll-indicator/ScrollIndicator";
 import Loader from "@/components/Loader";
 import SmoothScroll from "@/components/SmoothScroll";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
         <SmoothScroll />
         <Loader />
         <Nav />
+        <ScrollIndicator />
         {children}
       </body>
     </html>
