@@ -32,7 +32,6 @@ uniform float u_slosh;    // the liquid's surge: + forward, - back, wobbling to 
 uniform float u_stir;     // how hard the page is moving, 0 at rest
 
 const float PI = 3.14159265;
-const mat2 TURN = mat2(0.8, 0.6, -0.6, 0.8);
 
 // ── Shapes ────────────────────────────────────────────────────────────────
 
@@ -46,48 +45,6 @@ vec2 sdBoxGrad(vec2 p, vec2 b, float r) {
   vec2 g = vec2(sdBox(p + h.xy, b, r) - sdBox(p - h.xy, b, r),
                 sdBox(p + h.yx, b, r) - sdBox(p - h.yx, b, r));
   return g / max(length(g), 1e-5);
-}
-
-// ── Noise ─────────────────────────────────────────────────────────────────
-
-vec2 hash2(vec2 p) {
-  p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
-  return -1.0 + 2.0 * fract(sin(p) * 43758.5453);
-}
-
-// Gradient noise with a quintic fade, so its slopes are smooth too — the
-// liquid is lit by its slopes, and a cubic fade leaves creases in them.
-float noise(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  vec2 w = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
-  float a = dot(hash2(i), f);
-  float b = dot(hash2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0));
-  float c = dot(hash2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0));
-  float d = dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0));
-  return mix(mix(a, b, w.x), mix(c, d, w.x), w.y);
-}
-
-float fbm3(vec2 p) {
-  float v = 0.0;
-  float a = 0.5;
-  for (int i = 0; i < 3; i++) {
-    v += a * noise(p);
-    p = TURN * p * 2.03;
-    a *= 0.5;
-  }
-  return v;
-}
-
-float fbm4(vec2 p) {
-  float v = 0.0;
-  float a = 0.5;
-  for (int i = 0; i < 4; i++) {
-    v += a * noise(p);
-    p = TURN * p * 2.03;
-    a *= 0.5;
-  }
-  return v;
 }
 
 // ── Light ─────────────────────────────────────────────────────────────────
@@ -216,63 +173,88 @@ vec3 frame(vec2 p, vec2 hs, float u, float rOut, float bead, float face,
 }
 
 // ── The liquid ────────────────────────────────────────────────────────────
+// Thick black goo: everything below is a field, summed, that the channel
+// thresholds into liquid. Summing rather than taking the larger value is what
+// makes it goo — two shapes near each other swell together and stay joined by
+// a neck that thins as they part, rather than meeting at a crease.
 
-// Where the liquid's leading edge sits on average: advanced by the scroll, and
-// thrown forward or drawn back as the liquid sloshes.
-float frontBase(float hc, float wc) {
-  return mix(hc * 0.55, wc + hc * 1.6, u_progress) + u_slosh * hc * 0.55;
+const int BLOBS = 16;
+
+// Where the liquid's front sits, in channel heights from the left wall:
+// advanced by the scroll, and thrown forward or drawn back as it sloshes.
+float frontAt(float hc, float wc) {
+  return (mix(hc * 0.5, wc + hc * 0.4, u_progress) + u_slosh * hc * 0.55) / hc;
 }
 
-// Where the liquid's leading edge is, at height y. It wavers on its own — more
-// wildly while the page is moving — and is rounded off against the walls.
-float frontEdge(float y, float t, float hc, float wc) {
-  float yn = clamp(y / (hc * 0.5), -1.0, 1.0);
-  float x = frontBase(hc, wc);
-  x += fbm3(vec2(yn * 1.2 + 7.0, t * 0.3)) * hc * (0.7 + 0.45 * u_stir);
-  x -= hc * 0.4 * (1.0 - sqrt(max(1.0 - yn * yn, 0.0)));
-  return x;
-}
-
-// Where two flows meet they fuse with a fillet, as liquid does, rather than
-// crossing with a crease.
-float smax(float a, float b, float k) {
-  float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
-  return mix(a, b, h) + k * h * (1.0 - h);
-}
-
-// The body of the liquid: three ribbons running along the channel, each on its
-// own winding course at its own speed, swelling and thinning into tendrils as
-// they go, and fusing wherever their courses meet. Three bulbs drift up and
-// down the channel through them, each on its own slow period, so blobs gather
-// and separate. A slow swell underneath keeps the gaps from going dead flat.
-// len is the channel's length in channel heights.
-float flow(vec2 q, float t, float len) {
-  float h = 0.0;
-  for (int i = 0; i < 3; i++) {
+// The mass: a chain of soft blobs strung from the left wall to the front. Each
+// wanders about its place in the chain and swells and shrinks on its own beat,
+// so lobes bulge, necks pinch, and the mass is never still. Every blob carries
+// its share of the liquid for its stretch of channel: a short chain gathers
+// into one swollen body, and a long one stretches into lobes joined by necks.
+float mass(vec2 q, float t, float front) {
+  float f = 0.0;
+  float gap = max(front, 0.05) / float(BLOBS - 1);
+  float share = clamp(gap / 0.53, 0.2, 1.05);
+  for (int i = 0; i < BLOBS; i++) {
     float fi = float(i);
-    float x = q.x * (0.42 + 0.1 * fi) - t * (0.045 + 0.014 * fi) - u_slosh * 0.3;
-    float centre = 1.0 * noise(vec2(x * 1.0, fi * 3.7 + t * 0.03))
-                 + 0.25 * noise(vec2(x * 2.0, fi * 9.1 - t * 0.05));
-    centre = clamp(centre, -0.3, 0.3);
-    float width = 0.13 + 0.2 * smoothstep(-0.2, 0.4,
-      noise(vec2(x * 1.1 + 5.0, fi * 2.3 + t * 0.04)));
-    float d = (q.y - centre) / width;
-    h = smax(h, exp(-d * d) * (0.8 + 0.2 * fi / 2.0), 0.25);
-  }
-  for (int j = 0; j < 3; j++) {
-    float fj = float(j);
-    vec2 at = vec2(len * (0.5 + 0.46 * sin(t * (0.021 + 0.009 * fj) + fj * 2.1)),
-                   0.2 * sin(t * (0.05 + 0.017 * fj) + fj * 1.7));
-    float r = 0.24 + 0.07 * sin(t * 0.07 + fj * 2.9);
+    vec2 at = vec2(fi * gap + 0.12 * sin(t * (0.6 + 0.11 * fi) + fi * 2.3),
+                   0.2 * sin(t * (0.8 + 0.13 * fi) + fi * 1.7));
+    float r = 0.25 + 0.17 * fract(fi * 0.618034)
+            + 0.07 * sin(t * (1.1 + 0.19 * fi) + fi * 4.1);
     vec2 d = (q - at) / r;
-    h = smax(h, exp(-dot(d, d)) * 0.95, 0.28);
+    f += exp(-dot(d, d)) * share;
   }
-  return h + 0.08 * noise(vec2(q.x * 0.45 - t * 0.02, q.y * 1.2 + t * 0.03));
+  return f;
+}
+
+// Tendrils: two short strands reaching out of the front, thick at the root and
+// tapering to a point, with a slow whip running along them. They stretch out
+// while the page moves and draw back in when it rests.
+float tendrils(vec2 q, float t, float front) {
+  float f = 0.0;
+  float reach = 0.25 + 0.7 * clamp(u_stir + abs(u_slosh) * 0.5, 0.0, 1.5);
+  for (int k = 0; k < 2; k++) {
+    float fk = float(k);
+    vec2 root = vec2(front - 0.3, 0.25 * sin(fk * 2.1 + t * 0.45));
+    float l = reach * (0.5 + 0.5 * sin(t * (0.5 + 0.17 * fk) + fk * 3.3));
+    vec2 dir = normalize(vec2(1.0, 0.4 * sin(t * 0.7 + fk * 1.9)));
+    float along = clamp(dot(q - root, dir), 0.0, l);
+    float lean = along / max(l, 1e-3);
+    vec2 side = vec2(-dir.y, dir.x);
+    vec2 nearest = root + dir * along + side * 0.06 * sin(along * 7.0 - t * 2.5 + fk * 2.0) * lean;
+    vec2 d = (q - nearest) / mix(0.14, 0.03, lean);
+    f += exp(-dot(d, d)) * 0.95;
+  }
+  return f;
+}
+
+// Spray: drops flung off the front and drawn back into it, each on its own
+// cycle, flung further while the page moves. Each trails a strand of goo back
+// to the front that thins as it stretches and snaps well before the drop is at
+// its furthest. Each leaves and returns through the front, so no cycle shows a
+// seam.
+float spray(vec2 q, float t, float front) {
+  float f = 0.0;
+  float fling = 0.3 + 0.9 * clamp(u_stir + abs(u_slosh) * 0.6, 0.0, 1.6);
+  for (int j = 0; j < 4; j++) {
+    float fj = float(j);
+    float phase = fract(t * (0.21 + 0.06 * fj) + fj * 0.37);
+    float arc = 4.0 * phase * (1.0 - phase);
+    vec2 root = vec2(front - 0.3, 0.3 * sin(fj * 2.7 + t * 0.4));
+    vec2 at = root + vec2(arc * fling * (0.7 + 0.3 * sin(fj * 4.1)), 0.12 * arc * sin(fj * 5.3));
+    vec2 d = (q - at) / mix(0.15, 0.08, arc);
+    f += exp(-dot(d, d)) * 0.9;
+
+    vec2 ba = at - root;
+    float h = clamp(dot(q - root, ba) / max(dot(ba, ba), 1e-4), 0.0, 1.0);
+    float s = length(q - root - ba * h) / (0.07 * (1.0 - arc) + 0.005);
+    f += exp(-s * s) * 0.7 * (1.0 - arc);
+  }
+  return f;
 }
 
 // Rings spreading across the surface from two points that wander through the
-// liquid. Barely there at rest; while the page moves they come up strong and
-// break the edges into scallops.
+// liquid: a faint shimmer at rest, a stronger one while the page moves.
 float ripples(vec2 q, float t, float len) {
   float r = 0.0;
   for (int i = 0; i < 2; i++) {
@@ -285,63 +267,21 @@ float ripples(vec2 q, float t, float len) {
   return r;
 }
 
-// Spray: droplets thrown off the front and drawn back into it, each on its own
-// cycle and flung further while the page is moving. Each leaves and returns
-// through the front itself, so the cycle never shows a seam.
-float spray(vec2 q, float t, float front) {
-  float h = 0.0;
-  float fling = 0.3 + 0.9 * clamp(u_stir + abs(u_slosh) * 0.6, 0.0, 1.6);
-  for (int j = 0; j < 5; j++) {
-    float fj = float(j);
-    float phase = fract(t * (0.23 + 0.07 * fj) + fj * 0.37);
-    float arc = 4.0 * phase * (1.0 - phase);
-    vec2 at = vec2(front - 0.35 + arc * fling * (0.6 + 0.4 * sin(fj * 4.1)),
-                   0.36 * sin(fj * 2.7 + t * 0.4));
-    vec2 d = (q - at) / mix(0.16, 0.08, arc);
-    h = smax(h, exp(-dot(d, d)) * 0.9, 0.12);
-  }
-  return h;
-}
-
-// Satellites: small drops that bob off the body sideways, faster than anything
-// else in it, and fuse back in. Part of the body, so they never stray ahead of
-// the front.
-float satellites(vec2 q, float t, float len) {
-  float h = 0.0;
-  for (int j = 0; j < 4; j++) {
-    float fj = float(j);
-    vec2 at = vec2(len * (0.5 + 0.45 * sin(t * (0.05 + 0.013 * fj) + fj * 1.9)),
-                   0.3 * sin(t * (0.9 + 0.3 * fj) + fj * 2.3));
-    vec2 d = (q - at) / 0.1;
-    h = smax(h, exp(-dot(d, d)) * 0.85, 0.12);
-  }
-  return h;
-}
-
-// How much liquid there is at c (channel px, x from the left wall): crowned
-// across the channel, gathered by the flow, rippled, thinning out behind its
-// front — and the spray, which is free to fly ahead of it.
+// How much liquid there is at c (channel px, x from the left wall). Ripples
+// only move what is already there, so the bare floor stays clean.
 float liquid(vec2 c, float t, float hc, float wc) {
   vec2 q = c / hc;
-  float len = wc / hc;
-  float ahead = frontEdge(c.y, t, hc, wc) - c.x;
-  float body = 0.0;
-  if (ahead > 0.0) {
-    float k = 1.0 - clamp(ahead / (hc * 0.5), 0.0, 1.0);
-    float head = 1.0 - k * k * k;
-    float yn = c.y / (hc * 0.5);
-    float crown = 1.0 - yn * yn;
-    float swell = ripples(q, t, len) * (0.03 + 0.06 * min(u_stir, 1.5));
-    body = head * smax(0.12 * crown + flow(q, t, len) + swell, satellites(q, t, len), 0.12);
-  }
-  return smax(body, spray(q, t, frontBase(hc, wc) / hc), 0.12);
+  float front = frontAt(hc, wc);
+  float f = mass(q, t, front) + tendrils(q, t, front) + spray(q, t, front);
+  float shimmer = ripples(q, t, wc / hc) * (0.02 + 0.04 * min(u_stir, 1.5));
+  return f + shimmer * smoothstep(0.2, 0.8, f);
 }
 
 // Where there is enough of it, the liquid stands up off the floor: past THRESHOLD
-// it rises over RISE to its full depth, steeply at first, so every blob and
-// ribbon has a rounded rim that catches the light, like mercury on a plate.
+// it rises over RISE to its full depth, steeply at first, so every lobe, strand
+// and drop has a rounded rim that catches the light.
 const float THRESHOLD = 0.42;
-const float RISE = 0.3;
+const float RISE = 0.4;
 
 vec3 channel(vec2 p, vec2 chHalf, float rCh, float u, vec3 v, float px) {
   float hc = chHalf.y * 2.0;

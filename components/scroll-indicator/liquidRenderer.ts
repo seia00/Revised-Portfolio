@@ -119,8 +119,8 @@ export function createLiquidRenderer(
   let height = 0;
   let margin = 0;
   let dpr = 1;
-  // Start somewhere into the flow rather than at its origin, where the noise
-  // field is at its least interesting.
+  // Start somewhere into the motion rather than at its origin, where every
+  // blob and drop is still lined up on its starting phase.
   let time = 40;
   let frame = 0;
   let last = 0;
