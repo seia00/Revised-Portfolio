@@ -870,7 +870,7 @@ body {
   position: absolute;
   inset: 0;
   padding: 2.4% 1.4%;
-  border-radius: 6px;
+  border-radius: 9px;
   background: linear-gradient(180deg, #f4f6f8 0%, #6a6f75 10%, #141518 40%, #0b0c0e 62%, #3b3e43 88%, #dfe2e6 100%);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 14px 30px -10px rgba(0, 0, 0, 0.6);
 }
@@ -878,7 +878,7 @@ body {
 .scroll-indicator-fallback > span {
   display: block;
   height: 100%;
-  border-radius: 3px;
+  border-radius: 5px;
   background: #030304;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
   transform-origin: left;

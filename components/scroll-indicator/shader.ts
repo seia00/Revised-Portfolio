@@ -350,13 +350,14 @@ void main() {
   vec2 hs = u_size * 0.5;
 
   // The bevels keep a minimum width in px, so the frame still draws its lines
-  // at the small sizes the indicator is shown at.
-  float rOut = max(6.0 * u, 2.5);
+  // at the small sizes the indicator is shown at. The corners are rounded to
+  // about a fifth of the height, and the channel's follow at a softer radius.
+  float rOut = max(20.0 * u, 5.5);
   float bead = max(3.0 * u, 1.6);
   float face = 11.0 * u;
   float bevel = max(2.4 * u, 1.3);
   vec2 chHalf = hs - (bead + face + bevel);
-  float rCh = max(3.0 * u, 1.5);
+  float rCh = max(rOut * 0.55, 2.0);
 
   // A perspective eye a little further off than the object is wide, so a
   // flat face still sweeps through the reflections from one end to the other.
@@ -378,9 +379,11 @@ void main() {
   // Outside it: a pocket of shadow, so it sits in its own darkness on a light
   // page, and glints flaring off the corners the light hits.
   float shadow = 0.6 * exp(-max(dOut, 0.0) / (7.0 * u));
-  float glow = glint(p - vec2(-hs.x + 1.5 * u, hs.y - 1.5 * u), u)
-             + glint(p - vec2(hs.x - 1.5 * u, hs.y - 1.5 * u), u) * 0.8
-             + glint(p - vec2(hs.x - 1.5 * u, -hs.y + 1.5 * u), u) * 0.55;
+  // On the curve of each corner, where a rounded edge catches the light.
+  vec2 corner = hs - 0.3 * rOut;
+  float glow = glint(p - vec2(-corner.x, corner.y), u)
+             + glint(p - vec2(corner.x, corner.y), u) * 0.8
+             + glint(p - vec2(corner.x, -corner.y), u) * 0.55;
   glow *= 0.85;
 
   vec3 rgb = col * cover + vec3(glow);
