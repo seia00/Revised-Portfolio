@@ -11,8 +11,8 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { scrollSpring } from "@/lib/motion";
-import { useScrollStops } from "@/lib/scrollStops";
+import { NIGHTFALL, scrollSpring } from "@/lib/motion";
+import { useSlowZones } from "@/lib/slowZones";
 import { WORDS, type Word } from "@/data/words";
 
 /** A scroll window, as a pair of section progress values. */
@@ -39,9 +39,10 @@ type Layer = {
  * The section's height, in screens. Progress runs across all of it (see
  * `useScroll` below), and the plate is pinned from the end of the first —
  * so the first screen is the plate rising into view, and the rest is the
- * pinned shot.
+ * pinned shot. It ends just past the words, so the river takes over as soon
+ * as the reader moves on from them.
  */
-const SCREENS = 2.4;
+const SCREENS = 2.1;
 
 /** Section progress after `screens` of scrolling. */
 const at = (screens: number) => screens / SCREENS;
@@ -76,11 +77,11 @@ const READOUTS: readonly Window[] = [
 ];
 
 /**
- * Where the page comes to rest: once on the finished picture, and once on the
- * three words. A short stillness follows the second before the river takes
- * over, so the words are left standing rather than chased off.
+ * Where the scroll slows, in screens: through the finished picture, and
+ * through the three words. Past the words the plate lets go straight away
+ * rather than holding an empty beat.
  */
-const STOPS = [1.575, 2.05] as const;
+const SLOW = [1.575, 2.05] as const;
 
 /** The outline filters and their rim widths in px — see `Hollow`. */
 const HOLLOW = [
@@ -127,14 +128,24 @@ export default function HandsPlate() {
   const progress = useSpring(scrollYProgress, scrollSpring);
   const still = reduced === true;
 
+  // On the way out the plate goes dark in step with the river's ground rising
+  // under it (see NIGHTFALL), so the two chapters meet in the dark rather than
+  // along a grey edge. This screen is the river's first, so the two match.
+  const { scrollYProgress: leaving } = useScroll({
+    target: ref,
+    offset: ["end end", "end start"],
+  });
+  const exit = useSpring(leaving, scrollSpring);
+  const dusk = useTransform(exit, [0, NIGHTFALL], [0, 1]);
+
   // Progress 0 is the section's top at the foot of the viewport, and the run
-  // is the section's own height, so a stop `n` screens in sits here.
-  useScrollStops(() => {
+  // is the section's own height, so a moment `n` screens in sits here.
+  useSlowZones(() => {
     const el = ref.current;
     if (!el) return [];
     const appears = el.getBoundingClientRect().top + window.scrollY - window.innerHeight;
     const screen = el.offsetHeight / SCREENS;
-    return STOPS.map((screens) => appears + screens * screen);
+    return SLOW.map((screens) => appears + screens * screen);
   });
 
   return (
@@ -183,6 +194,12 @@ export default function HandsPlate() {
             ))}
           </ol>
         </div>
+
+        <motion.div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none bg-[#07080a]"
+          style={{ opacity: dusk }}
+        />
       </div>
     </section>
   );

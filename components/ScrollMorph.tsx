@@ -12,7 +12,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { useScrollStops } from "@/lib/scrollStops";
+import { useSlowZones } from "@/lib/slowZones";
 import { PROJECTS, type Project } from "@/data/projects";
 import { Serif } from "./ornaments";
 
@@ -90,10 +90,11 @@ type Layout = ReturnType<typeof layoutFor>;
 const insetFor = (narrow: boolean) => (narrow ? 1 : 2);
 
 /**
- * The progress values the page rests on: the ring, then every point at which a
- * card stands at the apex of the arch, so the turn moves one project at a time.
+ * The progress values the scroll slows through: the ring, then every point at
+ * which a card stands at the apex of the arch, so the turn eases past one
+ * project at a time.
  */
-function restsFor(narrow: boolean): number[] {
+function momentsFor(narrow: boolean): number[] {
   const turns = Math.max(1, COUNT - 1 - 2 * insetFor(narrow));
   const [from, to] = TURN;
   const apexes = Array.from({ length: turns + 1 }, (_, k) => from + (k / turns) * (to - from));
@@ -214,12 +215,12 @@ export default function ScrollMorph() {
   const morphProgress = useTransform(scrollYProgress, MORPH, [0, 1]);
   const turnProgress = useTransform(scrollYProgress, TURN, [0, 1]);
 
-  useScrollStops(() => {
+  useSlowZones(() => {
     const el = ref.current;
     if (!el) return [];
     const top = el.getBoundingClientRect().top + window.scrollY;
     const run = el.offsetHeight - window.innerHeight;
-    return restsFor(window.innerWidth < BREAKPOINT).map((p) => top + p * run);
+    return momentsFor(window.innerWidth < BREAKPOINT).map((p) => top + p * run);
   });
 
   const pointer = useMotionValue(0);

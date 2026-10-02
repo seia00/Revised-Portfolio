@@ -58,6 +58,16 @@ export const scrollSpring = {
   restDelta: 0.0005,
 } as const;
 
+/**
+ * The hand-off from the hands plate to the river: how far the river's chapter
+ * has risen into view, in screens, when the page has gone fully dark.
+ *
+ * The plate darkens on its way out at exactly the rate the river's ground does
+ * on its way in, so the seam between them is never seen, and the river's title
+ * can come to rest before the river has risen all the way.
+ */
+export const NIGHTFALL = 0.6;
+
 /** How long each item in a group waits behind the one before it, in seconds. */
 const REVEAL_STEP = 0.09;
 
