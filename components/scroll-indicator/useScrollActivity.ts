@@ -12,7 +12,7 @@ const TOP = 24;
  * True from the first scroll event away from the top of the page, and false
  * again once the page has been still for a moment — so the indicator is there
  * while the reader is moving and out of the way while they read. Programmatic
- * scrolls (a nav jump, a scroll stop settling) count: the page is moving.
+ * scrolls (a nav jump, the back-to-top glide) count: the page is moving.
  */
 export function useScrollActivity(): boolean {
   const [active, setActive] = useState(false);

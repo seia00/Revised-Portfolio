@@ -14,7 +14,7 @@ import {
 } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { easeOutExpo, NIGHTFALL, scrollSpring } from "@/lib/motion";
-import { useScrollStops } from "@/lib/scrollStops";
+import { useSlowZones } from "@/lib/slowZones";
 import { bankHalfWidth, createRiverRenderer, type RiverRenderer } from "./river/riverRenderer";
 import { TIMELINE } from "@/data/timeline";
 import { Serif } from "./ornaments";
@@ -62,7 +62,7 @@ const bendY = (i: number) => OVERTURE + (i + 0.5) * SPAN;
 
 /**
  * Section-y of the overture's title and of the closing line, in screens. The
- * title sits high, so it is centred — and the page rests on it — while the top
+ * title sits high, so it is centred — and the scroll slows over it — while the top
  * of the section is still a little way down the screen, over the plate gone
  * dark above it.
  */
@@ -303,7 +303,7 @@ export default function RiverLife() {
   const dark = useTransform(progress, [0, at(NIGHTFALL)], [0, 1]);
   // The smoke lightens the room, so it waits until the room's top edge has
   // all but left the screen: until then the dark above and below it match,
-  // and the title rests on one unbroken black.
+  // and the title is read on one unbroken black.
   const smoke = useTransform(progress, [at(0.85), at(1.35)], [0, 1]);
   const title = useTransform(progress, [at(0.2), at(0.64)], [0, 1]);
 
@@ -419,9 +419,9 @@ export default function RiverLife() {
     return top + screens * (el.offsetHeight / SCREENS) - window.innerHeight / 2;
   }
 
-  // The page rests on the title, on every milestone, and on the closing line —
+  // The scroll slows over the title, every milestone, and the closing line —
   // the last at the very end of the section, where the river has just run out.
-  useScrollStops(() => {
+  useSlowZones(() => {
     const el = ref.current;
     if (!el) return [];
     const top = el.getBoundingClientRect().top + window.scrollY;
