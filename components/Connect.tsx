@@ -39,7 +39,7 @@ export default function Connect() {
       className="relative px-5 md:px-10 lg:px-16 pt-28 md:pt-40 pb-10"
     >
       <div className="max-w-[1280px] mx-auto">
-        <SectionHeader index="04" label="Contact" aside="DMs open">
+        <SectionHeader index="05" label="Contact" aside="DMs open">
           How to <Serif>connect.</Serif>
         </SectionHeader>
 

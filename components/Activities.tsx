@@ -13,7 +13,7 @@ export default function Activities() {
       className="relative px-5 md:px-10 lg:px-16 py-28 md:py-40"
     >
       <div className="max-w-[1280px] mx-auto">
-        <SectionHeader index="03" label="Now" aside="Currently — 2026">
+        <SectionHeader index="04" label="Now" aside="Currently — 2026">
           Where I&apos;m <Serif>at.</Serif>
         </SectionHeader>
 
