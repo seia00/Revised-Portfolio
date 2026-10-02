@@ -13,12 +13,16 @@ import {
 } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { easeOutExpo, scrollSpring } from "@/lib/motion";
+import { useScrollStops } from "@/lib/scrollStops";
 import { TIMELINE } from "@/data/timeline";
 import { Serif } from "./ornaments";
 
 /* ── The shape of the chapter ──────────────────────────────────────────────
    The section is measured in screens: one of overture (the panel darkening,
-   then the light opening in it), one per milestone, and one to run out in.
+   then the light opening in it), a screen and a half per milestone, and one to
+   run out in. The half is what keeps it a story rather than a ride: the river
+   takes longer over each bend, so it swings bank to bank more gently, and the
+   milestones either side of the one being read sit fully off screen.
 
    The river runs *down* it, not across. The path is laid out in the section's
    own coordinates rather than inside the viewport, so it is not a picture of a
@@ -28,8 +32,12 @@ import { Serif } from "./ornaments";
 const OVERTURE = 1;
 const CODA = 1;
 const CHAPTERS = TIMELINE.length;
-const SCREENS = OVERTURE + CHAPTERS + CODA;
-const STEP = 1 / SCREENS;
+/** Screens of river per milestone. */
+const SPAN = 1.5;
+const SCREENS = OVERTURE + CHAPTERS * SPAN + CODA;
+
+/** Section progress after `screens` of scrolling. */
+const at = (screens: number) => screens / SCREENS;
 
 /** Where the light opens, measured down the section in screens. */
 const SOURCE_Y = 0.9;
@@ -45,11 +53,12 @@ const SOURCE_Y = 0.9;
  */
 const MOUTH_Y = SCREENS - 0.5;
 
-/** Section-y of milestone `i`, in screens: the middle of its own screen. */
-const bendY = (i: number) => OVERTURE + i + 0.5;
+/** Section-y of milestone `i`, in screens: the middle of its own stretch. */
+const bendY = (i: number) => OVERTURE + (i + 0.5) * SPAN;
 
-/** Progress at which milestone `i` sits in the middle of the viewport. */
-const centreOf = (i: number) => (OVERTURE + i + 1) * STEP;
+/** Section-y of the overture's title and of the closing line, in screens. */
+const TITLE_Y = 0.5;
+const CODA_Y = SCREENS - 0.32;
 
 /**
  * How far the river wanders as it descends, as fractions of the section width.
@@ -85,11 +94,16 @@ const NARROW: Course = {
 /** Length of the bright head of the current, as a fraction of the river. */
 const HEAD = 0.045;
 
-/** Which milestone the reader is standing in, or -1 during the overture. */
+/**
+ * Which milestone the reader is standing in, or -1 during the overture.
+ *
+ * Progress 0 is the section's top at the foot of the viewport, so the middle of
+ * the viewport is half a screen short of `SCREENS * progress` down the section.
+ */
 function chapterAt(progress: number): number {
-  const first = centreOf(0);
-  if (progress < first - STEP / 2) return -1;
-  const i = Math.round((progress - first) / STEP);
+  const depth = SCREENS * progress - 0.5;
+  if (depth < bendY(0) - SPAN / 2) return -1;
+  const i = Math.round((depth - bendY(0)) / SPAN);
   return Math.min(CHAPTERS - 1, Math.max(0, i));
 }
 
@@ -178,7 +192,7 @@ export default function RiverLife() {
   const [active, setActive] = useState(-1);
 
   // The course is drawn in the section's own pixels rather than in a scaled
-  // viewBox: the section is six screens tall and a handful wide, so any fixed
+  // viewBox: the section is eight screens tall and one wide, so any fixed
   // viewBox would have to be stretched to fit, and a stretched viewBox gives
   // a stroke that is thicker across than it is down.
   const [box, setBox] = useState({ w: 0, h: 0 });
@@ -214,7 +228,7 @@ export default function RiverLife() {
   }, [box.w, box.h, course, screenPx]);
 
   // Sampled once per shape so the draw can be read off depth. 512 samples over
-  // six screens is finer than a pixel at any size this runs at.
+  // eight screens is finer than a pixel at any size this runs at.
   const [depths, setDepths] = useState<Float64Array | null>(null);
 
   useEffect(() => {
@@ -249,18 +263,18 @@ export default function RiverLife() {
 
   // The panel does not cut to black, it goes out: the grey of the plate above
   // drains as the section rises, so the two chapters read as one move.
-  const ground = useTransform(progress, [0, 0.13], ["#c8cac8", "#07080a"]);
-  const smoke = useTransform(progress, [0.02, 0.15], [0, 1]);
-  const title = useTransform(progress, [0.05, 0.14], [0, 1]);
+  const ground = useTransform(progress, [0, at(0.78)], ["#c8cac8", "#07080a"]);
+  const smoke = useTransform(progress, [at(0.12), at(0.9)], [0, 1]);
+  const title = useTransform(progress, [at(0.3), at(0.84)], [0, 1]);
 
   // The light: a bloom that opens in the dark at the head of the course, then
   // falls back to a trace once the current is running — it is the source the
   // river came out of, not a second light competing with its head.
-  const dawn = useTransform(progress, [0.12, 0.24, 0.44], [0, 1, 0.13]);
+  const dawn = useTransform(progress, [at(0.72), at(1.44), at(2.64)], [0, 1, 0.13]);
   // Reaches down the way the river does: the bloom draws out along the course
   // rather than across it.
-  const dawnDown = useTransform(progress, [0.18, 0.34], [0.34, 1.9]);
-  const dawnWide = useTransform(progress, [0.18, 0.34], [0.34, 0.5]);
+  const dawnDown = useTransform(progress, [at(1.08), at(2.04)], [0.34, 1.9]);
+  const dawnWide = useTransform(progress, [at(1.08), at(2.04)], [0.34, 0.5]);
 
   // The head of the current sits at the middle of the viewport, always, so
   // scrolling down the page *is* travelling down the river.
@@ -297,14 +311,33 @@ export default function RiverLife() {
   // off the card, because every id on the page carries a `scroll-margin-top`
   // for the fixed header that would push the frame down by its height.
   function goToChapter(i: number) {
-    const el = ref.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const target =
-      top + bendY(i) * (el.offsetHeight / SCREENS) - window.innerHeight / 2;
+    const target = centred(bendY(i));
+    if (target === null) return;
     if (lenis) lenis.scrollTo(target);
     else window.scrollTo({ top: target, behavior: "smooth" });
   }
+
+  /** The scroll position that puts section-y `screens` mid-viewport. */
+  function centred(screens: number): number | null {
+    const el = ref.current;
+    if (!el) return null;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    return top + screens * (el.offsetHeight / SCREENS) - window.innerHeight / 2;
+  }
+
+  // The page rests on the title, on every milestone, and on the closing line —
+  // the last at the very end of the section, where the river has just run out.
+  useScrollStops(() => {
+    const el = ref.current;
+    if (!el) return [];
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    const chapters = TIMELINE.map((_, i) => centred(bendY(i)) ?? 0);
+    return [
+      centred(TITLE_Y) ?? top,
+      ...chapters,
+      top + el.offsetHeight - window.innerHeight,
+    ];
+  });
 
   return (
     <section
@@ -393,7 +426,10 @@ export default function RiverLife() {
         ))}
 
         {/* The overture, in the screen above the source. */}
-        <div className="river-overture">
+        <div
+          className="river-overture"
+          style={{ top: `${(TITLE_Y / SCREENS) * 100}%` }}
+        >
           <motion.div style={still ? undefined : { opacity: title }}>
             <p className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] uppercase text-field/40">
               § 02 — Life
@@ -457,7 +493,10 @@ export default function RiverLife() {
           );
         })}
 
-        <div className="river-coda">
+        <div
+          className="river-coda"
+          style={{ top: `${(CODA_Y / SCREENS) * 100}%` }}
+        >
           <motion.p
             className="font-serif italic text-field/70 text-center text-[clamp(24px,3.6vw,52px)] leading-[1.15]"
             initial={still ? false : { opacity: 0, y: 22 }}

@@ -12,6 +12,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
+import { useScrollStops } from "@/lib/scrollStops";
 import { PROJECTS, type Project } from "@/data/projects";
 import { Serif } from "./ornaments";
 
@@ -80,6 +81,25 @@ const SCATTER: readonly Target[] = PROJECTS.map((_, i) => ({
 
 type Layout = ReturnType<typeof layoutFor>;
 
+/**
+ * How many cards in from either end the turn starts and stops: the third card
+ * at the apex to begin with and the third from last to end on (second, on a
+ * phone, where fewer fit), so both flanks stay filled and every card crosses
+ * the middle once.
+ */
+const insetFor = (narrow: boolean) => (narrow ? 1 : 2);
+
+/**
+ * The progress values the page rests on: the ring, then every point at which a
+ * card stands at the apex of the arch, so the turn moves one project at a time.
+ */
+function restsFor(narrow: boolean): number[] {
+  const turns = Math.max(1, COUNT - 1 - 2 * insetFor(narrow));
+  const [from, to] = TURN;
+  const apexes = Array.from({ length: turns + 1 }, (_, k) => from + (k / turns) * (to - from));
+  return [0, ...apexes];
+}
+
 /** The geometry of every phase at a given stage size. */
 function layoutFor(width: number, height: number) {
   const narrow = width < BREAKPOINT;
@@ -89,10 +109,7 @@ function layoutFor(width: number, height: number) {
   // Neighbours on the arc sit 1.6 card widths apart, centre to centre — the
   // spacing the original design reached with twenty cards — at any count.
   const step = ((cardW * arcScale * 1.6) / arcRadius) * (180 / Math.PI);
-  // The turn starts with the third card at the apex and ends with the third
-  // from last there (second, on a phone, where fewer fit), so both flanks stay
-  // filled and every card crosses the middle once.
-  const inset = narrow ? 1 : 2;
+  const inset = insetFor(narrow);
 
   return {
     cardW,
@@ -196,6 +213,14 @@ export default function ScrollMorph() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const morphProgress = useTransform(scrollYProgress, MORPH, [0, 1]);
   const turnProgress = useTransform(scrollYProgress, TURN, [0, 1]);
+
+  useScrollStops(() => {
+    const el = ref.current;
+    if (!el) return [];
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    const run = el.offsetHeight - window.innerHeight;
+    return restsFor(window.innerWidth < BREAKPOINT).map((p) => top + p * run);
+  });
 
   const pointer = useMotionValue(0);
   const drift = useSpring(pointer, { stiffness: 30, damping: 20 });

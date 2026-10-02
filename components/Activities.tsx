@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { reveal, revealViewport } from "@/lib/motion";
 import { ACTIVITIES } from "@/data/activities";
 import { SectionHeader, Serif, Star } from "./ornaments";
+import ScrollStop from "./ScrollStop";
 
 export default function Activities() {
   return (
@@ -13,6 +14,7 @@ export default function Activities() {
       className="relative px-5 md:px-10 lg:px-16 py-28 md:py-40"
     >
       <div className="max-w-[1280px] mx-auto">
+        <ScrollStop />
         <SectionHeader index="04" label="Now" aside="Currently — 2026">
           Where I&apos;m <Serif>at.</Serif>
         </SectionHeader>

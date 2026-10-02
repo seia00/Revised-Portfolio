@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { reveal, revealViewport } from "@/lib/motion";
 import { SectionHeader, Serif } from "./ornaments";
+import ScrollStop from "./ScrollStop";
 
 const CHANNELS = [
   {
@@ -39,6 +40,7 @@ export default function Connect() {
       className="relative px-5 md:px-10 lg:px-16 pt-28 md:pt-40 pb-10"
     >
       <div className="max-w-[1280px] mx-auto">
+        <ScrollStop />
         <SectionHeader index="05" label="Contact" aside="DMs open">
           How to <Serif>connect.</Serif>
         </SectionHeader>
