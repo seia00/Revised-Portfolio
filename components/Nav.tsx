@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useAnimate, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { scrollSpring } from "@/lib/motion";
+import ChromeMark, { type ChromeMarkHandle } from "./logo/ChromeMark";
 
 const LINKS = [
   { id: "hero", label: "Index" },
@@ -17,6 +17,9 @@ const LINKS = [
 
 /** The fixed header's own height — a jump has to clear it to land square. */
 const HEADER = 64;
+
+/** The monogram's height in the header, px: big enough for its metal to read. */
+const MARK_HEIGHT = 26;
 
 /**
  * Back to the top. Within this many screens of it the page glides up; from
@@ -46,6 +49,7 @@ export default function Nav() {
   const reduced = useReducedMotion();
   const [veil, animate] = useAnimate<HTMLDivElement>();
   const returning = useRef(false);
+  const mark = useRef<ChromeMarkHandle>(null);
   // While the veil is up it takes the clicks, so nothing behind it is hit
   // mid-return.
   const [veiled, setVeiled] = useState(false);
@@ -140,19 +144,14 @@ export default function Nav() {
       <div className="h-full grid grid-cols-2 md:grid-cols-3 items-center px-5 md:px-10">
         <button
           onClick={() => scrollTo("hero")}
-          className="justify-self-start flex items-baseline gap-3 cursor-pointer"
+          onPointerEnter={() => mark.current?.redraw()}
+          onFocus={(e) => {
+            if (e.currentTarget.matches(":focus-visible")) mark.current?.redraw();
+          }}
+          className="justify-self-start flex items-center gap-3 cursor-pointer"
           aria-label="Back to top"
         >
-          {/* The mark ships white on transparent, so it inverts to ink on paper. */}
-          <Image
-            src="/logo.png"
-            alt="Seia Funayama"
-            width={851}
-            height={523}
-            sizes="40px"
-            loading="eager"
-            className="h-[19px] w-auto invert"
-          />
+          <ChromeMark ref={mark} height={MARK_HEIGHT} />
           <span className="hidden lg:inline font-mono text-[10px] tracking-[0.2em] uppercase text-ink-3">
             Seia Funayama
           </span>
