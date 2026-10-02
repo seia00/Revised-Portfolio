@@ -854,7 +854,7 @@ body {
    so a phone gets the same hardware, smaller. */
 .scroll-indicator-body {
   position: relative;
-  width: clamp(142px, 15.75vw, 225px);
+  width: clamp(120px, 12vw, 170px);
   aspect-ratio: 5.6;
 }
 
