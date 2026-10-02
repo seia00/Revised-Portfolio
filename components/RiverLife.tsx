@@ -13,16 +13,18 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { useLenis } from "lenis/react";
-import { easeOutExpo, scrollSpring } from "@/lib/motion";
+import { easeOutExpo, NIGHTFALL, scrollSpring } from "@/lib/motion";
 import { useScrollStops } from "@/lib/scrollStops";
 import { bankHalfWidth, createRiverRenderer, type RiverRenderer } from "./river/riverRenderer";
 import { TIMELINE } from "@/data/timeline";
 import { Serif } from "./ornaments";
 
 /* ── The shape of the chapter ──────────────────────────────────────────────
-   The section is measured in screens: one of overture (the panel darkening,
-   then the light opening in it), a little over a screen per milestone, and one
-   to run out in. The extra is what keeps it a story rather than a ride: the
+   The section is measured in screens: a little over half of overture (the
+   title, then the light opening under it), a little over a screen per
+   milestone, and one to run out in. The overture is short because the dark
+   arrives early: the hands plate goes out as this rises (see NIGHTFALL), so
+   the title can rest before the section has risen all the way. The extra is what keeps it a story rather than a ride: the
    river takes longer over each bend, so it swings bank to bank more gently,
    and the milestones either side of the one being read sit fully off screen.
 
@@ -31,7 +33,7 @@ import { Serif } from "./ornaments";
    river that sits still while the page moves past — it is the course itself,
    and scrolling carries the reader down it.                                */
 
-const OVERTURE = 1;
+const OVERTURE = 0.6;
 const CODA = 1;
 const CHAPTERS = TIMELINE.length;
 /** Screens of river per milestone. */
@@ -42,7 +44,7 @@ const SCREENS = OVERTURE + CHAPTERS * SPAN + CODA;
 const at = (screens: number) => screens / SCREENS;
 
 /** Where the light opens, measured down the section in screens. */
-const SOURCE_Y = 0.9;
+const SOURCE_Y = 0.65;
 
 /**
  * Where the river ends.
@@ -58,8 +60,13 @@ const MOUTH_Y = SCREENS - 0.5;
 /** Section-y of milestone `i`, in screens: the middle of its own stretch. */
 const bendY = (i: number) => OVERTURE + (i + 0.5) * SPAN;
 
-/** Section-y of the overture's title and of the closing line, in screens. */
-const TITLE_Y = 0.5;
+/**
+ * Section-y of the overture's title and of the closing line, in screens. The
+ * title sits high, so it is centred — and the page rests on it — while the top
+ * of the section is still a little way down the screen, over the plate gone
+ * dark above it.
+ */
+const TITLE_Y = 0.25;
 const CODA_Y = SCREENS - 0.32;
 
 /**
@@ -214,7 +221,7 @@ export default function RiverLife() {
   const [active, setActive] = useState(-1);
 
   // The course is drawn in the section's own pixels rather than in a scaled
-  // viewBox: the section is six and a half screens tall and one wide, so any fixed
+  // viewBox: the section is about six screens tall and one wide, so any fixed
   // viewBox would have to be stretched to fit, and a stretched viewBox gives
   // a stroke that is thicker across than it is down.
   const [box, setBox] = useState({ w: 0, h: 0 });
@@ -291,19 +298,23 @@ export default function RiverLife() {
   });
 
   // The panel does not cut to black, it goes out: the grey of the plate above
-  // drains as the section rises, so the two chapters read as one move.
-  const ground = useTransform(progress, [0, at(0.78)], ["#c8cac8", "#07080a"]);
-  const smoke = useTransform(progress, [at(0.12), at(0.9)], [0, 1]);
-  const title = useTransform(progress, [at(0.3), at(0.84)], [0, 1]);
+  // drains as the section rises, so the two chapters read as one move. The
+  // plate darkens by the same measure, so the seam between them never shows.
+  const dark = useTransform(progress, [0, at(NIGHTFALL)], [0, 1]);
+  // The smoke lightens the room, so it waits until the room's top edge has
+  // all but left the screen: until then the dark above and below it match,
+  // and the title rests on one unbroken black.
+  const smoke = useTransform(progress, [at(0.85), at(1.35)], [0, 1]);
+  const title = useTransform(progress, [at(0.2), at(0.64)], [0, 1]);
 
   // The light: a bloom that opens in the dark at the head of the course, then
   // falls back to a trace once the current is running — it is the source the
   // river came out of, not a second light competing with its head.
-  const dawn = useTransform(progress, [at(0.72), at(1.44), at(2.3)], [0, 1, 0.13]);
+  const dawn = useTransform(progress, [at(0.6), at(1.19), at(1.9)], [0, 1, 0.13]);
   // Reaches down the way the river does: the bloom draws out along the course
   // rather than across it.
-  const dawnDown = useTransform(progress, [at(1.08), at(2.04)], [0.34, 1.9]);
-  const dawnWide = useTransform(progress, [at(1.08), at(2.04)], [0.34, 0.5]);
+  const dawnDown = useTransform(progress, [at(0.83), at(1.79)], [0.34, 1.9]);
+  const dawnWide = useTransform(progress, [at(0.83), at(1.79)], [0.34, 0.5]);
 
   // The head of the current sits at the middle of the viewport, always, so
   // scrolling down the page *is* travelling down the river.
@@ -437,18 +448,21 @@ export default function RiverLife() {
     >
       {/* ── The room: pinned, because the dark does not move ── */}
       <div className="sticky top-0 h-svh overflow-hidden">
-        <motion.div
-          aria-hidden
-          className="absolute inset-0"
-          style={
-            still ? { backgroundColor: "#07080a" } : { backgroundColor: ground }
-          }
-        />
+        {/* The plate's grey, going dark over it — the same black, by the
+            same measure, as the overlay going out on the plate above. Only
+            light changes here, not position, so it runs with motion reduced
+            too: otherwise the hand-off would show its seam. */}
+        <div aria-hidden className="absolute inset-0 bg-plate">
+          <motion.div
+            className="absolute inset-0 bg-[#07080a]"
+            style={{ opacity: dark }}
+          />
+        </div>
 
         <motion.div
           aria-hidden
           className="river-smoke"
-          style={still ? undefined : { opacity: smoke }}
+          style={{ opacity: smoke }}
         >
           <span />
           <span />
