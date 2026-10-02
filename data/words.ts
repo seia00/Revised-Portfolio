@@ -1,6 +1,5 @@
 /**
- * The three words, rendered twice: as readouts inside <HandsPlate /> and in
- * full, with their definitions, by <ThreeWords />.
+ * The three words, read out inside <HandsPlate /> as the picture assembles.
  *
  * `style` is the word's own typographic treatment and travels with it, so the
  * same word is set the same way wherever it appears.

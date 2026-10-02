@@ -73,33 +73,71 @@ body::after {
    The shatter plate is printed, not pasted. `invert` makes a negative of
    the near-black source so its bright fractures become ink, and `multiply`
    drops the resulting white field away so only the marks sit on the paper.
-   The mask keeps that ink inside the frame — clear of the crop marks and
-   the mono metadata running along the top and bottom. */
+
+   The contrast is deliberately low. The source has no highlights at all —
+   nothing in it reads above ~65% luminance — so a hard curve folds four
+   fifths of the picture to pure white, which `multiply` then throws away:
+   the plate turns into a handful of stray fracture lines. Opening the curve
+   up keeps the midtones on the page, which is what carries the shards, the
+   impact star and the light falling in from the right. */
 .shatter-plate {
   mix-blend-mode: multiply;
+  /* On a phone the picture is framed whole, so it lands as a wide band with
+     its own hard top and bottom edge. The mask is cut to that band and
+     feathers those edges away, which is what keeps it reading as something
+     printed behind the name rather than a photograph pasted over it. */
   --plate-mask:
-    radial-gradient(ellipse 56% 44% at 50% 38%, #000 10%, rgba(0, 0, 0, 0.45) 52%, transparent 82%);
+    radial-gradient(
+      ellipse 94% 32% at 50% 42%,
+      #000 0%,
+      rgba(0, 0, 0, 0.94) 44%,
+      rgba(0, 0, 0, 0.52) 74%,
+      transparent 100%
+    );
   -webkit-mask-image: var(--plate-mask);
   mask-image: var(--plate-mask);
 }
 
 .shatter-ink {
-  filter: grayscale(1) invert(1) contrast(2.1) brightness(1.1);
+  filter: grayscale(1) invert(1) brightness(1.04) contrast(1.32);
 }
 
-/* Framing. `object-fit: cover` puts the point of impact off to the lower left,
-   so the image is enlarged and shifted until that point sits under the seal and
-   the fractures read as radiating from the monogram. A portrait frame already
-   crops hard to fill, so it needs far less of both. */
+/* Framing.
+   On a wide screen the plate is cropped to fill (`cover`), enlarged and
+   shifted until the point of impact sits under the monogram, so the
+   fractures read as radiating from the seal.
+   A portrait screen cannot do both: a 16:9 picture cropped to fill a tall
+   column shows roughly a quarter of its width, which is why the plate read
+   as a sliver of random shards there. So a phone frames it instead — the
+   whole picture, kept intact as a wide band behind the name, scaled past
+   the column edges so it still fills the measure. */
 .shatter-frame {
-  --plate-x: 26%;
-  --plate-y: -8%;
-  --plate-scale: 1.05;
+  object-fit: contain;
+  --plate-x: 13%;
+  --plate-y: -7%;
+  --plate-scale: 1.72;
   transform: translate(var(--plate-x), var(--plate-y)) scale(var(--plate-scale));
 }
 
 @media (min-width: 768px) {
+  /* Cropped to fill, so the plate would otherwise reach every edge of the
+     frame. The ellipse is wide but deliberately short: it holds the picture
+     at full strength through the middle, where the name is and where the
+     fractures radiate from the seal, and is spent well before the mono
+     metadata running along the top and bottom of the frame. */
+  .shatter-plate {
+    --plate-mask:
+      radial-gradient(
+        ellipse 78% 48% at 50% 45%,
+        #000 0%,
+        rgba(0, 0, 0, 0.95) 52%,
+        rgba(0, 0, 0, 0.55) 79%,
+        transparent 100%
+      );
+  }
+
   .shatter-frame {
+    object-fit: cover;
     --plate-x: 13.5%;
     --plate-y: -13%;
     --plate-scale: 1.5;
@@ -118,6 +156,35 @@ body::after {
      than the viewport: on a short, wide screen the plate is capped by height
      and viewport units would walk straight off its edges. */
   container-type: inline-size;
+}
+
+/* On a portrait screen the composition is a thin horizontal band with dead
+   space either side of it, and two hands reaching along the short axis. The
+   whole figure — hands, panels and all — is rotated as one, so the composition
+   itself is untouched but the two hands now enter from opposite corners and
+   reach into the middle along the diagonal, using the height a phone actually
+   has. The pieces translate in along their own local x, so their entrances
+   swing onto the same diagonal for free. */
+.hands-figure {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-30deg) scale(1.15);
+}
+
+/* Each item's `top` comes from a variable so a readout can sit clear of the
+   rotated figure, above or below the plate box, on a phone. */
+.plate-item {
+  top: var(--sm-top, var(--top));
+}
+
+@media (min-width: 768px) {
+  .hands-figure {
+    transform: none;
+  }
+
+  .plate-item {
+    top: var(--top);
+  }
 }
 
 /* ── Plate readouts ─────────────────────────────────────────────────
@@ -284,6 +351,291 @@ body::after {
   animation: scroll-cue 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
+/* ══ THE RIVER ══════════════════════════════════════════════════════
+   The life chapter. A dark panel full of drifting smoke, a light that
+   opens inside it, and that same light drawn out into a current the four
+   milestones hang off. Everything here animates on `transform` or on an
+   SVG dash pattern — no filters, because the dashes change every frame
+   and a blur would have to re-rasterise the full width with them. */
+
+/* Smoke: three soft bodies drifting at different rates and in different
+   directions, so the ground never quite repeats. */
+.river-smoke {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.river-smoke > span {
+  position: absolute;
+  display: block;
+  will-change: transform;
+}
+
+.river-smoke > span:nth-child(1) {
+  inset: -32% -18%;
+  background: radial-gradient(44% 46% at 32% 42%, #262c36 0%, rgba(38, 44, 54, 0) 72%);
+  animation: smoke-a 41s ease-in-out infinite alternate;
+}
+
+.river-smoke > span:nth-child(2) {
+  inset: -36% -22%;
+  background: radial-gradient(48% 42% at 68% 62%, #171c24 0%, rgba(23, 28, 36, 0) 70%);
+  animation: smoke-b 53s ease-in-out infinite alternate;
+}
+
+.river-smoke > span:nth-child(3) {
+  inset: -28% -16%;
+  background: radial-gradient(40% 50% at 52% 28%, #2f3640 0%, rgba(47, 54, 64, 0) 68%);
+  animation: smoke-c 67s ease-in-out infinite alternate;
+}
+
+@keyframes smoke-a {
+  from { transform: translate3d(-7%, -4%, 0) scale(1); }
+  to   { transform: translate3d(9%, 6%, 0) scale(1.22); }
+}
+
+@keyframes smoke-b {
+  from { transform: translate3d(8%, 5%, 0) scale(1.18); }
+  to   { transform: translate3d(-9%, -6%, 0) scale(1); }
+}
+
+@keyframes smoke-c {
+  from { transform: translate3d(4%, 7%, 0) scale(1.1); }
+  to   { transform: translate3d(-6%, -8%, 0) scale(1.3); }
+}
+
+/* The box the river is drawn in. Its aspect ratio matches the SVG viewBox
+   exactly, so the curve scales uniformly — no stretched strokes — and a
+   percentage measured against this box lands on the path, which is how the
+   bend markers are placed without measuring the curve at runtime. On a phone
+   it is lifted into the top third, where the text needs the room beneath. */
+.river-field {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30%;
+  transform: translateY(-50%);
+  aspect-ratio: 1000 / 400;
+}
+
+@media (min-width: 768px) {
+  .river-field {
+    top: 50%;
+  }
+}
+
+.river-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* The halo is wider than the path's own box; without this it is cut off
+     square at the left and right edges of the viewBox. */
+  overflow: visible;
+}
+
+.river-svg path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-linecap: round;
+}
+
+/* Four passes build the bloom: a wide faint halo, a body, a bright core, and
+   a swell that rides at the head of the current. */
+.river-halo { stroke-width: 22; stroke-opacity: 0.05; }
+.river-bed  { stroke-width: 9;  stroke-opacity: 0.1; }
+.river-core { stroke-width: 1.7; stroke-opacity: 0.5; }
+.river-wake { stroke-width: 13; stroke-opacity: 0.16; }
+.river-head { stroke-width: 2.6; stroke-opacity: 0.95; }
+
+/* The light. Sits at the river's source and is scaled from a bloom into a long
+   flat glow, so what opens in the dark is the same thing that becomes the
+   current. Centred with negative margins rather than a translate, so Framer's
+   scale has the transform to itself. */
+.river-dawn {
+  position: absolute;
+  left: 12%;
+  top: 43.5%;
+  width: 56%;
+  aspect-ratio: 1;
+  margin: -28% 0 0 -28%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.3) 38%,
+    rgba(255, 255, 255, 0) 72%
+  );
+}
+
+/* A specular highlight under the cursor, so the surface answers the reader
+   even when the page is standing still. */
+.river-cursor {
+  position: absolute;
+  width: 46svh;
+  height: 46svh;
+  margin: -23svh 0 0 -23svh;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.028) 46%,
+    rgba(255, 255, 255, 0) 72%
+  );
+}
+
+.river-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 88% 78% at 50% 50%, transparent 40%, rgba(4, 5, 7, 0.74) 100%);
+}
+
+/* ── Bends ──────────────────────────────────────────────────────────
+   A bend in the river is also the way into its chapter: the markers are
+   buttons, and the one the current has reached is lit. */
+.river-bend {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.4s ease;
+}
+
+.river-bend:hover,
+.river-bend:focus-visible,
+.river-bend[data-active="true"] {
+  color: #ffffff;
+}
+
+/* The reveal is written as an inline opacity, so focus has to shout over it —
+   a marker the current has not reached yet is still a reachable control. */
+.river-bend:focus-visible {
+  opacity: 1 !important;
+}
+
+.river-bend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s ease;
+}
+
+.river-bend:hover .river-bend-dot,
+.river-bend:focus-visible .river-bend-dot {
+  transform: scale(1.55);
+}
+
+.river-bend[data-active="true"] .river-bend-dot {
+  transform: scale(1.6);
+  box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.1);
+}
+
+.river-bend-label {
+  position: absolute;
+  top: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
+}
+
+.river-bend:hover .river-bend-label,
+.river-bend:focus-visible .river-bend-label,
+.river-bend[data-active="true"] .river-bend-label {
+  opacity: 1;
+}
+
+/* ── Milestones ─────────────────────────────────────────────────────
+   On a phone the river sits in the top third and the text simply stacks
+   beneath it. From md up each card moors to its own bend and alternates
+   bank, so the eye crosses the water at every chapter. */
+.river-card {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 44%;
+}
+
+@media (min-width: 768px) {
+  .river-card {
+    left: var(--x);
+    right: auto;
+    width: var(--w);
+    top: auto;
+  }
+
+  .river-card[data-side="below"] { top: 56%; }
+  .river-card[data-side="above"] { bottom: 52%; }
+}
+
+.river-rule {
+  display: block;
+  margin-top: 1.1rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+  transform-origin: left;
+  transform: scaleX(0.16);
+  transition:
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.6s ease;
+}
+
+.river-card[data-active="true"] .river-rule {
+  transform: scaleX(1);
+  background: rgba(255, 255, 255, 0.38);
+}
+
+/* The age is hollow until the current reaches its bend, then it fills. */
+.river-age {
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.45);
+  transition:
+    -webkit-text-fill-color 0.7s ease,
+    -webkit-text-stroke-color 0.7s ease;
+}
+
+.river-card:hover .river-age {
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.85);
+}
+
+.river-card[data-active="true"] .river-age {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-text-stroke-color: #ffffff;
+}
+
+/* The current runs out into paper, so the next chapter is not a cut. */
+.river-wash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Stops short of the closing line, which sits lower on a phone because the
+     river is lifted to the top there. */
+  height: 54%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 86%);
+}
+
+@media (min-width: 768px) {
+  .river-wash {
+    height: 64%;
+  }
+}
+
 /* Hide horizontal overflow caused by motion offsets.
  *
  * NOTE: use `overflow-x: clip` rather than `overflow-x: hidden`.
@@ -305,7 +657,8 @@ body {
   .seal-spin,
   .marquee,
   .scroll-cue,
-  .liquid-metal > span {
+  .liquid-metal > span,
+  .river-smoke > span {
     animation: none;
   }
   * {

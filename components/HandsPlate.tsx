@@ -9,6 +9,7 @@ import {
   useScroll,
   useSpring,
   useTransform,
+  type MotionStyle,
   type MotionValue,
 } from "framer-motion";
 import { scrollSpring } from "@/lib/motion";
@@ -29,6 +30,12 @@ type Placement = {
   readonly height?: number;
   readonly enter: readonly [number, number];
   readonly from: "left" | "right";
+  /**
+   * `top` below the md breakpoint, where the figure is rotated across the
+   * middle of the plate. Values outside 0–100% put a readout above or below
+   * the plate box, in the room a portrait screen has either side of it.
+   */
+  readonly smTop?: number;
 };
 
 type Layer = Placement & { readonly name: string; readonly height: number };
@@ -60,9 +67,9 @@ const LAYERS: readonly Layer[] = [
  * `offstageX`, which is why they carry an explicit width.
  */
 const READOUTS: readonly Placement[] = [
-  { left: 3.5, top: 4,  width: 44, enter: [0.64, 0.78], from: "left" },
-  { left: 60,  top: 4,  width: 36, enter: [0.7, 0.84],  from: "right" },
-  { left: 31,  top: 82, width: 38, enter: [0.76, 0.9],  from: "left" },
+  { left: 3.5, top: 4,  width: 44, smTop: -86, enter: [0.64, 0.78], from: "left" },
+  { left: 60,  top: 4,  width: 36, smTop: -86, enter: [0.7, 0.84],  from: "right" },
+  { left: 31,  top: 82, width: 38, smTop: 170, enter: [0.76, 0.9],  from: "left" },
 ] as const;
 
 /** Clearance past the plate edge, in plate widths, so nothing starts on screen. */
@@ -111,20 +118,22 @@ export default function HandsPlate() {
       <div className="sticky top-0 h-svh overflow-hidden flex items-center justify-center">
         <LiquidMetal />
         <div className="hands-plate relative">
-          {LAYERS.map((layer) => (
-            <Entering key={layer.name} at={layer} progress={progress} still={still}>
-              <Image
-                src={`/hands/${layer.name}.png`}
-                alt=""
-                fill
-                // The source is dithered pixel art: re-encoding softens the
-                // dither and the slices only come to ~150 KB together, so they
-                // ship untouched and scale up with hard pixel edges.
-                unoptimized
-                className="object-contain [image-rendering:pixelated]"
-              />
-            </Entering>
-          ))}
+          <div className="hands-figure">
+            {LAYERS.map((layer) => (
+              <Entering key={layer.name} at={layer} progress={progress} still={still}>
+                <Image
+                  src={`/hands/${layer.name}.png`}
+                  alt=""
+                  fill
+                  // The source is dithered pixel art: re-encoding softens the
+                  // dither and the slices only come to ~150 KB together, so
+                  // they ship untouched and scale up with hard pixel edges.
+                  unoptimized
+                  className="object-contain [image-rendering:pixelated]"
+                />
+              </Entering>
+            ))}
+          </div>
 
           {READOUTS.map((at, i) => (
             <Entering key={WORDS[i].word} at={at} progress={progress} still={still}>
@@ -160,17 +169,21 @@ function Entering({
   const [start, end] = at.enter;
   const x = useTransform(progress, [start, end], [`${offstageX(at)}%`, "0%"]);
 
+  // `top` is handed to CSS as a custom property rather than set outright,
+  // because a readout sits outside the plate box on a phone and an inline
+  // value cannot carry a breakpoint. MotionStyle has no slot for custom
+  // properties, hence the assertion.
+  const style = {
+    left: `${at.left}%`,
+    width: `${at.width}%`,
+    "--top": `${at.top}%`,
+    ...(at.smTop === undefined ? null : { "--sm-top": `${at.smTop}%` }),
+    ...(at.height === undefined ? null : { height: `${at.height}%` }),
+    ...(still ? null : { x }),
+  } as MotionStyle;
+
   return (
-    <motion.div
-      className="absolute"
-      style={{
-        left: `${at.left}%`,
-        top: `${at.top}%`,
-        width: `${at.width}%`,
-        ...(at.height === undefined ? null : { height: `${at.height}%` }),
-        ...(still ? null : { x }),
-      }}
-    >
+    <motion.div className="plate-item absolute" style={style}>
       {children}
     </motion.div>
   );

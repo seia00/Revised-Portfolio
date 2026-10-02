@@ -8,8 +8,8 @@ import { scrollSpring } from "@/lib/motion";
 
 const LINKS = [
   { id: "hero", label: "Index" },
-  { id: "words", label: "About" },
-  { id: "timeline", label: "Life" },
+  { id: "hands", label: "About" },
+  { id: "life", label: "Life" },
   { id: "activities", label: "Now" },
   { id: "connect", label: "Contact" },
 ] as const;
@@ -135,7 +135,7 @@ export default function Nav() {
             <span className="absolute inset-0 rounded-full bg-ink animate-ping opacity-40" />
             <span className="relative w-1.5 h-1.5 rounded-full bg-ink" />
           </span>
-          <span>Chiba</span>
+          <span>Tokyo</span>
           <span className="text-ink tabular-nums">{time ?? "--:--"}</span>
           <span>JST</span>
         </div>

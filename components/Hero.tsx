@@ -12,7 +12,7 @@ import { fadeUp, scrollSpring, staggerParent } from "@/lib/motion";
 import { CropMarks, Registration, Star } from "./ornaments";
 import ShatterPlate from "./ShatterPlate";
 
-const RING = "SEIA FUNAYAMA • PORTFOLIO • MMXXVI • CHIBA, JAPAN • ";
+const RING = "SEIA FUNAYAMA • PORTFOLIO • MMXXVI • TOKYO, JAPAN • ";
 
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -47,7 +47,7 @@ export default function Hero() {
 
         <div className="relative grid grid-cols-2 md:grid-cols-3 items-start p-4 md:p-6 font-mono text-[10px] md:text-[11px] tracking-[0.18em] uppercase text-ink-3">
           <span>Nº 001 — Index</span>
-          <span className="hidden md:block text-center">35.61° N, 140.11° E</span>
+          <span className="hidden md:block text-center">35.68° N, 139.77° E</span>
           <span className="text-right">Portfolio — MMXXVI</span>
         </div>
 
@@ -82,7 +82,7 @@ export default function Hero() {
           </motion.div>
 
           <motion.p variants={fadeUp} className="mt-3 font-serif italic text-ink-3 text-lg md:text-xl">
-            based in Chiba, Japan
+            based in Tokyo, Japan
           </motion.p>
         </motion.div>
 

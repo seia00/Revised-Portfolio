@@ -1,8 +1,7 @@
 import Hero from "@/components/Hero";
 import HandsPlate from "@/components/HandsPlate";
+import RiverLife from "@/components/RiverLife";
 import Marquee from "@/components/Marquee";
-import ThreeWords from "@/components/ThreeWords";
-import Timeline from "@/components/Timeline";
 import Activities from "@/components/Activities";
 import Connect from "@/components/Connect";
 
@@ -11,9 +10,8 @@ export default function Home() {
     <main className="relative">
       <Hero />
       <HandsPlate />
+      <RiverLife />
       <Marquee />
-      <ThreeWords />
-      <Timeline />
       <Activities />
       <Connect />
     </main>

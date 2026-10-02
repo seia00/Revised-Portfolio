@@ -5,8 +5,10 @@ import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { easeOutExpo, scrollSpring } from "@/lib/motion";
 
-/** How much ink the plate lays down. Any heavier and the name stops reading. */
-const INK = 0.72;
+/** How much ink the plate lays down. The name stays legible on top of it
+ *  because it is solid black at display size — the plate only ever reaches
+ *  the greys. */
+const INK = 0.94;
 
 /**
  * The hero centrepiece — the shatter photograph printed as ink on paper.
@@ -52,10 +54,10 @@ export default function ShatterPlate() {
           src="/shatter.png"
           alt=""
           fill
-          sizes="(max-width: 767px) 240vw, 160vw"
+          sizes="(max-width: 767px) 180vw, 160vw"
           loading="eager"
           fetchPriority="high"
-          className="object-cover shatter-frame"
+          className="shatter-frame"
         />
       </motion.div>
     </motion.div>
