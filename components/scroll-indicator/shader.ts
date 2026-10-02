@@ -107,6 +107,20 @@ vec3 chrome(vec3 n, vec3 v) {
   return vec3(env(reflect(-v, n))) * vec3(0.93, 0.95, 0.98);
 }
 
+// Polished silver, for the frame's face: a bright studio behind the viewer, so
+// a surface turned toward them reads silver rather than black, lighter from
+// above and to the right, darkening through a horizon band as it turns down.
+float silver(vec3 r) {
+  float sky = 0.95 + 0.45 * r.y + 0.15 * r.x;
+  float horizon = 1.0 - 0.6 * exp(-pow((r.y + 0.18) / 0.12, 2.0));
+  float key = pow(max(dot(r, normalize(vec3(0.5, 0.62, 0.6))), 0.0), 40.0) * 1.2;
+  return sky * horizon + key;
+}
+
+vec3 silverOf(vec3 n, vec3 v) {
+  return vec3(silver(reflect(-v, n))) * vec3(0.94, 0.96, 0.99);
+}
+
 float strip(float x, float from, float to) {
   return smoothstep(from - 0.04, from + 0.02, x) * (1.0 - smoothstep(to - 0.02, to + 0.06, x));
 }
@@ -161,7 +175,7 @@ vec3 notches(vec2 q, float flip, vec2 hs, float u, float bead, float face,
   }
   // A cut either side, so the strokes read as set into the face.
   vec3 col = base * (0.45 + 0.55 * smoothstep(0.0, 0.7 * u, best));
-  vec3 stroke = chrome(tilt(grad * flip, beadSlope(-best / r)), v);
+  vec3 stroke = silverOf(tilt(grad * flip, beadSlope(-best / r)), v);
   return mix(col, stroke, clamp(0.5 - best / px, 0.0, 1.0));
 }
 
@@ -182,15 +196,14 @@ vec3 frame(vec2 p, vec2 hs, float u, float rOut, float bead, float face,
     return chrome(tilt(-sdBoxGrad(p, chHalf, rCh), slope), v);
   }
 
-  // The face: smoked, polished, and very slightly crowned, so it carries a
-  // soft band of reflection rather than reading as a flat fill — brightest
-  // toward the upper right, with a fainter answer at the lower left.
+  // The face: polished silver, very slightly crowned, so it sweeps from bright
+  // to a darker band across its width rather than reading as a flat fill. The
+  // lip and bevel either side keep the darker chrome, which is what draws the
+  // crisp lines that frame it.
   float w = (e - bead) / max(e - bead + dCh - bevel, 1e-3);
   vec3 n = tilt(sdBoxGrad(p, hs, rOut), 0.3 * cos(PI * w));
   vec3 r = reflect(-v, n);
-  vec3 col = chrome(n, v) * 0.75
-           + 0.3 * smoothstep(0.1, 0.55, 0.9 * (r.x + r.y))
-           + 0.16 * smoothstep(0.15, 0.55, -0.9 * (r.x + r.y));
+  vec3 col = silverOf(n, v) + 0.12 * smoothstep(0.1, 0.55, 0.9 * (r.x + r.y));
   col = notches(p, 1.0, hs, u, bead, face, col, v, px);
   col = notches(-p, -1.0, hs, u, bead, face, col, v, px);
   return col;
