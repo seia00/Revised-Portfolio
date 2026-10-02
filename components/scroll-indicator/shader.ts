@@ -157,8 +157,15 @@ vec3 frame(vec2 p, vec2 hs, float u, float rOut, float bead, float face,
   // studio's gradients rather than reading as one flat tone.
   float w = (e - bead) / max(e - bead + dCh - bevel, 1e-3);
   vec3 col = mirrorOf(tilt(sdBoxGrad(p, hs, rOut), 0.5 * cos(PI * w)), v);
-  col = notches(p, 1.0, hs, u, bead, face, col, v, px);
-  col = notches(-p, -1.0, hs, u, bead, face, col, v, px);
+  // The notches need a face wide enough to sit in. On a narrow one the three
+  // strokes fill the whole rounded corner and read as a dent cut into it, so
+  // they fade out as the face narrows past a few px.
+  float detail = smoothstep(4.0, 7.0, face);
+  if (detail > 0.0) {
+    vec3 cut = notches(p, 1.0, hs, u, bead, face, col, v, px);
+    cut = notches(-p, -1.0, hs, u, bead, face, cut, v, px);
+    col = mix(col, cut, detail);
+  }
   return col;
 }
 
