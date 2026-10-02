@@ -32,6 +32,19 @@ body {
   color: #0a0a0a;
 }
 
+/* No native scrollbar: the scroll indicator shows where the reader is, and a
+   grey bar down the edge cut across every full-bleed chapter. The page still
+   scrolls by wheel, touch, keyboard and the nav exactly as before. */
+html,
+body {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 /* Fixed nav is 64px tall — keep anchored sections clear of it. */
 [id] {
   scroll-margin-top: 64px;
