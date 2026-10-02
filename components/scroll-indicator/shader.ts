@@ -2,11 +2,13 @@
  * The scroll indicator, drawn as one object in one pass: a machined chrome
  * frame around a recessed channel of glossy black liquid, under glass.
  *
- * Everything is shaded the same way — a surface normal reflected into a single
- * procedural studio environment — so the frame's bevels and the liquid's crests
- * catch the same lights and read as parts of one physical thing. Units are CSS
- * pixels, scaled from a design height of 110 (`u`), so the object keeps its
- * proportions at any size.
+ * Everything is shaded the same way — a surface normal reflected into a
+ * procedural studio — and both materials share its key light and strips, so
+ * the frame's bevels and the liquid's crests read as parts of one physical
+ * thing. The chrome sees the studio bright and blown out, which is what makes
+ * it shine; the liquid sees the same lights as narrow strips on a dark ground.
+ * Units are CSS pixels, scaled from a design height of 110 (`u`), so the object
+ * keeps its proportions at any size.
  */
 
 export const VERTEX = /* glsl */ `
@@ -49,43 +51,32 @@ vec2 sdBoxGrad(vec2 p, vec2 b, float r) {
 
 // ── Light ─────────────────────────────────────────────────────────────────
 
-// A dark studio: a wide softbox overhead, a strip to the right, dimmer fills
-// left and below, a hard key up and to the right, and a little light from
-// every grazing angle so every bevel draws a line.
-float env(vec3 r) {
-  float top = smoothstep(0.2, 0.8, r.y) * (1.0 - smoothstep(0.35, 1.0, abs(r.x)));
-  float right = smoothstep(0.5, 0.95, r.x) * (1.0 - smoothstep(0.3, 0.9, abs(r.y)));
-  float left = smoothstep(0.6, 0.98, -r.x) * 0.45;
-  float bottom = smoothstep(0.55, 0.95, -r.y) * 0.4;
-  float rim = smoothstep(0.75, 0.98, length(r.xy)) * 0.35;
-  float key = pow(max(dot(r, normalize(vec3(0.5, 0.62, 0.6))), 0.0), 80.0) * 5.0;
-  return 0.015 + top * 1.4 + right * 0.95 + left + bottom + rim + key;
-}
-
-vec3 chrome(vec3 n, vec3 v) {
-  return vec3(env(reflect(-v, n))) * vec3(0.93, 0.95, 0.98);
-}
-
-// Polished silver, for the frame's face: a bright studio behind the viewer, so
-// a surface turned toward them reads silver rather than black, lighter from
-// above and to the right, darkening through a horizon band as it turns down.
-float silver(vec3 r) {
-  float sky = 0.95 + 0.45 * r.y + 0.15 * r.x;
-  float horizon = 1.0 - 0.6 * exp(-pow((r.y + 0.18) / 0.12, 2.0));
-  float key = pow(max(dot(r, normalize(vec3(0.5, 0.62, 0.6))), 0.0), 40.0) * 1.2;
-  return sky * horizon + key;
-}
-
-vec3 silverOf(vec3 n, vec3 v) {
-  return vec3(silver(reflect(-v, n))) * vec3(0.94, 0.96, 0.99);
-}
-
 float strip(float x, float from, float to) {
   return smoothstep(from - 0.04, from + 0.02, x) * (1.0 - smoothstep(to - 0.02, to + 0.06, x));
 }
 
-// The same studio seen in something glossier: the lights resolve into narrow
-// strips, so a curved surface draws them out into long, clean streaks.
+// Polished chrome: a mirror in a bright white studio. What makes metal read as
+// shiny rather than grey is contrast, so the sky is blown nearly to white and
+// the horizon is a hard, nearly black line just below eye level, with a mid
+// grey floor beneath it. Two crisp light strips and a hot key glint sit on
+// top. Any surface turning through the horizon draws a sharp dark line, and
+// any facing up or toward a strip flashes white.
+float mirror(vec3 r) {
+  float sky = smoothstep(-0.2, 0.05, r.y);
+  float lit = mix(0.12 + 0.4 * smoothstep(-0.9, -0.3, r.y),
+                  1.9 + 0.9 * smoothstep(0.2, 0.9, r.y) + 0.5 * smoothstep(-0.3, 0.4, r.x), sky);
+  lit *= 1.0 - 0.92 * exp(-pow((r.y + 0.22) / 0.11, 2.0));
+  lit += strip(r.x, 0.34, 0.41) * 2.5 + strip(-r.x, 0.52, 0.58) * 1.6;
+  lit += pow(max(dot(r, normalize(vec3(0.5, 0.62, 0.6))), 0.0), 120.0) * 8.0;
+  return lit;
+}
+
+vec3 mirrorOf(vec3 n, vec3 v) {
+  return vec3(mirror(reflect(-v, n))) * vec3(0.95, 0.97, 1.0);
+}
+
+// The black liquid's studio: the same lights, resolved into narrow strips on a
+// dark ground, so its curves draw them out into long, clean streaks.
 float gloss(vec3 r) {
   float across = 1.0 - smoothstep(0.4, 0.9, abs(r.x));
   float top = strip(r.y, 0.38, 0.62) * across;
@@ -138,7 +129,7 @@ vec3 notches(vec2 q, float flip, vec2 hs, float u, float bead, float face,
   }
   // A cut either side, so the strokes read as set into the face.
   vec3 col = base * (0.45 + 0.55 * smoothstep(0.0, 0.7 * u, best));
-  vec3 stroke = silverOf(tilt(grad * flip, beadSlope(-best / r)), v);
+  vec3 stroke = mirrorOf(tilt(grad * flip, beadSlope(-best / r)), v);
   return mix(col, stroke, clamp(0.5 - best / px, 0.0, 1.0));
 }
 
@@ -149,27 +140,31 @@ vec3 frame(vec2 p, vec2 hs, float u, float rOut, float bead, float face,
 
   if (e < bead) {
     // The outer lip.
-    return chrome(tilt(sdBoxGrad(p, hs, rOut), beadSlope(e / bead)), v);
+    return mirrorOf(tilt(sdBoxGrad(p, hs, rOut), beadSlope(e / bead)), v);
   }
 
   if (dCh < bevel) {
     // The inner bevel, falling into the channel.
     float t = 1.0 - dCh / bevel;
     float slope = t / sqrt(max(1.0 - t * t, 0.03));
-    return chrome(tilt(-sdBoxGrad(p, chHalf, rCh), slope), v);
+    return mirrorOf(tilt(-sdBoxGrad(p, chHalf, rCh), slope), v);
   }
 
-  // The face: polished silver, very slightly crowned, so it sweeps from bright
-  // to a darker band across its width rather than reading as a flat fill. The
-  // lip and bevel either side keep the darker chrome, which is what draws the
-  // crisp lines that frame it.
+  // The face: crowned, so as it turns across its width it runs from white
+  // through the studio's dark horizon line — the banding that reads as chrome.
   float w = (e - bead) / max(e - bead + dCh - bevel, 1e-3);
-  vec3 n = tilt(sdBoxGrad(p, hs, rOut), 0.3 * cos(PI * w));
-  vec3 r = reflect(-v, n);
-  vec3 col = silverOf(n, v) + 0.12 * smoothstep(0.1, 0.55, 0.9 * (r.x + r.y));
+  vec3 col = mirrorOf(tilt(sdBoxGrad(p, hs, rOut), 0.5 * cos(PI * w)), v);
   col = notches(p, 1.0, hs, u, bead, face, col, v, px);
   col = notches(-p, -1.0, hs, u, bead, face, col, v, px);
   return col;
+}
+
+// A band of light sweeping diagonally across the metal every few seconds of
+// the liquid's clock — so more often while the page is moving.
+float sweep(vec2 p, vec2 hs) {
+  float at = fract(u_time * 0.09) * 3.2 - 1.1;
+  float x = p.x / hs.x * 0.5 + p.y / hs.y * 0.05;
+  return exp(-pow((x - at) / 0.035, 2.0)) * 1.6 + exp(-pow((x - at + 0.07) / 0.012, 2.0)) * 0.9;
 }
 
 // ── The liquid ────────────────────────────────────────────────────────────
@@ -369,9 +364,11 @@ void main() {
 
   vec3 col = vec3(0.0);
   if (cover > 0.0) {
-    col = sdBox(p, chHalf, rCh) > 0.0
+    bool metal = sdBox(p, chHalf, rCh) > 0.0;
+    col = metal
       ? frame(p, hs, u, rOut, bead, face, bevel, chHalf, rCh, v, px)
       : channel(p, chHalf, rCh, u, v, px);
+    col += vec3(sweep(p, hs)) * (metal ? 1.0 : 0.08);
   }
   col = 1.0 - exp(-col * 1.15);
 
@@ -381,7 +378,7 @@ void main() {
   float glow = glint(p - vec2(-hs.x + 1.5 * u, hs.y - 1.5 * u), u)
              + glint(p - vec2(hs.x - 1.5 * u, hs.y - 1.5 * u), u) * 0.8
              + glint(p - vec2(hs.x - 1.5 * u, -hs.y + 1.5 * u), u) * 0.55;
-  glow *= 0.55;
+  glow *= 0.85;
 
   vec3 rgb = col * cover + vec3(glow);
   float a = cover + (1.0 - cover) * shadow;
