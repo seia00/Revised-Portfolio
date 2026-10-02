@@ -145,17 +145,24 @@ body::after {
 }
 
 /* ── Hands plate ────────────────────────────────────────────────────
-   The sliced layers are positioned as percentages of the 1280x720 source,
+   The stage is the picture plus its three words. It carries the width, and is
+   the container the words are measured against, so they hold the same
+   proportion of the composition at every size. The cap keeps the plate inside
+   the viewport it is pinned in on short, wide screens. */
+.hands-stage {
+  width: min(100%, calc(92svh * 16 / 9));
+  container-type: inline-size;
+  /* Room for the turned figure on a phone — see .hands-figure. A percentage,
+     because a container's own units resolve against the one above it; on a
+     phone the stage is the full width, so this is 13% of the stage. */
+  padding-top: 13%;
+}
+
+/* The sliced layers are positioned as percentages of the 1280x720 source,
    so the box has to stay exactly 16:9 for them to line up — hence the ratio
-   here rather than a height. The cap keeps it inside the viewport it is
-   pinned in on short, wide screens. */
+   here rather than a height. */
 .hands-plate {
   aspect-ratio: 16 / 9;
-  width: min(100%, calc(92svh * 16 / 9));
-  /* The readouts live inside the plate, so they are measured against it rather
-     than the viewport: on a short, wide screen the plate is capped by height
-     and viewport units would walk straight off its edges. */
-  container-type: inline-size;
 }
 
 /* On a portrait screen the composition is a thin horizontal band with dead
@@ -164,17 +171,75 @@ body::after {
    itself is untouched but the two hands now enter from opposite corners and
    reach into the middle along the diagonal, using the height a phone actually
    has. The pieces translate in along their own local x, so their entrances
-   swing onto the same diagonal for free. */
+   swing onto the same diagonal for free.
+
+   Turned, the hands reach about 13% of the plate's width past its top and
+   bottom edges. The stage pads for that above, and the words clear it below,
+   so the pair is centred on what is actually drawn rather than on the box. */
 .hands-figure {
   position: absolute;
   inset: 0;
   transform: rotate(-30deg) scale(1.15);
 }
 
-/* Each item's `top` comes from a variable so a readout can sit clear of the
-   rotated figure, above or below the plate box, on a phone. */
-.plate-item {
-  top: var(--sm-top, var(--top));
+/* ── Plate readouts ─────────────────────────────────────────────────
+   The three words as one ruled list. On a phone they stack under the picture
+   at the full width of the screen, each on its own rule with its index set
+   against the right edge; from md up they run as a single line across the band
+   of empty ground above the hands. */
+.plate-readouts {
+  margin-top: 19cqw;
+  padding: 0 5.5cqw;
+}
+
+.plate-readout {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 1rem;
+  padding: 2.6cqw 0 1.8cqw;
+}
+
+.plate-rule {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform-origin: left;
+}
+
+.plate-tag {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: clamp(9px, 2.6cqw, 12px);
+  letter-spacing: 0.2em;
+  line-height: 1;
+}
+
+/* The word rises out of its own line box, so the box clips it. The padding
+   (and the margin that takes it back) leaves room for the italic to overhang
+   and for the outline's stroke, without letting the word show before it has
+   risen. `clip` rather than `hidden`, so the box is not a scroll container and
+   the tag can still find its baseline. */
+.plate-word {
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
+  font-size: 12cqw;
+  line-height: 0.88;
+  overflow: clip;
+  padding: 0.08em 0.14em 0.1em;
+  margin: -0.08em -0.14em -0.1em;
+}
+
+/* The outline is cut by a filter rather than stroked — see `Hollow` in
+   HandsPlate — so the word is filled solid and the filter takes the middle out. */
+.plate-word .text-outline {
+  -webkit-text-fill-color: currentColor;
+  -webkit-text-stroke: 0;
+  filter: url(#plate-hollow-sm);
 }
 
 @media (min-width: 768px) {
@@ -182,30 +247,44 @@ body::after {
     transform: none;
   }
 
-  .plate-item {
-    top: var(--top);
+  .hands-stage {
+    padding-top: 0;
   }
-}
 
-/* ── Plate readouts ─────────────────────────────────────────────────
-   Set in container units so the three words hold the same proportion of the
-   composition at every size, with a floor so they stay legible on a phone,
-   where the plate is only a band across the middle of the screen. */
-.plate-word {
-  font-size: clamp(13px, 4.6cqw, 104px);
-  line-height: 0.88;
-}
+  /* Pinned into the band above the hands: from 6% down it is clear of the
+     header on short screens, and it ends well above the latency panel. */
+  .plate-readouts {
+    position: absolute;
+    top: 6%;
+    left: 3.5%;
+    right: 3.5%;
+    display: flex;
+    gap: 2cqw;
+    margin: 0;
+    padding: 0;
+  }
 
-/* The outline treatment carries a fixed 1.5px stroke, which at plate sizes
-   would close up the counters on a phone and look thin on a wide display. */
-.plate-word.text-outline {
-  -webkit-text-stroke-width: clamp(1px, 0.14cqw, 3px);
-}
+  /* Each column takes its word's width plus an equal share of what is left,
+     so the three rules tile the whole measure. */
+  .plate-readout {
+    flex: 1 1 auto;
+    display: block;
+    padding: 1.3cqw 0 0;
+  }
 
-.plate-tag {
-  font-size: clamp(8px, 1.05cqw, 13px);
-  letter-spacing: 0.2em;
-  line-height: 1;
+  .plate-tag {
+    display: block;
+    margin-bottom: 1.1cqw;
+    font-size: clamp(9px, 0.95cqw, 13px);
+  }
+
+  .plate-word {
+    font-size: clamp(30px, 6cqw, 120px);
+  }
+
+  .plate-word .text-outline {
+    filter: url(#plate-hollow-lg);
+  }
 }
 
 /* ── Liquid metal ───────────────────────────────────────────────────

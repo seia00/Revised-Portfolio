@@ -9,36 +9,30 @@ import {
   useScroll,
   useSpring,
   useTransform,
-  type MotionStyle,
   type MotionValue,
 } from "framer-motion";
 import { scrollSpring } from "@/lib/motion";
-import { WORDS } from "@/data/words";
+import { WORDS, type Word } from "@/data/words";
+
+/** A scroll window, as a pair of section progress values. */
+type Window = readonly [number, number];
 
 /**
- * Where something sits on the plate, and when it arrives.
+ * One cut-out piece of the picture, and when it arrives.
  *
- * Geometry is a percentage of the 1280x720 source, so the cut-out layers
- * reassemble into the original composition at any plate size and the readouts
- * stay pinned to the same bands of empty ground. `enter` is the scroll window
+ * Geometry is a percentage of the 1280x720 source, so the layers reassemble
+ * into the original composition at any plate size. `enter` is the scroll window
  * the piece travels across; `from` is the edge it travels in from.
  */
-type Placement = {
+type Layer = {
+  readonly name: string;
   readonly left: number;
   readonly top: number;
   readonly width: number;
-  readonly height?: number;
-  readonly enter: readonly [number, number];
+  readonly height: number;
+  readonly enter: Window;
   readonly from: "left" | "right";
-  /**
-   * `top` below the md breakpoint, where the figure is rotated across the
-   * middle of the plate. Values outside 0–100% put a readout above or below
-   * the plate box, in the room a portrait screen has either side of it.
-   */
-  readonly smTop?: number;
 };
-
-type Layer = Placement & { readonly name: string; readonly height: number };
 
 /**
  * The picture: hands first, then the instrument panels.
@@ -60,17 +54,23 @@ const LAYERS: readonly Layer[] = [
 ] as const;
 
 /**
- * The verdict: the three words land last, in the bands of empty ground above
- * and below the hands, so they read as what the instruments in the picture
- * resolved to rather than as a caption parked underneath it. Positions are
- * clear of every panel, and each one still enters off the plate — see
- * `offstageX`, which is why they carry an explicit width.
+ * When each of the three words reads out, once the picture is together. They
+ * overlap, so the line builds as one gesture rather than three separate ones.
  */
-const READOUTS: readonly Placement[] = [
-  { left: 3.5, top: 4,  width: 44, smTop: -86, enter: [0.64, 0.78], from: "left" },
-  { left: 60,  top: 4,  width: 36, smTop: -86, enter: [0.7, 0.84],  from: "right" },
-  { left: 31,  top: 82, width: 38, smTop: 170, enter: [0.76, 0.9],  from: "left" },
+const READOUTS: readonly Window[] = [
+  [0.64, 0.78],
+  [0.7, 0.84],
+  [0.76, 0.9],
 ] as const;
+
+/** The outline filters and their rim widths in px — see `Hollow`. */
+const HOLLOW = [
+  ["plate-hollow-sm", 1],
+  ["plate-hollow-lg", 2],
+] as const;
+
+/** How much of a readout's window its rule takes to draw across. */
+const RULE_SHARE = 0.55;
 
 /** Clearance past the plate edge, in plate widths, so nothing starts on screen. */
 const OFFSTAGE = 6;
@@ -79,17 +79,17 @@ const OFFSTAGE = 6;
  * How far off the plate a piece starts, expressed in its own width because that
  * is what a percentage `x` transform resolves against.
  */
-function offstageX(at: Placement): number {
+function offstageX(at: Layer): number {
   const travel =
     at.from === "left" ? -(at.left + at.width + OFFSTAGE) : 100 - at.left + OFFSTAGE;
   return (travel / at.width) * 100;
 }
 
 /**
- * The second chapter: the two hands, their instrument panels and the three
- * words fly in from the edges and lock into place as the page is scrolled. The
- * plate is pinned while that happens, so the assembly reads as one held shot
- * rather than something passing by.
+ * The second chapter: the two hands and their instrument panels fly in from the
+ * edges and lock into place as the page is scrolled, and then the three words
+ * read out as one ruled line. The plate is pinned while that happens, so the
+ * assembly reads as one held shot rather than something passing by.
  */
 export default function HandsPlate() {
   const ref = useRef<HTMLDivElement>(null);
@@ -115,40 +115,43 @@ export default function HandsPlate() {
       aria-label="Two hands, reaching"
       className="relative h-[260svh] bg-plate"
     >
-      <div className="sticky top-0 h-svh overflow-hidden flex items-center justify-center">
+      {/* Below md the words stack under the picture, so the pair is centred in
+          the room left under the header rather than in the whole screen. */}
+      <div className="sticky top-0 h-svh overflow-hidden flex items-center justify-center pt-16 md:pt-0">
         <LiquidMetal />
-        <div className="hands-plate relative">
-          <div className="hands-figure">
-            {LAYERS.map((layer) => (
-              <Entering key={layer.name} at={layer} progress={progress} still={still}>
-                <Image
-                  src={`/hands/${layer.name}.png`}
-                  alt=""
-                  fill
-                  // The source is dithered pixel art: re-encoding softens the
-                  // dither and the slices only come to ~150 KB together, so
-                  // they ship untouched and scale up with hard pixel edges.
-                  unoptimized
-                  className="object-contain [image-rendering:pixelated]"
-                />
-              </Entering>
-            ))}
+        <div className="hands-stage relative">
+          <div className="hands-plate relative">
+            <div className="hands-figure">
+              {LAYERS.map((layer) => (
+                <Entering key={layer.name} at={layer} progress={progress} still={still}>
+                  <Image
+                    src={`/hands/${layer.name}.png`}
+                    alt=""
+                    fill
+                    // The source is dithered pixel art: re-encoding softens the
+                    // dither and the slices only come to ~150 KB together, so
+                    // they ship untouched and scale up with hard pixel edges.
+                    unoptimized
+                    className="object-contain [image-rendering:pixelated]"
+                  />
+                </Entering>
+              ))}
+            </div>
           </div>
 
-          {READOUTS.map((at, i) => (
-            <Entering key={WORDS[i].word} at={at} progress={progress} still={still}>
-              <span
-                aria-hidden
-                className="plate-tag hidden md:flex items-center gap-[1cqw] mb-[1.2cqw] font-mono uppercase text-ink-3"
-              >
-                Adj_0{i + 1}
-                <span className="h-px flex-1 bg-edge-2" />
-              </span>
-              <span className={`plate-word block text-ink ${WORDS[i].style}`}>
-                {WORDS[i].word}
-              </span>
-            </Entering>
-          ))}
+          <Hollow />
+          <ol aria-label="In three words" className="plate-readouts">
+            {WORDS.map((word, i) => (
+              <Readout
+                key={word.word}
+                word={word}
+                index={i}
+                enter={READOUTS[i]}
+                progress={progress}
+                still={still}
+              />
+            ))}
+          </ol>
         </div>
       </div>
     </section>
@@ -161,7 +164,7 @@ function Entering({
   still,
   children,
 }: {
-  at: Placement;
+  at: Layer;
   progress: MotionValue<number>;
   still: boolean;
   children: React.ReactNode;
@@ -169,22 +172,89 @@ function Entering({
   const [start, end] = at.enter;
   const x = useTransform(progress, [start, end], [`${offstageX(at)}%`, "0%"]);
 
-  // `top` is handed to CSS as a custom property rather than set outright,
-  // because a readout sits outside the plate box on a phone and an inline
-  // value cannot carry a breakpoint. MotionStyle has no slot for custom
-  // properties, hence the assertion.
-  const style = {
-    left: `${at.left}%`,
-    width: `${at.width}%`,
-    "--top": `${at.top}%`,
-    ...(at.smTop === undefined ? null : { "--sm-top": `${at.smTop}%` }),
-    ...(at.height === undefined ? null : { height: `${at.height}%` }),
-    ...(still ? null : { x }),
-  } as MotionStyle;
-
   return (
-    <motion.div className="plate-item absolute" style={style}>
+    <motion.div
+      className="absolute"
+      style={{
+        left: `${at.left}%`,
+        top: `${at.top}%`,
+        width: `${at.width}%`,
+        height: `${at.height}%`,
+        ...(still ? null : { x }),
+      }}
+    >
       {children}
     </motion.div>
+  );
+}
+
+/**
+ * The outline treatment, cut from the solid word rather than stroked onto it.
+ *
+ * A text stroke traces every contour in the font, and a variable font keeps its
+ * glyphs as overlapping pieces, so a stroked D shows its stem through its bowl.
+ * Eroding the filled shape and keeping only the rim outlines what is actually
+ * drawn instead. Two weights, picked in CSS, so the rim keeps pace with the type.
+ */
+function Hollow() {
+  return (
+    <svg aria-hidden width="0" height="0" className="absolute">
+      {HOLLOW.map(([id, radius]) => (
+        <filter key={id} id={id} colorInterpolationFilters="sRGB">
+          <feMorphology in="SourceAlpha" operator="erode" radius={radius} result="inner" />
+          <feComposite in="SourceGraphic" in2="inner" operator="out" />
+        </filter>
+      ))}
+    </svg>
+  );
+}
+
+/**
+ * One word of the three: a hairline draws across, then the word rises up out
+ * of it, as if the rule were the edge it had been waiting behind.
+ */
+function Readout({
+  word,
+  index,
+  enter,
+  progress,
+  still,
+}: {
+  word: Word;
+  index: number;
+  enter: Window;
+  progress: MotionValue<number>;
+  still: boolean;
+}) {
+  const [start, end] = enter;
+  const ruled = start + (end - start) * RULE_SHARE;
+
+  const rule = useTransform(progress, [start, ruled], [0, 1]);
+  const tag = useTransform(progress, [start, ruled], [0, 1]);
+  const rise = useTransform(progress, [start, end], ["120%", "0%"]);
+
+  return (
+    <li className="plate-readout">
+      <motion.span
+        aria-hidden
+        className="plate-rule bg-ink/40"
+        style={still ? undefined : { scaleX: rule }}
+      />
+      <motion.span
+        aria-hidden
+        className="plate-tag font-mono uppercase text-ink-2"
+        style={still ? undefined : { opacity: tag }}
+      >
+        Adj_0{index + 1}
+      </motion.span>
+      <span className="plate-word">
+        <motion.span
+          className={`block text-ink ${word.style}`}
+          style={still ? undefined : { y: rise }}
+        >
+          {word.word}
+        </motion.span>
+      </span>
+    </li>
   );
 }
