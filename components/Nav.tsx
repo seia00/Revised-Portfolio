@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useAnimate, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { scrollSpring } from "@/lib/motion";
 
@@ -18,6 +18,22 @@ const LINKS = [
 /** The fixed header's own height — a jump has to clear it to land square. */
 const HEADER = 64;
 
+/**
+ * Back to the top. Within this many screens of it the page glides up; from
+ * further down a glide is thousands of px of every chapter smearing past, so
+ * the page fades out under a veil, jumps, and fades back in on the hero.
+ */
+const GLIDE_LIMIT = 2;
+const GLIDE = 1.1;
+const VEIL_IN = { duration: 0.45, ease: [0.65, 0, 0.35, 1] } as const;
+const VEIL_OUT = { duration: 0.8, ease: [0.16, 1, 0.3, 1] } as const;
+
+/** A beat under the veil, for the hero's scroll-linked pieces to settle. */
+const SETTLE_MS = 220;
+
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
 const clock = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Asia/Tokyo",
   hour: "2-digit",
@@ -27,6 +43,12 @@ const clock = new Intl.DateTimeFormat("en-GB", {
 export default function Nav() {
   const [active, setActive] = useState<string>("hero");
   const lenis = useLenis();
+  const reduced = useReducedMotion();
+  const [veil, animate] = useAnimate<HTMLDivElement>();
+  const returning = useRef(false);
+  // While the veil is up it takes the clicks, so nothing behind it is hit
+  // mid-return.
+  const [veiled, setVeiled] = useState(false);
 
   // A measure rule across the foot of the header. Sprung so it eases to a stop
   // with the page rather than twitching on every wheel notch.
@@ -64,7 +86,33 @@ export default function Nav() {
     };
   }, []);
 
+  async function backToTop() {
+    if (returning.current) return;
+    if (!lenis || reduced) {
+      if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+      else window.scrollTo(0, 0);
+      return;
+    }
+    if (window.scrollY <= window.innerHeight * GLIDE_LIMIT) {
+      lenis.scrollTo(0, { duration: GLIDE, easing: easeInOutCubic });
+      return;
+    }
+
+    returning.current = true;
+    setVeiled(true);
+    await animate(veil.current, { opacity: 1 }, VEIL_IN);
+    lenis.scrollTo(0, { immediate: true, force: true });
+    await new Promise((resolve) => window.setTimeout(resolve, SETTLE_MS));
+    await animate(veil.current, { opacity: 0 }, VEIL_OUT);
+    setVeiled(false);
+    returning.current = false;
+  }
+
   function scrollTo(id: string) {
+    if (id === "hero") {
+      void backToTop();
+      return;
+    }
     const el = document.getElementById(id);
     if (!el) return;
     // Through Lenis where it is driving, so a jump uses the same easing as a
@@ -74,6 +122,15 @@ export default function Nav() {
   }
 
   return (
+    <>
+    {/* The veil the page fades under on a long return to the top. Below the
+        header, so the bar that was clicked stays put through it. */}
+    <div
+      ref={veil}
+      aria-hidden
+      className={`fixed inset-0 z-[35] bg-field ${veiled ? "pointer-events-auto" : "pointer-events-none"}`}
+      style={{ opacity: 0 }}
+    />
     <header className="fixed top-0 inset-x-0 z-40 h-16 bg-field/85 backdrop-blur-md border-b border-edge">
       <motion.span
         aria-hidden
@@ -142,5 +199,6 @@ export default function Nav() {
         </div>
       </div>
     </header>
+    </>
   );
 }
