@@ -406,24 +406,13 @@ body::after {
   to   { transform: translate3d(-6%, -8%, 0) scale(1.3); }
 }
 
-/* The box the river is drawn in. Its aspect ratio matches the SVG viewBox
-   exactly, so the curve scales uniformly — no stretched strokes — and a
-   percentage measured against this box lands on the path, which is how the
-   bend markers are placed without measuring the curve at runtime. On a phone
-   it is lifted into the top third, where the text needs the room beneath. */
-.river-field {
+/* The course. Laid out down the whole section rather than inside the pinned
+   room, so it scrolls with the page: the reader goes down the river instead of
+   watching it pass. Its viewBox is set to the section's measured pixel size,
+   so one user unit is one pixel and the strokes are never stretched. */
+.river-course {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 30%;
-  transform: translateY(-50%);
-  aspect-ratio: 1000 / 400;
-}
-
-@media (min-width: 768px) {
-  .river-field {
-    top: 50%;
-  }
+  inset: 0;
 }
 
 .river-svg {
@@ -431,8 +420,9 @@ body::after {
   inset: 0;
   width: 100%;
   height: 100%;
-  /* The halo is wider than the path's own box; without this it is cut off
-     square at the left and right edges of the viewBox. */
+  pointer-events: none;
+  /* The halo is wider than the path's own box; without this it is cut square
+     at the edges of the viewBox. */
   overflow: visible;
 }
 
@@ -442,25 +432,40 @@ body::after {
   stroke-linecap: round;
 }
 
-/* Four passes build the bloom: a wide faint halo, a body, a bright core, and
-   a swell that rides at the head of the current. */
-.river-halo { stroke-width: 22; stroke-opacity: 0.05; }
-.river-bed  { stroke-width: 9;  stroke-opacity: 0.1; }
-.river-core { stroke-width: 1.7; stroke-opacity: 0.5; }
-.river-wake { stroke-width: 13; stroke-opacity: 0.16; }
-.river-head { stroke-width: 2.6; stroke-opacity: 0.95; }
+/* The copy the course is measured against. A `stroke="none"` attribute would
+   lose to the rule above — presentation attributes sit below the cascade — so
+   it is taken out here instead, where it can win. */
+.river-svg .river-gauge {
+  stroke: none;
+}
 
-/* The light. Sits at the river's source and is scaled from a bloom into a long
-   flat glow, so what opens in the dark is the same thing that becomes the
-   current. Centred with negative margins rather than a translate, so Framer's
-   scale has the transform to itself. */
+/* Four passes build the bloom: a wide faint halo, a body, a bright core, and a
+   swell that rides at the head of the current. Widths are in real pixels now,
+   so they are set per breakpoint rather than scaled by a viewBox. */
+.river-halo { stroke-width: 18; stroke-opacity: 0.05; }
+.river-bed  { stroke-width: 7;  stroke-opacity: 0.1; }
+.river-core { stroke-width: 1.4; stroke-opacity: 0.5; }
+.river-wake { stroke-width: 11; stroke-opacity: 0.16; }
+.river-head { stroke-width: 2.2; stroke-opacity: 0.95; }
+
+@media (min-width: 768px) {
+  .river-halo { stroke-width: 26; }
+  .river-bed  { stroke-width: 10; }
+  .river-core { stroke-width: 1.7; }
+  .river-wake { stroke-width: 15; }
+  .river-head { stroke-width: 2.8; }
+}
+
+/* The light at the source, scaled from a bloom into something that reaches
+   downwards as the river takes it over — what opens in the dark is the same
+   thing that becomes the current. Centred with negative margins rather than a
+   translate, so Framer's scale has the transform to itself, and sized in
+   viewport units because the section it sits in is six screens tall. */
 .river-dawn {
   position: absolute;
-  left: 12%;
-  top: 43.5%;
-  width: 56%;
-  aspect-ratio: 1;
-  margin: -28% 0 0 -28%;
+  width: 46svh;
+  height: 46svh;
+  margin: -23svh 0 0 -23svh;
   border-radius: 50%;
   pointer-events: none;
   background: radial-gradient(
@@ -471,8 +476,8 @@ body::after {
   );
 }
 
-/* A specular highlight under the cursor, so the surface answers the reader
-   even when the page is standing still. */
+/* A specular highlight under the cursor, so the room answers the reader even
+   when the page is standing still. */
 .river-cursor {
   position: absolute;
   width: 46svh;
@@ -498,7 +503,8 @@ body::after {
 
 /* ── Bends ──────────────────────────────────────────────────────────
    A bend in the river is also the way into its chapter: the markers are
-   buttons, and the one the current has reached is lit. */
+   buttons, and the one the current has reached is lit. The label sits on the
+   bank opposite its text, so neither the water nor the card runs through it. */
 .river-bend {
   position: absolute;
   width: 28px;
@@ -546,11 +552,19 @@ body::after {
 
 .river-bend-label {
   position: absolute;
-  top: calc(100% - 2px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
   opacity: 0.5;
   transition: opacity 0.4s ease;
+}
+
+.river-bend[data-label="left"] .river-bend-label {
+  right: calc(100% - 2px);
+  transform: translateY(-50%);
+}
+
+.river-bend[data-label="right"] .river-bend-label {
+  left: calc(100% - 2px);
+  transform: translateY(-50%);
 }
 
 .river-bend:hover .river-bend-label,
@@ -559,27 +573,30 @@ body::after {
   opacity: 1;
 }
 
-/* ── Milestones ─────────────────────────────────────────────────────
-   On a phone the river sits in the top third and the text simply stacks
-   beneath it. From md up each card moors to its own bend and alternates
-   bank, so the eye crosses the water at every chapter. */
-.river-card {
+/* ── Text moored along the course ───────────────────────────────────
+   Each block is centred on its own point of the river. The centring lives on
+   the positioned wrapper and the reveal on the element inside it, because
+   Framer writes `transform` outright and would otherwise drop the offset. */
+.river-overture,
+.river-card,
+.river-coda {
   position: absolute;
-  left: 5%;
-  right: 5%;
-  top: 44%;
+  transform: translateY(-50%);
 }
 
-@media (min-width: 768px) {
-  .river-card {
-    left: var(--x);
-    right: auto;
-    width: var(--w);
-    top: auto;
-  }
+.river-overture {
+  left: 0;
+  right: 0;
+  top: calc(0.5 / 6 * 100%);
+  padding: 0 1.5rem;
+  text-align: center;
+}
 
-  .river-card[data-side="below"] { top: 56%; }
-  .river-card[data-side="above"] { bottom: 52%; }
+.river-coda {
+  left: 0;
+  right: 0;
+  top: calc(5.68 / 6 * 100%);
+  padding: 0 1.5rem;
 }
 
 .river-rule {
@@ -615,25 +632,6 @@ body::after {
 .river-card[data-active="true"] .river-age {
   -webkit-text-fill-color: #ffffff;
   -webkit-text-stroke-color: #ffffff;
-}
-
-/* The current runs out into paper, so the next chapter is not a cut. */
-.river-wash {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* Stops short of the closing line, which sits lower on a phone because the
-     river is lifted to the top there. */
-  height: 54%;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 86%);
-}
-
-@media (min-width: 768px) {
-  .river-wash {
-    height: 64%;
-  }
 }
 
 /* Hide horizontal overflow caused by motion offsets.
