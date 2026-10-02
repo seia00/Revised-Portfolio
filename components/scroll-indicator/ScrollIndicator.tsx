@@ -21,10 +21,6 @@ const MARGIN = 0.24;
 /** Sharper than this costs fill rate and buys nothing at this size. */
 const MAX_DPR = 2;
 
-/** How much the page's own speed stirs the liquid, and the most it can. */
-const STIR = 18;
-const MAX_STIR = 2.5;
-
 /** It drops in on a spring, with a little give, and is drawn back up briskly. */
 const DROP: Variants = {
   hidden: { y: "-100%", transition: { duration: 0.5, ease: [0.55, 0, 0.75, 0.06] } },
@@ -43,8 +39,9 @@ const FADE: Variants = {
  * It drops down from under the header once the reader starts scrolling and is
  * drawn back up when they stop, so it is there while they move and out of the
  * way while they read. The liquid animates on its own clock, stirred harder
- * while the page moves; its fill follows the scroll through a soft spring so
- * its leading edge travels with some weight.
+ * while the page moves — it sloshes forward with the scroll, rocks back when
+ * the page stops, and throws droplets off its front; its fill follows the
+ * scroll through a soft spring so its leading edge travels with some weight.
  *
  * Decorative: it carries no text and takes no pointer events.
  */
@@ -76,9 +73,7 @@ export default function ScrollIndicator() {
       el,
       () => ({
         progress: level.get(),
-        agitation: still
-          ? 0
-          : Math.min(Math.abs(scrollYProgress.getVelocity()) * STIR, MAX_STIR),
+        velocity: still ? 0 : scrollYProgress.getVelocity(),
       }),
       fallBack
     );

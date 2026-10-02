@@ -4,8 +4,8 @@ import { FRAGMENT, VERTEX } from "./shader";
 export type LiquidInput = {
   /** How far down the page the reader is, 0..1. */
   progress: number;
-  /** How hard the page is moving: the liquid runs faster while it does. */
-  agitation: number;
+  /** How fast that is changing, in progress per second; signed. */
+  velocity: number;
 };
 
 export type LiquidRenderer = {
@@ -21,6 +21,28 @@ export type LiquidRenderer = {
 
 /** The longest step the animation will take, so a stalled tab does not lurch. */
 const MAX_STEP = 1 / 20;
+
+/** The liquid's own pace, before the page stirs it. */
+const PACE = 1.6;
+
+/** How much the page's speed stirs the liquid, the most it can, and how fast
+ *  the stirring dies away once the page stops (per second). */
+const STIR = 18;
+const MAX_STIR = 2.5;
+const STIR_DECAY = 4;
+
+/**
+ * The slosh: a spring the scroll speed pulls on, damped well short of critical
+ * so the liquid surges with the page and rocks back and forth a few times
+ * after it stops, settling in about a second and a half.
+ */
+const SLOSH_GAIN = 14;
+const MAX_SURGE = 1.4;
+const SLOSH_STIFFNESS = 38;
+const SLOSH_DAMPING = 3.6;
+const SLOSH_SUBSTEP = 1 / 120;
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 function compile(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
   const shader = gl.createShader(type);
@@ -89,6 +111,8 @@ export function createLiquidRenderer(
     size: gl.getUniformLocation(program, "u_size"),
     time: gl.getUniformLocation(program, "u_time"),
     progress: gl.getUniformLocation(program, "u_progress"),
+    slosh: gl.getUniformLocation(program, "u_slosh"),
+    stir: gl.getUniformLocation(program, "u_stir"),
   };
 
   let width = 0;
@@ -101,6 +125,9 @@ export function createLiquidRenderer(
   let frame = 0;
   let last = 0;
   let running = false;
+  let slosh = 0;
+  let sloshSpeed = 0;
+  let stir = 0;
 
   function paint() {
     if (width === 0 || height === 0) return;
@@ -110,14 +137,33 @@ export function createLiquidRenderer(
     gl.uniform1f(uniform.dpr, dpr);
     gl.uniform2f(uniform.size, width, height);
     gl.uniform1f(uniform.time, time);
-    gl.uniform1f(uniform.progress, Math.min(1, Math.max(0, progress)));
+    gl.uniform1f(uniform.progress, clamp(progress, 0, 1));
+    gl.uniform1f(uniform.slosh, slosh);
+    gl.uniform1f(uniform.stir, stir);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+
+  /** Advance the liquid's motion by `step` seconds. */
+  function advance(step: number) {
+    const { velocity } = read();
+
+    const surge = clamp(velocity * SLOSH_GAIN, -MAX_SURGE, MAX_SURGE);
+    for (let left = step; left > 0; left -= SLOSH_SUBSTEP) {
+      const h = Math.min(left, SLOSH_SUBSTEP);
+      sloshSpeed += (SLOSH_STIFFNESS * (surge - slosh) - SLOSH_DAMPING * sloshSpeed) * h;
+      slosh += sloshSpeed * h;
+    }
+
+    const stirred = Math.min(Math.abs(velocity) * STIR, MAX_STIR);
+    stir = stirred > stir ? stirred : stir + (stirred - stir) * (1 - Math.exp(-step * STIR_DECAY));
+
+    time += step * (PACE + stir);
   }
 
   function tick(now: number) {
     const step = last === 0 ? 0 : Math.min((now - last) / 1000, MAX_STEP);
     last = now;
-    time += step * (1 + read().agitation);
+    advance(step);
     paint();
     frame = requestAnimationFrame(tick);
   }

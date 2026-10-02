@@ -28,6 +28,8 @@ uniform float u_dpr;
 uniform vec2 u_size;      // the object itself, CSS px
 uniform float u_time;
 uniform float u_progress; // 0..1
+uniform float u_slosh;    // the liquid's surge: + forward, - back, wobbling to rest
+uniform float u_stir;     // how hard the page is moving, 0 at rest
 
 const float PI = 3.14159265;
 const mat2 TURN = mat2(0.8, 0.6, -0.6, 0.8);
@@ -128,11 +130,15 @@ float strip(float x, float from, float to) {
 // The same studio seen in something glossier: the lights resolve into narrow
 // strips, so a curved surface draws them out into long, clean streaks.
 float gloss(vec3 r) {
-  float top = strip(r.y, 0.38, 0.62) * (1.0 - smoothstep(0.4, 0.9, abs(r.x)));
-  float side = strip(r.x, 0.5, 0.62) * 0.8;
+  float across = 1.0 - smoothstep(0.4, 0.9, abs(r.x));
+  float top = strip(r.y, 0.38, 0.62) * across;
+  // The softbox's far edge, a second thin line above the first — the doubled
+  // highlight that makes a surface read as wet rather than just shiny.
+  float edge = strip(r.y, 0.7, 0.75) * across;
+  float side = strip(r.x, 0.5, 0.62);
   float under = strip(-r.y, 0.55, 0.65) * 0.25;
-  float key = pow(max(dot(r, normalize(vec3(0.45, 0.6, 0.66))), 0.0), 160.0) * 6.0;
-  return 0.008 + top * 1.6 + side + under + key;
+  float key = pow(max(dot(r, normalize(vec3(0.45, 0.6, 0.66))), 0.0), 220.0) * 9.0;
+  return 0.008 + top * 2.2 + edge * 1.4 + side + under + key;
 }
 
 // A surface falling away in direction dir with the given slope.
@@ -211,12 +217,18 @@ vec3 frame(vec2 p, vec2 hs, float u, float rOut, float bead, float face,
 
 // ── The liquid ────────────────────────────────────────────────────────────
 
-// Where the liquid's leading edge is, at height y. It advances with the scroll,
-// wavers on its own, and is rounded off against the walls like a drop.
+// Where the liquid's leading edge sits on average: advanced by the scroll, and
+// thrown forward or drawn back as the liquid sloshes.
+float frontBase(float hc, float wc) {
+  return mix(hc * 0.55, wc + hc * 1.6, u_progress) + u_slosh * hc * 0.55;
+}
+
+// Where the liquid's leading edge is, at height y. It wavers on its own — more
+// wildly while the page is moving — and is rounded off against the walls.
 float frontEdge(float y, float t, float hc, float wc) {
   float yn = clamp(y / (hc * 0.5), -1.0, 1.0);
-  float x = mix(hc * 0.55, wc + hc * 1.6, u_progress);
-  x += fbm3(vec2(yn * 1.2 + 7.0, t * 0.2)) * hc * 0.7;
+  float x = frontBase(hc, wc);
+  x += fbm3(vec2(yn * 1.2 + 7.0, t * 0.3)) * hc * (0.7 + 0.45 * u_stir);
   x -= hc * 0.4 * (1.0 - sqrt(max(1.0 - yn * yn, 0.0)));
   return x;
 }
@@ -238,7 +250,7 @@ float flow(vec2 q, float t, float len) {
   float h = 0.0;
   for (int i = 0; i < 3; i++) {
     float fi = float(i);
-    float x = q.x * (0.42 + 0.1 * fi) - t * (0.045 + 0.014 * fi);
+    float x = q.x * (0.42 + 0.1 * fi) - t * (0.045 + 0.014 * fi) - u_slosh * 0.3;
     float centre = 1.0 * noise(vec2(x * 1.0, fi * 3.7 + t * 0.03))
                  + 0.25 * noise(vec2(x * 2.0, fi * 9.1 - t * 0.05));
     centre = clamp(centre, -0.3, 0.3);
@@ -258,16 +270,71 @@ float flow(vec2 q, float t, float len) {
   return h + 0.08 * noise(vec2(q.x * 0.45 - t * 0.02, q.y * 1.2 + t * 0.03));
 }
 
+// Rings spreading across the surface from two points that wander through the
+// liquid. Barely there at rest; while the page moves they come up strong and
+// break the edges into scallops.
+float ripples(vec2 q, float t, float len) {
+  float r = 0.0;
+  for (int i = 0; i < 2; i++) {
+    float fi = float(i);
+    vec2 o = vec2(len * (0.3 + 0.4 * fi) + sin(t * 0.13 + fi * 2.0) * len * 0.2,
+                  0.15 * sin(t * 0.21 + fi));
+    float d = length((q - o) * vec2(0.6, 1.0));
+    r += sin(d * 18.0 - t * 4.0 + fi * 1.3) * exp(-d * 1.2);
+  }
+  return r;
+}
+
+// Spray: droplets thrown off the front and drawn back into it, each on its own
+// cycle and flung further while the page is moving. Each leaves and returns
+// through the front itself, so the cycle never shows a seam.
+float spray(vec2 q, float t, float front) {
+  float h = 0.0;
+  float fling = 0.3 + 0.9 * clamp(u_stir + abs(u_slosh) * 0.6, 0.0, 1.6);
+  for (int j = 0; j < 5; j++) {
+    float fj = float(j);
+    float phase = fract(t * (0.23 + 0.07 * fj) + fj * 0.37);
+    float arc = 4.0 * phase * (1.0 - phase);
+    vec2 at = vec2(front - 0.35 + arc * fling * (0.6 + 0.4 * sin(fj * 4.1)),
+                   0.36 * sin(fj * 2.7 + t * 0.4));
+    vec2 d = (q - at) / mix(0.16, 0.08, arc);
+    h = smax(h, exp(-dot(d, d)) * 0.9, 0.12);
+  }
+  return h;
+}
+
+// Satellites: small drops that bob off the body sideways, faster than anything
+// else in it, and fuse back in. Part of the body, so they never stray ahead of
+// the front.
+float satellites(vec2 q, float t, float len) {
+  float h = 0.0;
+  for (int j = 0; j < 4; j++) {
+    float fj = float(j);
+    vec2 at = vec2(len * (0.5 + 0.45 * sin(t * (0.05 + 0.013 * fj) + fj * 1.9)),
+                   0.3 * sin(t * (0.9 + 0.3 * fj) + fj * 2.3));
+    vec2 d = (q - at) / 0.1;
+    h = smax(h, exp(-dot(d, d)) * 0.85, 0.12);
+  }
+  return h;
+}
+
 // How much liquid there is at c (channel px, x from the left wall): crowned
-// across the channel, gathered by the flow, and thinning out behind its front.
+// across the channel, gathered by the flow, rippled, thinning out behind its
+// front — and the spray, which is free to fly ahead of it.
 float liquid(vec2 c, float t, float hc, float wc) {
+  vec2 q = c / hc;
+  float len = wc / hc;
   float ahead = frontEdge(c.y, t, hc, wc) - c.x;
-  if (ahead <= 0.0) return 0.0;
-  float k = 1.0 - clamp(ahead / (hc * 0.5), 0.0, 1.0);
-  float head = 1.0 - k * k * k;
-  float yn = c.y / (hc * 0.5);
-  float crown = 1.0 - yn * yn;
-  return head * (0.12 * crown + flow(c / hc, t, wc / hc));
+  float body = 0.0;
+  if (ahead > 0.0) {
+    float k = 1.0 - clamp(ahead / (hc * 0.5), 0.0, 1.0);
+    float head = 1.0 - k * k * k;
+    float yn = c.y / (hc * 0.5);
+    float crown = 1.0 - yn * yn;
+    float swell = ripples(q, t, len) * (0.03 + 0.06 * min(u_stir, 1.5));
+    body = head * smax(0.12 * crown + flow(q, t, len) + swell, satellites(q, t, len), 0.12);
+  }
+  return smax(body, spray(q, t, frontBase(hc, wc) / hc), 0.12);
 }
 
 // Where there is enough of it, the liquid stands up off the floor: past THRESHOLD
@@ -305,12 +372,14 @@ vec3 channel(vec2 p, vec2 chHalf, float rCh, float u, vec3 v, float px) {
   float fres = 0.04 + 0.96 * pow(1.0 - clamp(dot(n, v), 0.0, 1.0), 5.0);
   vec3 wet = vec3(0.006, 0.007, 0.009)
            + gloss(reflect(-v, n)) * mix(0.35, 1.0, fres) * vec3(0.9, 0.93, 0.97)
-           + fres * 0.12;
+           + fres * 0.2;
 
   // The floor: a grey plate under the glass, lit from above, with a soft
-  // shadow gathering wherever the liquid is about to rise from it.
+  // shadow gathering wherever the liquid is about to rise from it, and a bright
+  // film right at the edge where the plate is wet.
   vec3 plate = vec3(mix(0.42, 0.54, g.y)) * vec3(0.97, 0.98, 1.0);
   plate *= 1.0 - 0.45 * smoothstep(THRESHOLD - 0.28, THRESHOLD, f0);
+  plate += 0.22 * exp(-pow((f0 - (THRESHOLD - 0.06)) / 0.03, 2.0));
 
   vec3 col = mix(plate, wet, cover);
 
