@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Instrument_Serif, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
+import ScrollIndicator from "@/components/scroll-indicator/ScrollIndicator";
+import Loader from "@/components/Loader";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const serif = Instrument_Serif({
   variable: "--font-instrument-serif",
@@ -35,7 +38,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
       <body className="min-h-screen bg-field text-ink antialiased font-sans selection:bg-ink selection:text-field">
+        <SmoothScroll />
+        <Loader />
         <Nav />
+        <ScrollIndicator />
         {children}
       </body>
     </html>

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { reveal, revealViewport } from "@/lib/motion";
 import { ACTIVITIES } from "@/data/activities";
 import { SectionHeader, Serif, Star } from "./ornaments";
+import ScrollStop from "./ScrollStop";
 
 export default function Activities() {
   return (
@@ -12,7 +14,8 @@ export default function Activities() {
       className="relative px-5 md:px-10 lg:px-16 py-28 md:py-40"
     >
       <div className="max-w-[1280px] mx-auto">
-        <SectionHeader index="03" label="Now" aside="Currently — 2026">
+        <ScrollStop />
+        <SectionHeader index="04" label="Now" aside="Currently — 2026">
           Where I&apos;m <Serif>at.</Serif>
         </SectionHeader>
 
@@ -20,10 +23,11 @@ export default function Activities() {
           {ACTIVITIES.map((a, i) => (
             <motion.article
               key={a.n}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-10% 0px" }}
-              transition={{ duration: 0.8, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              variants={reveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+              custom={i}
               className="group relative bg-field text-ink hover:bg-ink hover:text-field transition-colors duration-500 p-7 md:p-9 flex flex-col min-h-[460px]"
             >
               <div className="flex items-baseline justify-between font-mono text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-ink-3 group-hover:text-field/60 transition-colors duration-500">
