@@ -141,13 +141,16 @@ vec3 notches(vec2 q, float flip, vec2 hs, float u, float bead, float face,
   vec2 c0 = vec2(-hs.x + bead + face * 0.5, hs.y - bead - face * 0.5);
   vec2 along = vec2(0.70710678, 0.70710678);
   vec2 across = vec2(0.70710678, -0.70710678);
-  float r = 1.0 * u;
+  // Never thinner than a hairline, or they vanish at small sizes.
+  float r = max(1.0 * u, 0.7);
+  float gap = max(3.3 * u, 2.0);
+  float reach = max(4.2 * u, 2.6);
   float best = 1e5;
   vec2 grad = vec2(0.0);
   for (int k = -1; k <= 1; k++) {
-    vec2 m = c0 + across * float(k) * 3.3 * u;
-    vec2 a = m - along * 4.2 * u;
-    vec2 ba = along * 8.4 * u;
+    vec2 m = c0 + across * float(k) * gap;
+    vec2 a = m - along * reach;
+    vec2 ba = along * reach * 2.0;
     float h = clamp(dot(q - a, ba) / dot(ba, ba), 0.0, 1.0);
     vec2 off = q - (a + ba * h);
     float d = length(off) - r;
@@ -309,12 +312,14 @@ void main() {
   float u = u_size.y / 110.0;
   vec2 hs = u_size * 0.5;
 
-  float rOut = 6.0 * u;
-  float bead = 3.0 * u;
+  // The bevels keep a minimum width in px, so the frame still draws its lines
+  // at the small sizes the indicator is shown at.
+  float rOut = max(6.0 * u, 2.5);
+  float bead = max(3.0 * u, 1.6);
   float face = 11.0 * u;
-  float bevel = 2.4 * u;
+  float bevel = max(2.4 * u, 1.3);
   vec2 chHalf = hs - (bead + face + bevel);
-  float rCh = 3.0 * u;
+  float rCh = max(3.0 * u, 1.5);
 
   // A perspective eye a little further off than the object is wide, so a
   // flat face still sweeps through the reflections from one end to the other.
