@@ -494,6 +494,22 @@ body::after {
   inset: 0;
 }
 
+/* The river: drawn in the pinned room, under the cards and the markers that
+   scroll over it. Where it is live, the SVG line is only the gauge the course
+   is measured from, and its own light stands down. */
+.river-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+[data-river="webgl"] .river-light {
+  display: none;
+}
+
 .river-svg {
   position: absolute;
   inset: 0;
@@ -636,13 +652,15 @@ body::after {
   transition: opacity 0.4s ease;
 }
 
+/* Clear of the river itself, which is wider downstream (`--clear`, set per
+   bend from the river's width there). */
 .river-bend[data-label="left"] .river-bend-label {
-  right: calc(100% - 2px);
+  right: calc(100% + var(--clear, -2px));
   transform: translateY(-50%);
 }
 
 .river-bend[data-label="right"] .river-bend-label {
-  left: calc(100% - 2px);
+  left: calc(100% + var(--clear, -2px));
   transform: translateY(-50%);
 }
 

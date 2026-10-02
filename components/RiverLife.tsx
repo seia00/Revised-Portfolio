@@ -9,11 +9,13 @@ import {
   useScroll,
   useSpring,
   useTransform,
+  type MotionStyle,
   type MotionValue,
 } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { easeOutExpo, scrollSpring } from "@/lib/motion";
 import { useScrollStops } from "@/lib/scrollStops";
+import { bankHalfWidth, createRiverRenderer, type RiverRenderer } from "./river/riverRenderer";
 import { TIMELINE } from "@/data/timeline";
 import { Serif } from "./ornaments";
 
@@ -93,6 +95,19 @@ const NARROW: Course = {
 
 /** Length of the bright head of the current, as a fraction of the river. */
 const HEAD = 0.045;
+
+/**
+ * How wide the river grows by its mouth, as a bank half-width in px. It rises
+ * from a trickle at the source; a phone gets a narrower river to match its
+ * narrower course.
+ */
+const WIDEST = { wide: 30, narrow: 22 } as const;
+
+/** Points sampled along the course, for the river's ribbon and the draw. */
+const SAMPLES = 600;
+
+/** Sharper than this costs fill rate the river does not need. */
+const MAX_DPR = 2;
 
 /**
  * Which milestone the reader is standing in, or -1 during the overture.
@@ -186,9 +201,16 @@ const CARD_VIEWPORT = { once: true, margin: "-20% 0px -20% 0px" } as const;
 export default function RiverLife() {
   const ref = useRef<HTMLElement>(null);
   const measure = useRef<SVGPathElement>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const renderer = useRef<RiverRenderer | null>(null);
+  // The sampled course and its length, kept for the renderer, which may be
+  // created before or after the course is first measured.
+  const sampled = useRef<{ points: Float32Array; length: number; widest: number } | null>(null);
   const reduced = useReducedMotion();
   const still = reduced === true;
-  const lenis = useLenis();
+  // Redrawn from Lenis's own scroll event as well as on every frame, so the
+  // river is never a frame behind the cards and markers scrolling with the page.
+  const lenis = useLenis(() => renderer.current?.draw());
   const [active, setActive] = useState(-1);
 
   // The course is drawn in the section's own pixels rather than in a scaled
@@ -227,8 +249,9 @@ export default function RiverLife() {
     return smoothPath(points);
   }, [box.w, box.h, course, screenPx]);
 
-  // Sampled once per shape so the draw can be read off depth. 512 samples over
-  // six and a half screens is finer than a pixel at any size this runs at.
+  // Sampled once per shape: the depths, so the draw can be read off depth, and
+  // the points, which the river's ribbon is laid along. 600 samples over six
+  // and a half screens is finer than a pixel at any size this runs at.
   const [depths, setDepths] = useState<Float64Array | null>(null);
 
   useEffect(() => {
@@ -242,13 +265,19 @@ export default function RiverLife() {
       setDepths(null);
       return;
     }
-    const steps = 512;
-    const ys = new Float64Array(steps + 1);
-    for (let i = 0; i <= steps; i++) {
-      ys[i] = el.getPointAtLength((i / steps) * total).y;
+    const ys = new Float64Array(SAMPLES + 1);
+    const points = new Float32Array((SAMPLES + 1) * 2);
+    for (let i = 0; i <= SAMPLES; i++) {
+      const at = el.getPointAtLength((i / SAMPLES) * total);
+      ys[i] = at.y;
+      points[i * 2] = at.x;
+      points[i * 2 + 1] = at.y;
     }
+    const widest = box.w >= 768 ? WIDEST.wide : WIDEST.narrow;
+    sampled.current = { points, length: total, widest };
+    renderer.current?.setCourse(points, total, widest);
     setDepths(ys);
-  }, [path]);
+  }, [path, box.w]);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -286,6 +315,60 @@ export default function RiverLife() {
     return clamp01((headDepth - from) / ((MOUTH_Y - SOURCE_Y) * screenPx));
   });
   const head = useTransform(draw, (v) => Math.max(0, v - HEAD));
+
+  // The river itself: a ribbon of moving light laid along the course, drawn in
+  // the pinned room behind the cards. The SVG line below stays as the fallback
+  // for a browser without WebGL.
+  useEffect(() => {
+    const section = ref.current;
+    const el = canvas.current;
+    if (!section || !el) return;
+
+    const created = createRiverRenderer(
+      el,
+      () => ({
+        offset: el.getBoundingClientRect().top - section.getBoundingClientRect().top,
+        head: still ? Number.MAX_SAFE_INTEGER : draw.get() * (sampled.current?.length ?? 0),
+      }),
+      {
+        calm: still,
+        onLost: () => {
+          section.dataset.river = "svg";
+          renderer.current = null;
+        },
+      }
+    );
+    if (!created) {
+      section.dataset.river = "svg";
+      return;
+    }
+    section.dataset.river = "webgl";
+    renderer.current = created;
+    if (sampled.current) {
+      const { points, length, widest } = sampled.current;
+      created.setCourse(points, length, widest);
+    }
+
+    const resize = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      created.resize(width, height, Math.min(window.devicePixelRatio || 1, MAX_DPR));
+    });
+    resize.observe(el);
+
+    // Only flowing while the section is on screen.
+    const visible = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) created.start();
+      else created.stop();
+    });
+    visible.observe(section);
+
+    return () => {
+      resize.disconnect();
+      visible.disconnect();
+      created.destroy();
+      renderer.current = null;
+    };
+  }, [still, draw]);
 
   // A specular highlight that follows the cursor across the dark, so the room
   // answers the reader even when the page is still. Mouse only — there is no
@@ -372,6 +455,8 @@ export default function RiverLife() {
           <span />
         </motion.div>
 
+        <canvas ref={canvas} aria-hidden className="river-canvas" />
+
         {!still && (
           <motion.div
             aria-hidden
@@ -404,11 +489,13 @@ export default function RiverLife() {
             aria-hidden
           >
             <path ref={measure} className="river-gauge" d={path} />
-            <RiverLight
-              path={path}
-              draw={still ? undefined : draw}
-              head={head}
-            />
+            <g className="river-light">
+              <RiverLight
+                path={path}
+                draw={still ? undefined : draw}
+                head={head}
+              />
+            </g>
           </svg>
         )}
 
@@ -418,6 +505,14 @@ export default function RiverLife() {
             index={i}
             x={x}
             y={bendY(i)}
+            river={
+              depths
+                ? bankHalfWidth(
+                    arcAtDepth(depths, bendY(i) * screenPx),
+                    box.w >= 768 ? WIDEST.wide : WIDEST.narrow
+                  )
+                : 0
+            }
             labelSide={course.card(x).left > x ? "left" : "right"}
             reach={still ? undefined : draw}
             active={active === i}
@@ -513,7 +608,8 @@ export default function RiverLife() {
 }
 
 /**
- * The light itself: one curve, stroked several times over.
+ * The river as a line of light, for a browser without WebGL: one curve,
+ * stroked several times over.
  *
  * `pathLength` is Framer's normalised draw — 0 is nothing, 1 is the whole
  * river — so halo, bed and core all extend from a single value, and the head
@@ -588,6 +684,7 @@ function Bend({
   index,
   x,
   y,
+  river,
   labelSide,
   reach,
   active,
@@ -596,6 +693,8 @@ function Bend({
   index: number;
   x: number;
   y: number;
+  /** The river's bank half-width at this bend, px, which the label clears. */
+  river: number;
   labelSide: "left" | "right";
   reach?: MotionValue<number>;
   active: boolean;
@@ -614,11 +713,14 @@ function Bend({
       data-label={labelSide}
       aria-label={`Age ${milestone.age} — ${milestone.title}`}
       className="river-bend"
-      style={{
-        left: `${x * 100}%`,
-        top: `${(y / SCREENS) * 100}%`,
-        opacity: surfaced,
-      }}
+      style={
+        {
+          left: `${x * 100}%`,
+          top: `${(y / SCREENS) * 100}%`,
+          opacity: surfaced,
+          "--clear": `${Math.max(river - 6, -2)}px`,
+        } as MotionStyle
+      }
     >
       <span className="river-bend-dot" />
       <span className="river-bend-label font-mono text-[10px] tracking-[0.18em] uppercase whitespace-nowrap">
