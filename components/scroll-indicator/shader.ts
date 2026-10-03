@@ -1,8 +1,8 @@
-import { BOTTOM_ARC, EYE, EYE_BOX, TOP_ARC } from "./eye";
+import { BLADES, BOTTOM_ARC, EYE_BOX, TOP_ARC } from "./eye";
 
 /**
  * The scroll indicator, drawn as one object in one pass: an eye in machined
- * chrome — a long almond with a needle-thin blade off each end — holding a
+ * chrome — a long almond with a blade off each end — holding a
  * recessed channel of glossy black liquid, under glass.
  *
  * Everything is shaded the same way — a surface normal reflected into a
@@ -57,13 +57,13 @@ const vec2 TOP_C = vec2(${num(TOP_ARC.x)}, ${num(TOP_ARC.y)});
 const float TOP_R = ${num(TOP_ARC.r)};
 const vec2 BOTTOM_C = vec2(${num(BOTTOM_ARC.x)}, ${num(BOTTOM_ARC.y)});
 const float BOTTOM_R = ${num(BOTTOM_ARC.r)};
-const vec2 LEFT_TIP = ${vec(EYE.leftTip)};
-const vec2 LEFT_TOP = ${vec(EYE.leftTop)};
-const vec2 LEFT_BOTTOM = ${vec(EYE.leftBottom)};
-const vec2 RIGHT_TIP = ${vec(EYE.rightTip)};
-const vec2 RIGHT_TOP = ${vec(EYE.rightTop)};
-const vec2 RIGHT_BOTTOM = ${vec(EYE.rightBottom)};
-const vec2 PEAK = ${vec(EYE.top)};
+const vec2 LEFT_TIP = ${vec(BLADES.left.tip)};
+const vec2 LEFT_TOP = ${vec(BLADES.left.base[0])};
+const vec2 LEFT_BOTTOM = ${vec(BLADES.left.base[1])};
+const vec2 RIGHT_TIP = ${vec(BLADES.right.tip)};
+const vec2 RIGHT_TOP = ${vec(BLADES.right.base[0])};
+const vec2 RIGHT_BOTTOM = ${vec(BLADES.right.base[1])};
+const vec2 CREST = vec2(${num(TOP_ARC.x)}, ${num(TOP_ARC.y - TOP_ARC.r)});
 const float EYE_WIDTH = ${num(EYE_BOX.width)};
 
 // The drawing's units per CSS px, at the size the object is drawn.
@@ -180,8 +180,9 @@ float beadSlope(float t) {
 
 // The chrome around the liquid, like a lid: a rounded outer lip, a crowned
 // face, and a bevel falling into the channel. d is the distance to the
-// outline (negative inside) and n which way is out. The blades are thinner
-// than the lip, so they are all lip: rounded chrome needles.
+// outline (negative inside) and n which way is out. The blades are too thin
+// to hold any liquid, so they are lip and face alone: a rounded edge either
+// side and a crowned spine down the middle.
 vec3 rim(float d, vec2 n, float bead, float face, float bevel, vec3 v) {
   float e = -d;                          // depth in from the outer edge
   float dCh = d + bead + face + bevel;   // distance out from the channel
@@ -388,6 +389,11 @@ float glint(vec2 d, float u) {
   return core * 0.9 + (wide + tall) * 0.35;
 }
 
+// One sample of the rim at q, swept by the band of light.
+vec3 metal(vec2 q, float d, float bead, float face, float bevel, vec3 v, vec2 hs) {
+  return rim(d, sdEyeGrad(q), bead, face, bevel, v) + vec3(sweep(q, hs));
+}
+
 void main() {
   vec2 p = gl_FragCoord.xy / u_dpr - u_canvas * 0.5;
   float px = 1.0 / u_dpr;
@@ -411,21 +417,49 @@ void main() {
 
   vec3 col = vec3(0.0);
   if (cover > 0.0) {
-    bool metal = dOut > -rimWidth;
-    col = metal
-      ? rim(dOut, sdEyeGrad(p), bead, face, bevel, v)
-      : channel(p, dOut, rimWidth, channelEnds(rimWidth), u, v, px);
-    col += vec3(sweep(p, hs)) * (metal ? 1.0 : 0.08);
+    // Four samples a pixel, on a rotated grid. The rim's lip, face and bevel
+    // meet along curves, and shaded once a pixel those seams step from pixel
+    // to pixel and read as a row of dashes; averaged, they run smooth. The
+    // liquid is soft already, so it is shaded once, where it is needed.
+    vec3 chrome = vec3(0.0);
+    float metals = 0.0;
+    float wets = 0.0;
+    for (int i = 0; i < 4; i++) {
+      vec2 o = i == 0 ? vec2(0.125, 0.375)
+             : i == 1 ? vec2(-0.375, 0.125)
+             : i == 2 ? vec2(0.375, -0.125)
+             : vec2(-0.125, -0.375);
+      vec2 q = p + o * px;
+      float d = sdEye(q);
+      if (d > 0.0) continue;
+      if (d > -rimWidth) {
+        chrome += metal(q, d, bead, face, bevel, v, hs);
+        metals += 1.0;
+      } else {
+        wets += 1.0;
+      }
+    }
+    if (metals + wets == 0.0) {
+      // Only just inside the edge: the lip, at its very rim.
+      col = metal(p, -0.01, bead, face, bevel, v, hs);
+    } else {
+      vec3 wet = wets > 0.0
+        ? channel(p, dOut, rimWidth, channelEnds(rimWidth), u, v, px) + vec3(sweep(p, hs)) * 0.08
+        : vec3(0.0);
+      col = (chrome + wet * wets) / (metals + wets);
+    }
   }
   col = 1.0 - exp(-col * 1.15);
 
   // Outside it: a pocket of shadow, so it sits in its own darkness on a light
   // page, and glints flaring where the light catches it — on the crest of the
-  // upper lid, and partway along each blade.
+  // upper lid, and along the spine of each blade.
   float shadow = 0.6 * exp(-max(dOut, 0.0) / (7.0 * u));
-  float glow = glint(p - (fromEye(PEAK) - vec2(0.0, bead)), u)
-             + glint(p - fromEye(mix(RIGHT_TOP, RIGHT_TIP, 0.45)), u) * 0.8
-             + glint(p - fromEye(mix(LEFT_TOP, LEFT_TIP, 0.5)), u) * 0.55;
+  vec2 rightSpine = mix(mix(RIGHT_TOP, RIGHT_BOTTOM, 0.5), RIGHT_TIP, 0.5);
+  vec2 leftSpine = mix(mix(LEFT_TOP, LEFT_BOTTOM, 0.5), LEFT_TIP, 0.55);
+  float glow = glint(p - (fromEye(CREST) - vec2(0.0, bead)), u)
+             + glint(p - fromEye(rightSpine), u) * 0.8
+             + glint(p - fromEye(leftSpine), u) * 0.55;
   glow *= 0.85;
 
   vec3 rgb = col * cover + vec3(glow);
