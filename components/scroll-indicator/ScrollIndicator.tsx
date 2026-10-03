@@ -9,6 +9,7 @@ import {
   useSpring,
   type Variants,
 } from "framer-motion";
+import { ALMOND_PATH, EYE_BOX, EYE_PATH } from "./eye";
 import { createLiquidRenderer, type LiquidRenderer } from "./liquidRenderer";
 import { useScrollActivity } from "./useScrollActivity";
 
@@ -33,8 +34,19 @@ const FADE: Variants = {
 };
 
 /**
- * A scroll-progress indicator: a piece of chrome hardware holding a channel of
- * black liquid, which fills the channel as the page is read.
+ * The fallback's channel: the almond drawn in, about its middle, by about the
+ * width of the WebGL object's rim.
+ */
+const CHANNEL_INSET = (() => {
+  const cx = EYE_BOX.x + EYE_BOX.width / 2;
+  const cy = EYE_BOX.y + EYE_BOX.height / 2;
+  return `translate(${cx} ${cy}) scale(0.88 0.62) translate(${-cx} ${-cy})`;
+})();
+
+/**
+ * A scroll-progress indicator: an eye in polished chrome — a long almond with
+ * a needle-thin blade off each end — holding a channel of black liquid, which
+ * fills the almond from left to right as the page is read.
  *
  * It drops down from under the header once the reader starts scrolling and is
  * drawn back up when they stop, so it is there while they move and out of the
@@ -129,9 +141,29 @@ export default function ScrollIndicator() {
     >
       <div ref={body} className="scroll-indicator-body">
         <canvas ref={canvas} className="scroll-indicator-canvas" />
-        <div className="scroll-indicator-fallback">
-          <motion.span style={{ scaleX: viscous }} />
-        </div>
+        <svg
+          className="scroll-indicator-fallback"
+          viewBox={`${EYE_BOX.x} ${EYE_BOX.y} ${EYE_BOX.width} ${EYE_BOX.height}`}
+        >
+          <defs>
+            <linearGradient id="scroll-indicator-chrome" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#f4f6f8" />
+              <stop offset="0.12" stopColor="#6a6f75" />
+              <stop offset="0.42" stopColor="#141518" />
+              <stop offset="0.62" stopColor="#0b0c0e" />
+              <stop offset="0.86" stopColor="#3b3e43" />
+              <stop offset="1" stopColor="#dfe2e6" />
+            </linearGradient>
+            <clipPath id="scroll-indicator-channel">
+              <path d={ALMOND_PATH} transform={CHANNEL_INSET} />
+            </clipPath>
+          </defs>
+          <path d={EYE_PATH} fill="url(#scroll-indicator-chrome)" />
+          <g clipPath="url(#scroll-indicator-channel)">
+            <rect {...EYE_BOX} fill="#585c61" />
+            <motion.rect {...EYE_BOX} fill="#030304" style={{ scaleX: viscous, originX: 0 }} />
+          </g>
+        </svg>
       </div>
     </motion.div>
   );

@@ -1,15 +1,27 @@
+import { BOTTOM_ARC, EYE, EYE_BOX, TOP_ARC } from "./eye";
+
 /**
- * The scroll indicator, drawn as one object in one pass: a machined chrome
- * frame around a recessed channel of glossy black liquid, under glass.
+ * The scroll indicator, drawn as one object in one pass: an eye in machined
+ * chrome — a long almond with a needle-thin blade off each end — holding a
+ * recessed channel of glossy black liquid, under glass.
  *
  * Everything is shaded the same way — a surface normal reflected into a
  * procedural studio — and both materials share its key light and strips, so
- * the frame's bevels and the liquid's crests read as parts of one physical
+ * the rim's bevels and the liquid's crests read as parts of one physical
  * thing. The chrome sees the studio bright, which is what makes it shine; the
  * liquid sees the same lights as narrow strips on a dark ground.
- * Units are CSS pixels, scaled from a design height of 110 (`u`), so the object
- * keeps its proportions at any size.
+ * Units are CSS pixels, with detail scaled from a design height of 110 (`u`),
+ * so the object keeps its proportions at any size.
  */
+
+/**
+ * The eye's geometry, written into the shader in hundredths of its drawing's
+ * units — small enough numbers that squared distances stay in range at medium
+ * precision.
+ */
+const E = 100;
+const num = (n: number) => (n / E).toFixed(4);
+const vec = ([x, y]: readonly [number, number]) => `vec2(${num(x)}, ${num(y)})`;
 
 export const VERTEX = /* glsl */ `
 attribute vec2 a_position;
@@ -35,18 +47,79 @@ uniform float u_stir;     // how hard the page is moving, 0 at rest
 
 const float PI = 3.14159265;
 
-// ── Shapes ────────────────────────────────────────────────────────────────
+// ── The shape ─────────────────────────────────────────────────────────────
+// The eye, in its drawing's own units (hundredths of them; y runs down): an
+// almond — the overlap of a great circle arcing over its top and another
+// under its bottom — with a thin triangular blade off each end.
 
-float sdBox(vec2 p, vec2 b, float r) {
-  vec2 q = abs(p) - b + r;
-  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+const vec2 CENTRE = vec2(${num(EYE_BOX.x + EYE_BOX.width / 2)}, ${num(EYE_BOX.y + EYE_BOX.height / 2)});
+const vec2 TOP_C = vec2(${num(TOP_ARC.x)}, ${num(TOP_ARC.y)});
+const float TOP_R = ${num(TOP_ARC.r)};
+const vec2 BOTTOM_C = vec2(${num(BOTTOM_ARC.x)}, ${num(BOTTOM_ARC.y)});
+const float BOTTOM_R = ${num(BOTTOM_ARC.r)};
+const vec2 LEFT_TIP = ${vec(EYE.leftTip)};
+const vec2 LEFT_TOP = ${vec(EYE.leftTop)};
+const vec2 LEFT_BOTTOM = ${vec(EYE.leftBottom)};
+const vec2 RIGHT_TIP = ${vec(EYE.rightTip)};
+const vec2 RIGHT_TOP = ${vec(EYE.rightTop)};
+const vec2 RIGHT_BOTTOM = ${vec(EYE.rightBottom)};
+const vec2 PEAK = ${vec(EYE.top)};
+const float EYE_WIDTH = ${num(EYE_BOX.width)};
+
+// The drawing's units per CSS px, at the size the object is drawn.
+float unit;
+
+vec2 toEye(vec2 p) {
+  return vec2(CENTRE.x + p.x * unit, CENTRE.y - p.y * unit);
 }
 
-vec2 sdBoxGrad(vec2 p, vec2 b, float r) {
+vec2 fromEye(vec2 q) {
+  return vec2(q.x - CENTRE.x, CENTRE.y - q.y) / unit;
+}
+
+float sdTriangle(vec2 p, vec2 p0, vec2 p1, vec2 p2) {
+  vec2 e0 = p1 - p0, e1 = p2 - p1, e2 = p0 - p2;
+  vec2 v0 = p - p0, v1 = p - p1, v2 = p - p2;
+  vec2 pq0 = v0 - e0 * clamp(dot(v0, e0) / dot(e0, e0), 0.0, 1.0);
+  vec2 pq1 = v1 - e1 * clamp(dot(v1, e1) / dot(e1, e1), 0.0, 1.0);
+  vec2 pq2 = v2 - e2 * clamp(dot(v2, e2) / dot(e2, e2), 0.0, 1.0);
+  float s = sign(e0.x * e2.y - e0.y * e2.x);
+  vec2 d = min(min(vec2(dot(pq0, pq0), s * (v0.x * e0.y - v0.y * e0.x)),
+                   vec2(dot(pq1, pq1), s * (v1.x * e1.y - v1.y * e1.x))),
+                   vec2(dot(pq2, pq2), s * (v2.x * e2.y - v2.y * e2.x)));
+  return -sqrt(d.x) * sign(d.y);
+}
+
+// Signed distance to the eye's outline, in CSS px: negative inside.
+float sdEye(vec2 p) {
+  vec2 q = toEye(p);
+  float almond = max(length(q - TOP_C) - TOP_R, length(q - BOTTOM_C) - BOTTOM_R);
+  float blades = min(sdTriangle(q, LEFT_TIP, LEFT_TOP, LEFT_BOTTOM),
+                     sdTriangle(q, RIGHT_TIP, RIGHT_TOP, RIGHT_BOTTOM));
+  return min(almond, blades) / unit;
+}
+
+// Which way is out, at p.
+vec2 sdEyeGrad(vec2 p) {
   vec2 h = vec2(0.35, 0.0);
-  vec2 g = vec2(sdBox(p + h.xy, b, r) - sdBox(p - h.xy, b, r),
-                sdBox(p + h.yx, b, r) - sdBox(p - h.yx, b, r));
+  vec2 g = vec2(sdEye(p + h.xy) - sdEye(p - h.xy), sdEye(p + h.yx) - sdEye(p - h.yx));
   return g / max(length(g), 1e-5);
+}
+
+// Where the channel ends either side, in CSS px across from the middle: the
+// points where the two circles, each brought in by the rim, cross.
+vec2 channelEnds(float rim) {
+  float r1 = TOP_R - rim * unit;
+  float r2 = BOTTOM_R - rim * unit;
+  vec2 d = BOTTOM_C - TOP_C;
+  float l = length(d);
+  float a = (r1 * r1 - r2 * r2 + l * l) / (2.0 * l);
+  float h = sqrt(max(r1 * r1 - a * a, 0.0));
+  vec2 m = TOP_C + d * (a / l);
+  vec2 across = vec2(-d.y, d.x) / l;
+  float x1 = (m + across * h).x;
+  float x2 = (m - across * h).x;
+  return (vec2(min(x1, x2), max(x1, x2)) - CENTRE.x) / unit;
 }
 
 // ── Light ─────────────────────────────────────────────────────────────────
@@ -103,70 +176,32 @@ float beadSlope(float t) {
   return k / sqrt(max(1.0 - k * k, 0.03));
 }
 
-// ── The frame ─────────────────────────────────────────────────────────────
+// ── The rim ───────────────────────────────────────────────────────────────
 
-// Three raised strokes across a corner of the frame's face. q is in a space
-// where the corner in question is the top-left one.
-vec3 notches(vec2 q, float flip, vec2 hs, float u, float bead, float face,
-             vec3 base, vec3 v, float px) {
-  vec2 c0 = vec2(-hs.x + bead + face * 0.5, hs.y - bead - face * 0.5);
-  vec2 along = vec2(0.70710678, 0.70710678);
-  vec2 across = vec2(0.70710678, -0.70710678);
-  // Never thinner than a hairline, or they vanish at small sizes.
-  float r = max(1.0 * u, 0.7);
-  float gap = max(3.3 * u, 2.0);
-  float reach = max(4.2 * u, 2.6);
-  float best = 1e5;
-  vec2 grad = vec2(0.0);
-  for (int k = -1; k <= 1; k++) {
-    vec2 m = c0 + across * float(k) * gap;
-    vec2 a = m - along * reach;
-    vec2 ba = along * reach * 2.0;
-    float h = clamp(dot(q - a, ba) / dot(ba, ba), 0.0, 1.0);
-    vec2 off = q - (a + ba * h);
-    float d = length(off) - r;
-    if (d < best) {
-      best = d;
-      grad = off / max(length(off), 1e-5);
-    }
-  }
-  // A cut either side, so the strokes read as set into the face.
-  vec3 col = base * (0.45 + 0.55 * smoothstep(0.0, 0.7 * u, best));
-  vec3 stroke = mirrorOf(tilt(grad * flip, beadSlope(-best / r)), v);
-  return mix(col, stroke, clamp(0.5 - best / px, 0.0, 1.0));
-}
-
-vec3 frame(vec2 p, vec2 hs, float u, float rOut, float bead, float face,
-           float bevel, vec2 chHalf, float rCh, vec3 v, float px) {
-  float e = -sdBox(p, hs, rOut);   // depth in from the outer edge
-  float dCh = sdBox(p, chHalf, rCh); // distance out from the channel
+// The chrome around the liquid, like a lid: a rounded outer lip, a crowned
+// face, and a bevel falling into the channel. d is the distance to the
+// outline (negative inside) and n which way is out. The blades are thinner
+// than the lip, so they are all lip: rounded chrome needles.
+vec3 rim(float d, vec2 n, float bead, float face, float bevel, vec3 v) {
+  float e = -d;                          // depth in from the outer edge
+  float dCh = d + bead + face + bevel;   // distance out from the channel
 
   if (e < bead) {
     // The outer lip.
-    return mirrorOf(tilt(sdBoxGrad(p, hs, rOut), beadSlope(e / bead)), v);
+    return mirrorOf(tilt(n, beadSlope(e / bead)), v);
   }
 
   if (dCh < bevel) {
     // The inner bevel, falling into the channel.
     float t = 1.0 - dCh / bevel;
     float slope = t / sqrt(max(1.0 - t * t, 0.03));
-    return mirrorOf(tilt(-sdBoxGrad(p, chHalf, rCh), slope), v);
+    return mirrorOf(tilt(-n, slope), v);
   }
 
   // The face: crowned, so as it turns across its width it sweeps through the
   // studio's gradients rather than reading as one flat tone.
-  float w = (e - bead) / max(e - bead + dCh - bevel, 1e-3);
-  vec3 col = mirrorOf(tilt(sdBoxGrad(p, hs, rOut), 0.5 * cos(PI * w)), v);
-  // The notches need a face wide enough to sit in. On a narrow one the three
-  // strokes fill the whole rounded corner and read as a dent cut into it, so
-  // they fade out as the face narrows past a few px.
-  float detail = smoothstep(4.0, 7.0, face);
-  if (detail > 0.0) {
-    vec3 cut = notches(p, 1.0, hs, u, bead, face, col, v, px);
-    cut = notches(-p, -1.0, hs, u, bead, face, cut, v, px);
-    col = mix(col, cut, detail);
-  }
-  return col;
+  float w = (e - bead) / max(face, 1e-3);
+  return mirrorOf(tilt(n, 0.5 * cos(PI * w)), v);
 }
 
 // A band of light sweeping diagonally across the metal every few seconds of
@@ -288,11 +323,13 @@ float liquid(vec2 c, float t, float hc, float wc) {
 const float THRESHOLD = 0.42;
 const float RISE = 0.4;
 
-vec3 channel(vec2 p, vec2 chHalf, float rCh, float u, vec3 v, float px) {
-  float hc = chHalf.y * 2.0;
-  float wc = chHalf.x * 2.0;
+// The channel runs between ends.x and ends.y, its widest depth hc across the
+// middle; the liquid is laid out in it from its left end.
+vec3 channel(vec2 p, float d, float rimWidth, vec2 ends, float u, vec3 v, float px) {
+  float hc = u_size.y - 2.0 * rimWidth;
+  float wc = ends.y - ends.x;
   float t = u_time;
-  vec2 c = vec2(p.x + chHalf.x, p.y);
+  vec2 c = vec2(p.x - ends.x, p.y);
   vec2 g = vec2(c.x / wc, p.y / hc + 0.5);
 
   float eps = max(0.6, hc * 0.012);
@@ -328,10 +365,11 @@ vec3 channel(vec2 p, vec2 chHalf, float rCh, float u, vec3 v, float px) {
 
   vec3 col = mix(plate, wet, cover);
 
-  // Recessed: shaded along the walls, and in the shadow of the upper lip.
-  float inset = -sdBox(p, chHalf, rCh);
+  // Recessed: shaded along the walls, and in the shadow of the upper lid.
+  float inset = -(d + rimWidth);
+  float underLid = (TOP_R - length(toEye(p) - TOP_C)) / unit - rimWidth;
   col *= mix(0.5, 1.0, smoothstep(0.0, 6.0 * u, inset));
-  col *= mix(0.75, 1.0, smoothstep(0.0, 14.0 * u, chHalf.y - p.y));
+  col *= mix(0.75, 1.0, smoothstep(0.0, 14.0 * u, underLid));
 
   // The glass over it: one soft diagonal sheen, a finer one beside it, and a
   // hairline catching the light just inside the walls.
@@ -355,42 +393,39 @@ void main() {
   float px = 1.0 / u_dpr;
   float u = u_size.y / 110.0;
   vec2 hs = u_size * 0.5;
+  unit = EYE_WIDTH / u_size.x;
 
-  // The bevels keep a minimum width in px, so the frame still draws its lines
-  // at the small sizes the indicator is shown at. The corners are rounded to
-  // about a fifth of the height, and the channel's follow at a softer radius.
-  float rOut = max(20.0 * u, 5.5);
-  float bead = max(3.0 * u, 1.6);
-  float face = 11.0 * u;
-  float bevel = max(2.4 * u, 1.3);
-  vec2 chHalf = hs - (bead + face + bevel);
-  float rCh = max(rOut * 0.55, 2.0);
+  // The rim keeps a minimum width in px, so it still draws its lines at the
+  // small sizes the indicator is shown at.
+  float bead = max(0.05 * u_size.y, 1.4);
+  float face = 0.085 * u_size.y;
+  float bevel = max(0.05 * u_size.y, 1.2);
+  float rimWidth = bead + face + bevel;
 
   // A perspective eye a little further off than the object is wide, so a
   // flat face still sweeps through the reflections from one end to the other.
   vec3 v = normalize(vec3(-p, u_size.x * 1.1));
 
-  float dOut = sdBox(p, hs, rOut);
+  float dOut = sdEye(p);
   float cover = clamp(0.5 - dOut / px, 0.0, 1.0);
 
   vec3 col = vec3(0.0);
   if (cover > 0.0) {
-    bool metal = sdBox(p, chHalf, rCh) > 0.0;
+    bool metal = dOut > -rimWidth;
     col = metal
-      ? frame(p, hs, u, rOut, bead, face, bevel, chHalf, rCh, v, px)
-      : channel(p, chHalf, rCh, u, v, px);
+      ? rim(dOut, sdEyeGrad(p), bead, face, bevel, v)
+      : channel(p, dOut, rimWidth, channelEnds(rimWidth), u, v, px);
     col += vec3(sweep(p, hs)) * (metal ? 1.0 : 0.08);
   }
   col = 1.0 - exp(-col * 1.15);
 
   // Outside it: a pocket of shadow, so it sits in its own darkness on a light
-  // page, and glints flaring off the corners the light hits.
+  // page, and glints flaring where the light catches it — on the crest of the
+  // upper lid, and partway along each blade.
   float shadow = 0.6 * exp(-max(dOut, 0.0) / (7.0 * u));
-  // On the curve of each corner, where a rounded edge catches the light.
-  vec2 corner = hs - 0.3 * rOut;
-  float glow = glint(p - vec2(-corner.x, corner.y), u)
-             + glint(p - vec2(corner.x, corner.y), u) * 0.8
-             + glint(p - vec2(corner.x, -corner.y), u) * 0.55;
+  float glow = glint(p - (fromEye(PEAK) - vec2(0.0, bead)), u)
+             + glint(p - fromEye(mix(RIGHT_TOP, RIGHT_TIP, 0.45)), u) * 0.8
+             + glint(p - fromEye(mix(LEFT_TOP, LEFT_TIP, 0.5)), u) * 0.55;
   glow *= 0.85;
 
   vec3 rgb = col * cover + vec3(glow);
