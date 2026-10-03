@@ -623,11 +623,11 @@ body::after {
   .river-head { stroke-width: 2.8; }
 }
 
-/* The light at the source, scaled from a bloom into something that reaches
-   downwards as the river takes it over — what opens in the dark is the same
-   thing that becomes the current. Centred with negative margins rather than a
-   translate, so Framer's scale has the transform to itself, and sized in
-   viewport units because the section it sits in is six screens tall. */
+/* The light at the source: a round glow that opens out evenly in the dark
+   as the river begins, then falls back to a trace. Centred with negative
+   margins rather than a translate, so Framer's scale has the transform to
+   itself, and sized in viewport units because the section it sits in is six
+   screens tall. */
 .river-dawn {
   position: absolute;
   width: 46svh;
