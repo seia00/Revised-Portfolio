@@ -1014,12 +1014,13 @@ body {
   pointer-events: none;
 }
 
-/* The object itself. Its proportions are fixed and it scales as one piece,
-   so a phone gets the same hardware, smaller. */
+/* The object itself: the eye, in its drawing's proportions (see
+   scroll-indicator/eye.ts). They are fixed and it scales as one piece, so a
+   phone gets the same eye, smaller; it runs wide because it is so slender. */
 .scroll-indicator-body {
   position: relative;
-  width: clamp(120px, 12vw, 170px);
-  aspect-ratio: 5.6;
+  width: clamp(180px, 17vw, 280px);
+  aspect-ratio: 2145 / 285;
 }
 
 .scroll-indicator-canvas {
@@ -1027,25 +1028,16 @@ body {
   display: block;
 }
 
-/* Without WebGL: the same object in outline — a chrome band around a dark
+/* Without WebGL: the same eye, flat — a chrome gradient round a grey
    channel, with the black filling it from the left. */
 .scroll-indicator-fallback {
   display: none;
   position: absolute;
   inset: 0;
-  padding: 2.4% 1.4%;
-  border-radius: 9px;
-  background: linear-gradient(180deg, #f4f6f8 0%, #6a6f75 10%, #141518 40%, #0b0c0e 62%, #3b3e43 88%, #dfe2e6 100%);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 14px 30px -10px rgba(0, 0, 0, 0.6);
-}
-
-.scroll-indicator-fallback > span {
-  display: block;
+  width: 100%;
   height: 100%;
-  border-radius: 5px;
-  background: #030304;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
-  transform-origin: left;
+  overflow: visible;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
 }
 
 .scroll-indicator-body[data-engine="fallback"] .scroll-indicator-fallback {
