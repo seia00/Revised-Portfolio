@@ -29,9 +29,12 @@ const VIEW = `${-PAD} ${-PAD} ${MARK_WIDTH + PAD * 2} ${MARK_HEIGHT + PAD * 2}`;
 const FLOW_X = 120;
 const FLOW_Y = 330;
 
+/** Where the steel's stops sit along that axis: dark, rising to a bright band, dark again. */
+const STEEL = [0, 0.3, 0.44, 0.5, 0.56, 0.68, 1] as const;
+
 /**
- * The monogram in polished metal: near-black chrome with bands of reflected
- * light flowing slowly across it, and a glint that sweeps over it every few
+ * The monogram in polished metal — black chrome on paper, silver at night —
+ * with bands of reflected light flowing slowly across it, and a glint that sweeps over it every few
  * seconds, so it always catches the light.
  *
  * `redraw` plays the same move as the hover on louisraille.fr's star: the
@@ -106,15 +109,11 @@ export default function ChromeMark({
           y2={FLOW_Y}
           spreadMethod="reflect"
         >
-          <stop offset="0" stopColor="#08090a" />
-          <stop offset="0.3" stopColor="#25292e" />
-          <stop offset="0.44" stopColor="#80868e" />
-          {/* Just short of white, so a band crossing a bar never quite
-              melts into the paper behind it. */}
-          <stop offset="0.5" stopColor="#d9dde1" />
-          <stop offset="0.56" stopColor="#6f757d" />
-          <stop offset="0.68" stopColor="#16181b" />
-          <stop offset="1" stopColor="#060708" />
+          {/* The colours are the theme's (--steel-*, globals.css): black
+              chrome on paper, silver at night. */}
+          {STEEL.map((offset, i) => (
+            <stop key={offset} offset={offset} style={{ stopColor: `var(--steel-${i + 1})` }} />
+          ))}
         </linearGradient>
         <linearGradient id={`${id}-glint`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
@@ -144,7 +143,7 @@ export default function ChromeMark({
         </g>
       </g>
 
-      <g ref={outline} opacity="0" fill="none" stroke="#0a0a0a" strokeWidth={line} strokeLinejoin="miter">
+      <g ref={outline} opacity="0" fill="none" stroke="var(--ink)" strokeWidth={line} strokeLinejoin="miter">
         {MARK_LOOPS.map((d) => (
           <path key={d} d={d} pathLength={1} strokeDasharray="1 1" strokeDashoffset="0" />
         ))}

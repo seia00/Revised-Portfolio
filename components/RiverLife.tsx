@@ -540,13 +540,13 @@ export default function RiverLife() {
           style={{ top: `${(TITLE_Y / SCREENS) * 100}%` }}
         >
           <motion.div style={still ? undefined : { opacity: title }}>
-            <p className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] uppercase text-field/40">
+            <p className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] uppercase text-snow/40">
               § 02 — Life
             </p>
-            <h2 className="mt-7 font-sans font-semibold uppercase tracking-[-0.045em] leading-[0.88] text-field text-[clamp(44px,8.5vw,128px)]">
+            <h2 className="mt-7 font-sans font-semibold uppercase tracking-[-0.045em] leading-[0.88] text-snow text-[clamp(44px,8.5vw,128px)]">
               My life, <Serif>thus far.</Serif>
             </h2>
-            <p className="mt-7 font-serif italic text-field/55 text-lg md:text-2xl">
+            <p className="mt-7 font-serif italic text-snow/55 text-lg md:text-2xl">
               Four turning points, one current.
             </p>
           </motion.div>
@@ -572,7 +572,7 @@ export default function RiverLife() {
                 whileInView="visible"
                 viewport={CARD_VIEWPORT}
               >
-                <div className="flex items-baseline justify-between gap-4 font-mono text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-field/40">
+                <div className="flex items-baseline justify-between gap-4 font-mono text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-snow/40">
                   <span>
                     0{i + 1} — {m.stage}
                   </span>
@@ -589,10 +589,10 @@ export default function RiverLife() {
                     {String(m.age).padStart(2, "0")}
                   </span>
                   <div className="pt-1">
-                    <h3 className="font-sans font-semibold tracking-[-0.03em] text-field leading-[1.05] text-[clamp(22px,2.5vw,36px)]">
+                    <h3 className="font-sans font-semibold tracking-[-0.03em] text-snow leading-[1.05] text-[clamp(22px,2.5vw,36px)]">
                       {m.title}
                     </h3>
-                    <p className="mt-4 text-field/55 leading-[1.7] text-[14px] md:text-[16px]">
+                    <p className="mt-4 text-snow/55 leading-[1.7] text-[14px] md:text-[16px]">
                       {m.body}
                     </p>
                   </div>
@@ -607,7 +607,7 @@ export default function RiverLife() {
           style={{ top: `${(CODA_Y / SCREENS) * 100}%` }}
         >
           <motion.p
-            className="font-serif italic text-field/70 text-center text-[clamp(24px,3.6vw,52px)] leading-[1.15]"
+            className="font-serif italic text-snow/70 text-center text-[clamp(24px,3.6vw,52px)] leading-[1.15]"
             initial={still ? false : { opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-25% 0px -15% 0px" }}

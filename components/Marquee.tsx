@@ -4,7 +4,7 @@ const ITEMS = ["Relentless", "Curious", "Driven", "Developer", "Debater", "Found
 
 export default function Marquee() {
   return (
-    <div aria-hidden className="bg-ink text-field overflow-hidden py-4 md:py-5">
+    <div aria-hidden className="bg-band text-on-band overflow-hidden py-4 md:py-5">
       <div className="marquee flex w-max">
         {[0, 1].map((copy) => (
           <div key={copy} className="flex items-center shrink-0">

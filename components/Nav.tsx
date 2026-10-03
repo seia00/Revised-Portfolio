@@ -5,6 +5,7 @@ import { motion, useAnimate, useReducedMotion, useScroll, useSpring } from "fram
 import { useLenis } from "lenis/react";
 import { scrollSpring } from "@/lib/motion";
 import ChromeMark, { type ChromeMarkHandle } from "./logo/ChromeMark";
+import ThemeToggle from "./theme/ThemeToggle";
 
 const LINKS = [
   { id: "hero", label: "Index" },
@@ -195,6 +196,9 @@ export default function Nav() {
           <span>Tokyo</span>
           <span className="text-ink tabular-nums">{time ?? "--:--"}</span>
           <span>JST</span>
+          <span className="ml-2 md:ml-4">
+            <ThemeToggle />
+          </span>
         </div>
       </div>
     </header>
