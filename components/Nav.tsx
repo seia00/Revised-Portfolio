@@ -16,6 +16,12 @@ const LINKS = [
   { id: "connect", label: "Contact" },
 ] as const;
 
+/**
+ * Contact is the last chapter, which opens close up on the figure and pulls
+ * back to the details — so the link lands at its end, where they are.
+ */
+const LANDS_AT_END = "connect";
+
 /** The fixed header's own height — a jump has to clear it to land square. */
 const HEADER = 64;
 
@@ -120,6 +126,14 @@ export default function Nav() {
     }
     const el = document.getElementById(id);
     if (!el) return;
+    if (id === LANDS_AT_END) {
+      // A position rather than the element, so the header's scroll margin is
+      // not taken off it.
+      const end = el.getBoundingClientRect().top + window.scrollY + el.offsetHeight - window.innerHeight;
+      if (lenis) lenis.scrollTo(end);
+      else window.scrollTo({ top: end, behavior: "smooth" });
+      return;
+    }
     // Through Lenis where it is driving, so a jump uses the same easing as a
     // scroll; natively otherwise, which is also the reduced-motion path.
     if (lenis) lenis.scrollTo(el, { offset: -HEADER });
@@ -136,7 +150,7 @@ export default function Nav() {
       className={`fixed inset-0 z-[35] bg-field ${veiled ? "pointer-events-auto" : "pointer-events-none"}`}
       style={{ opacity: 0 }}
     />
-    <header className="fixed top-0 inset-x-0 z-40 h-16 bg-field/85 backdrop-blur-md border-b border-edge">
+    <header className="site-header fixed top-0 inset-x-0 z-40 h-16 bg-field/85 backdrop-blur-md border-b border-edge">
       <motion.span
         aria-hidden
         style={{ scaleX: progress }}

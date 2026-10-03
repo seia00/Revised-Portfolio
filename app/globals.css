@@ -61,6 +61,9 @@
 
   --band: #0a0a0a;
   --on-band: #ffffff;
+
+  /* The ground the idle figure's frames were drawn on, matched exactly. */
+  --idle-ground: #e4e6e0;
 }
 
 /* Night: the page goes to near-black and the type to a soft white rather
@@ -83,6 +86,8 @@
 
   --band: #161618;
   --on-band: #e4e4e1;
+
+  --idle-ground: #03060c;
 }
 
 html,
@@ -1280,4 +1285,262 @@ body {
 
 :root[data-theme="dark"] .theme-toggle-disc {
   transform: rotate(180deg);
+}
+
+/* ══ THE ENDING ═════════════════════════════════════════════════════
+   The last chapter, set on the ground the idle figure's frames were drawn
+   on, matched exactly, so the 16:9 frame has no edge wherever the camera
+   puts it. */
+.ending {
+  --ending-rule: color-mix(in srgb, var(--ink) 38%, transparent);
+  position: relative;
+  background: var(--idle-ground);
+}
+
+.ending-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* The frame, standing on the foot of the screen: the figure runs off the
+   frame's lower edge, so that edge never leaves the screen's. Connect places
+   and sizes it for the screen and the details; this only holds until then.
+   Framer owns `transform`, for the camera. */
+.ending-camera {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 60svh;
+  aspect-ratio: 16 / 9;
+}
+
+/* The sprite exactly as drawn: one frame at a time, scaled with hard pixel
+   edges, never smoothed, filtered or faded. */
+.idle-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* The leader lines from the fingertip, in the tone of the rules they run
+   into. */
+.ending-leaders {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke: var(--ending-rule);
+  stroke-width: 1;
+}
+
+/* The details. On a phone or a portrait screen they stack under the header
+   and the figure fills the screen below them; on a wide screen the contacts
+   are listed where the figure points and the rest sits in the corners.
+   Connect reads `--ending-layout` to frame the figure to whichever it is. */
+.ending-details {
+  --ending-layout: stacked;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: calc(64px + 22px) 20px 0;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.75;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.ending-details > * {
+  pointer-events: auto;
+}
+
+.ending-label {
+  margin-bottom: 2px;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--ink-2);
+}
+
+/* The contacts, as ruled rows: big names, sized to the list's own width,
+   and the handle set against the right. */
+.ending-contacts {
+  container-type: inline-size;
+}
+
+/* Each row carries its own rules, so they arrive with it. */
+.ending-contact {
+  border-top: 1px solid var(--ending-rule);
+}
+
+.ending-contact:last-child {
+  border-bottom: 1px solid var(--ending-rule);
+}
+
+.ending-contact-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 14px;
+  row-gap: 4px;
+  padding: 12px 0 14px;
+}
+
+.ending-contact-n {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--ink-2);
+}
+
+.ending-contact-title {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(26px, 9cqw, 58px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+  transition: text-decoration-color 0.3s ease;
+}
+
+/* The handle and its arrow keep together, wrapping under the name as one
+   when the row is too narrow for both. */
+.ending-contact-handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--ink-2);
+}
+
+.ending-contact-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--ink);
+  transform: rotate(-45deg);
+  transition: transform 0.3s ease;
+}
+
+.ending-contact-link:hover .ending-contact-title,
+.ending-contact-link:focus-visible .ending-contact-title {
+  text-decoration-color: currentColor;
+}
+
+.ending-contact-link:hover .ending-contact-arrow,
+.ending-contact-link:focus-visible .ending-contact-arrow {
+  transform: none;
+}
+
+.ending-fine {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--ink-2);
+}
+
+.ending-colophon {
+  display: none;
+}
+
+.ending-link {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 0.3s ease;
+}
+
+.ending-link:hover,
+.ending-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+@media (min-width: 768px) {
+  .ending-details {
+    padding: calc(64px + 32px) 40px 0;
+    font-size: 11px;
+  }
+}
+
+/* Pointing. Connect sets where the list goes: across from the end of the
+   fan of leader lines, and up or down so its rules straddle the fingertip. */
+@media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
+  .ending-details {
+    --ending-layout: pointing;
+    display: block;
+    padding: 0;
+  }
+
+  .ending-status {
+    position: absolute;
+    top: calc(64px + 32px);
+    right: 64px;
+    text-align: right;
+  }
+
+  .ending-contacts {
+    position: absolute;
+    left: var(--contacts-left, 50%);
+    right: 64px;
+    top: var(--contacts-top, 40%);
+  }
+
+  .ending-fine {
+    position: absolute;
+    left: var(--contacts-left, 50%);
+    right: 64px;
+    bottom: 40px;
+  }
+
+  .ending-colophon {
+    display: block;
+    margin-top: 8px;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--ink-2);
+  }
+}
+
+/* While the scene is in view the paper grain stands aside, so the frames
+   show exactly as drawn; while it is close up, so do the header and the
+   scroll indicator. After the night rules, which set the grain too. */
+body::after {
+  transition: opacity 0.6s ease;
+}
+
+:root[data-ending] body::after {
+  opacity: 0;
+}
+
+.site-header {
+  transition: translate 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-ending="close"] .site-header {
+  translate: 0 -100%;
+}
+
+:root[data-ending="close"] .scroll-indicator {
+  visibility: hidden;
 }
