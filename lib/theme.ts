@@ -33,9 +33,10 @@ export function useTheme(): Theme {
 
 /**
  * Plays the switch over the page and calls `swap` at the moment the page is
- * fully covered, so the change of theme itself is never seen.
+ * fully covered, so the change of theme itself is never seen. `to` is the
+ * theme it is switching to.
  */
-export type ThemeTransition = (swap: () => void) => Promise<void>;
+export type ThemeTransition = (swap: () => void, to: Theme) => Promise<void>;
 
 let transition: ThemeTransition | null = null;
 let switching = false;
@@ -62,7 +63,7 @@ export async function switchTheme(): Promise<void> {
   }
   switching = true;
   try {
-    await transition(() => setTheme(next));
+    await transition(() => setTheme(next), next);
   } finally {
     switching = false;
   }

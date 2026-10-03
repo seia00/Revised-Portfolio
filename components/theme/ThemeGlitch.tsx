@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { registerThemeTransition } from "@/lib/theme";
+import { registerThemeTransition, type Theme } from "@/lib/theme";
 import { MARK_HEIGHT, MARK_PATH, MARK_WIDTH } from "../logo/mark";
-import { makeStatic } from "./staticNoise";
+import { makeStatic, type StaticPalette } from "./staticNoise";
 
 /** One beat of the glitch, in ms: two frames at 60Hz, so it stutters like a bad signal. */
 const BEAT = 34;
@@ -17,23 +17,43 @@ const ROLL = 6;
 const STATIC_WIDTH = 420;
 const STATIC_FRAMES = 6;
 
+/**
+ * Going dark, the signal bleeds: the static runs red and its fringes are all
+ * reds, each beat picking its own — bright ones laid over the static as
+ * light, deep ones pressed into it as stain (see globals.css). Going light,
+ * the fringes are the usual red and cyan, set in CSS.
+ */
+const BRIGHT_REDS = [
+  "rgba(255, 26, 38, 0.6)",
+  "rgba(232, 18, 52, 0.6)",
+  "rgba(255, 64, 40, 0.55)",
+] as const;
+const BLOOD_REDS = [
+  "rgba(138, 3, 3, 0.92)",
+  "rgba(112, 0, 12, 0.92)",
+  "rgba(86, 0, 4, 0.92)",
+  "rgba(164, 10, 22, 0.88)",
+] as const;
+
 type Layers = {
   root: HTMLDivElement;
   snow: HTMLCanvasElement;
-  red: HTMLDivElement;
-  cyan: HTMLDivElement;
+  /** The two coloured fringes, pulled either way off each band. */
+  lead: HTMLDivElement;
+  trail: HTMLDivElement;
   mark: HTMLDivElement;
 };
 
 const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
 const either = () => (Math.random() < 0.5 ? -1 : 1);
+const pick = <T,>(from: readonly T[]) => from[Math.floor(Math.random() * from.length)];
 const beat = () => new Promise((r) => setTimeout(r, BEAT));
 
 /**
  * The theme switch, played as a channel losing its signal: bands of static
- * tear across the page with their red and cyan pulled apart, the static takes
- * the whole screen — the theme changes underneath it, and the mark flickers
- * through — then it rolls up off the new page.
+ * tear across the page with their colours pulled apart, the static takes the
+ * whole screen — the theme changes underneath it, and the mark flickers
+ * through — then it rolls up off the new page. Into the dark it all runs red.
  *
  * Kept to two changes of the whole screen, in and out, and no full-screen
  * colour flashes: the flicker is all in the static's grain, which holds its
@@ -42,16 +62,16 @@ const beat = () => new Promise((r) => setTimeout(r, BEAT));
 export default function ThemeGlitch() {
   const root = useRef<HTMLDivElement>(null);
   const snow = useRef<HTMLCanvasElement>(null);
-  const red = useRef<HTMLDivElement>(null);
-  const cyan = useRef<HTMLDivElement>(null);
+  const lead = useRef<HTMLDivElement>(null);
+  const trail = useRef<HTMLDivElement>(null);
   const mark = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const layers = {
       root: root.current,
       snow: snow.current,
-      red: red.current,
-      cyan: cyan.current,
+      lead: lead.current,
+      trail: trail.current,
       mark: mark.current,
     };
     if (Object.values(layers).some((el) => el === null)) return;
@@ -60,8 +80,11 @@ export default function ThemeGlitch() {
     // the moment it is pressed.
     const idle = window.requestIdleCallback ?? ((fn: () => void) => window.setTimeout(fn, 1200));
     const cancel = window.cancelIdleCallback ?? window.clearTimeout;
-    const pending = idle(() => prepare(ready.snow));
-    const unregister = registerThemeTransition((swap) => play(ready, swap));
+    const pending = idle(() => {
+      prepare(ready.snow, "grey");
+      prepare(ready.snow, "blood");
+    });
+    const unregister = registerThemeTransition((swap, to) => play(ready, swap, to));
     return () => {
       cancel(pending);
       unregister();
@@ -71,8 +94,8 @@ export default function ThemeGlitch() {
   return (
     <div ref={root} aria-hidden className="theme-glitch">
       <canvas ref={snow} className="theme-glitch-snow" />
-      <div ref={red} className="theme-glitch-red" />
-      <div ref={cyan} className="theme-glitch-cyan" />
+      <div ref={lead} className="theme-glitch-lead" />
+      <div ref={trail} className="theme-glitch-trail" />
       <div ref={mark} className="theme-glitch-mark">
         <svg viewBox={`0 0 ${MARK_WIDTH} ${MARK_HEIGHT}`}>
           <path d={MARK_PATH} fillRule="evenodd" fill="#ffffff" />
@@ -82,25 +105,29 @@ export default function ThemeGlitch() {
   );
 }
 
-let frames: ImageData[] | null = null;
+const reels: Partial<Record<StaticPalette, ImageData[]>> = {};
 
-/** Make the static at the screen's current proportions, unless it already fits. */
-function prepare(snow: HTMLCanvasElement): ImageData[] | null {
+/** Make the static in `palette` at the screen's current proportions, unless it already fits. */
+function prepare(snow: HTMLCanvasElement, palette: StaticPalette): ImageData[] | null {
   const ctx = snow.getContext("2d");
   if (!ctx) return null;
   const height = Math.round((STATIC_WIDTH * window.innerHeight) / window.innerWidth);
-  if (!frames || frames[0].height !== height) {
+  if (snow.width !== STATIC_WIDTH || snow.height !== height) {
     snow.width = STATIC_WIDTH;
     snow.height = height;
-    frames = makeStatic(ctx, STATIC_WIDTH, height, STATIC_FRAMES);
   }
-  return frames;
+  const reel = reels[palette];
+  if (reel && reel[0].height === height) return reel;
+  const made = makeStatic(ctx, STATIC_WIDTH, height, STATIC_FRAMES, palette);
+  reels[palette] = made;
+  return made;
 }
 
-async function play(layers: Layers, swap: () => void): Promise<void> {
-  const { root, snow, red, cyan, mark } = layers;
+async function play(layers: Layers, swap: () => void, to: Theme): Promise<void> {
+  const { root, snow, lead, trail, mark } = layers;
+  const bleeding = to === "dark";
   const ctx = snow.getContext("2d");
-  const reel = prepare(snow);
+  const reel = prepare(snow, bleeding ? "blood" : "grey");
   if (!ctx || !reel) {
     swap();
     return;
@@ -114,19 +141,24 @@ async function play(layers: Layers, swap: () => void): Promise<void> {
     el.style.transform = `translate3d(${dx}px, 0, 0)`;
   };
   /**
-   * The colour fringes on a band, flickering: red pulled one way and up a
-   * little, cyan the other way and down, so they show as separate edges
-   * rather than mixing back to grey.
+   * The colour fringes on a band, flickering: one pulled one way and up a
+   * little, the other the other way and down, so they show as separate edges
+   * rather than mixing back together.
    */
   const fringe = (top: number, bottom: number) => {
     const pull = rand(9, 16) * either();
     const lift = rand(0.8, 2.2);
     const lit = Math.random() < 0.75;
-    band(red, Math.max(0, top - lift), bottom - lift, pull, lit);
-    band(cyan, top + lift, Math.min(100, bottom + lift), -pull, lit);
+    if (bleeding) {
+      lead.style.backgroundColor = pick(BRIGHT_REDS);
+      trail.style.backgroundColor = pick(BLOOD_REDS);
+    }
+    band(lead, Math.max(0, top - lift), bottom - lift, pull, lit);
+    band(trail, top + lift, Math.min(100, bottom + lift), -pull, lit);
   };
 
   root.dataset.on = "";
+  root.dataset.to = to;
 
   // Tearing in: a band of static somewhere new on every beat.
   for (let i = 0; i < TEAR; i++) {
@@ -160,10 +192,12 @@ async function play(layers: Layers, swap: () => void): Promise<void> {
     await beat();
   }
 
-  for (const el of [snow, red, cyan, mark]) {
+  for (const el of [snow, lead, trail, mark]) {
     el.style.opacity = "0";
     el.style.clipPath = "";
     el.style.transform = "";
+    el.style.backgroundColor = "";
   }
   delete root.dataset.on;
+  delete root.dataset.to;
 }
