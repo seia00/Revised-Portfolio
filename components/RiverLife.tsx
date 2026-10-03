@@ -311,10 +311,9 @@ export default function RiverLife() {
   // falls back to a trace once the current is running — it is the source the
   // river came out of, not a second light competing with its head.
   const dawn = useTransform(progress, [at(0.6), at(1.19), at(1.9)], [0, 1, 0.13]);
-  // Reaches down the way the river does: the bloom draws out along the course
-  // rather than across it.
-  const dawnDown = useTransform(progress, [at(0.83), at(1.79)], [0.34, 1.9]);
-  const dawnWide = useTransform(progress, [at(0.83), at(1.79)], [0.34, 0.5]);
+  // Opens out evenly as it brightens: a round glow, not drawn out along the
+  // course.
+  const dawnSize = useTransform(progress, [at(0.83), at(1.79)], [0.34, 0.8]);
 
   // The head of the current sits at the middle of the viewport, always, so
   // scrolling down the page *is* travelling down the river.
@@ -491,8 +490,8 @@ export default function RiverLife() {
             left: `${course.source * 100}%`,
             top: `${(SOURCE_Y / SCREENS) * 100}%`,
             ...(still
-              ? { opacity: 0.13, scaleX: 0.5, scaleY: 1.9 }
-              : { opacity: dawn, scaleX: dawnWide, scaleY: dawnDown }),
+              ? { opacity: 0.13, scale: 0.8 }
+              : { opacity: dawn, scale: dawnSize }),
           }}
         />
 
