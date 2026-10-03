@@ -1285,6 +1285,7 @@ body {
    on, matched exactly, so the 16:9 frame has no edge wherever the camera
    puts it. */
 .ending {
+  --ending-rule: color-mix(in srgb, var(--ink) 38%, transparent);
   position: relative;
   background: var(--idle-ground);
 }
@@ -1297,16 +1298,15 @@ body {
 }
 
 /* The frame, standing on the foot of the screen: the figure runs off the
-   frame's lower edge, so that edge never leaves the screen's. Connect sizes
-   it to the screen and the details; this height only holds until then.
-   Centred with `translate`, because Framer owns `transform` for the camera. */
+   frame's lower edge, so that edge never leaves the screen's. Connect places
+   and sizes it for the screen and the details; this only holds until then.
+   Framer owns `transform`, for the camera. */
 .ending-camera {
   position: absolute;
-  left: 50%;
+  left: 0;
   bottom: 0;
   height: 60svh;
   aspect-ratio: 16 / 9;
-  translate: -50% 0;
 }
 
 /* The sprite exactly as drawn: one frame at a time, scaled with hard pixel
@@ -1322,24 +1322,32 @@ body {
   pointer-events: none;
 }
 
-/* The details. On a phone or a portrait screen they stack in a band under
-   the header with the figure below them; on a wide screen they take the
-   four corners around it. Connect reads `--ending-layout` to frame the
-   figure to whichever it is. */
+/* The leader lines from the fingertip, in the tone of the rules they run
+   into. */
+.ending-leaders {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke: var(--ending-rule);
+  stroke-width: 1;
+}
+
+/* The details. On a phone or a portrait screen they stack under the header
+   and the figure fills the screen below them; on a wide screen the contacts
+   are listed where the figure points and the rest sits in the corners.
+   Connect reads `--ending-layout` to frame the figure to whichever it is. */
 .ending-details {
   --ending-layout: stacked;
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
-  grid-template-areas:
-    "status links"
-    "mail mail"
-    "dm dm";
-  align-content: start;
-  column-gap: 16px;
-  row-gap: 22px;
-  padding: calc(64px + 24px) 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: calc(64px + 22px) 20px 0;
   pointer-events: none;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -1353,23 +1361,6 @@ body {
   pointer-events: auto;
 }
 
-.ending-status {
-  grid-area: status;
-}
-
-.ending-links {
-  grid-area: links;
-  text-align: right;
-}
-
-.ending-mail {
-  grid-area: mail;
-}
-
-.ending-dm {
-  grid-area: dm;
-}
-
 .ending-label {
   margin-bottom: 2px;
   font-size: 9px;
@@ -1377,18 +1368,85 @@ body {
   color: var(--ink-2);
 }
 
-.ending-big {
-  display: inline-block;
+/* The contacts, as ruled rows: big names, sized to the list's own width,
+   and the handle set against the right. */
+.ending-contacts {
+  container-type: inline-size;
+}
+
+/* Each row carries its own rules, so they arrive with it. */
+.ending-contact {
+  border-top: 1px solid var(--ending-rule);
+}
+
+.ending-contact:last-child {
+  border-bottom: 1px solid var(--ending-rule);
+}
+
+.ending-contact-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 14px;
+  row-gap: 4px;
+  padding: 12px 0 14px;
+}
+
+.ending-contact-n {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--ink-2);
+}
+
+.ending-contact-title {
   font-family: var(--font-sans);
   font-weight: 800;
-  font-size: clamp(20px, 6.2vw, 34px);
+  font-size: clamp(26px, 9cqw, 58px);
   line-height: 1;
-  letter-spacing: -0.03em;
-  overflow-wrap: anywhere;
+  letter-spacing: -0.035em;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+  transition: text-decoration-color 0.3s ease;
+}
+
+/* The handle and its arrow keep together, wrapping under the name as one
+   when the row is too narrow for both. */
+.ending-contact-handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--ink-2);
+}
+
+.ending-contact-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--ink);
+  transform: rotate(-45deg);
+  transition: transform 0.3s ease;
+}
+
+.ending-contact-link:hover .ending-contact-title,
+.ending-contact-link:focus-visible .ending-contact-title {
+  text-decoration-color: currentColor;
+}
+
+.ending-contact-link:hover .ending-contact-arrow,
+.ending-contact-link:focus-visible .ending-contact-arrow {
+  transform: none;
 }
 
 .ending-fine {
-  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
   font-size: 9px;
   letter-spacing: 0.18em;
   color: var(--ink-2);
@@ -1418,28 +1476,42 @@ body {
   }
 }
 
-@media (min-width: 1200px) and (min-aspect-ratio: 1/1) {
+/* Pointing. Connect sets where the list goes: across from the end of the
+   fan of leader lines, and up or down so its rules straddle the fingertip. */
+@media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
   .ending-details {
-    --ending-layout: corners;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr auto;
-    grid-template-areas:
-      "status links"
-      ". ."
-      "mail dm";
-    padding: calc(64px + 32px) 64px 44px;
+    --ending-layout: pointing;
+    display: block;
+    padding: 0;
   }
 
-  .ending-dm {
+  .ending-status {
+    position: absolute;
+    top: calc(64px + 32px);
+    right: 64px;
     text-align: right;
   }
 
-  .ending-big {
-    font-size: clamp(22px, 1.9vw, 34px);
+  .ending-contacts {
+    position: absolute;
+    left: var(--contacts-left, 50%);
+    right: 64px;
+    top: var(--contacts-top, 40%);
+  }
+
+  .ending-fine {
+    position: absolute;
+    left: var(--contacts-left, 50%);
+    right: 64px;
+    bottom: 40px;
   }
 
   .ending-colophon {
     display: block;
+    margin-top: 8px;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--ink-2);
   }
 }
 
