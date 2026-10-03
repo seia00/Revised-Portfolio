@@ -103,6 +103,12 @@ const NARROW: Course = {
 /** Length of the bright head of the current, as a fraction of the river. */
 const HEAD = 0.045;
 
+/** A passed milestone's flash: the room lighting up, and the burst at its marker, in ms. */
+const FLASH_MS = 700;
+const BURST_MS = 750;
+const RING_MS = 950;
+const FLARE_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+
 /**
  * How wide the river grows by its mouth, as a bank half-width in px. It rises
  * from a trickle at the source; a phone gets a narrower river to match its
@@ -209,6 +215,7 @@ export default function RiverLife() {
   const ref = useRef<HTMLElement>(null);
   const measure = useRef<SVGPathElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const flash = useRef<HTMLSpanElement>(null);
   const renderer = useRef<RiverRenderer | null>(null);
   // The sampled course and its length, kept for the renderer, which may be
   // created before or after the course is first measured.
@@ -410,6 +417,19 @@ export default function RiverLife() {
     else window.scrollTo({ top: target, behavior: "smooth" });
   }
 
+  // A milestone passed lights the whole room for a moment, centred on its
+  // marker. The head of the current is held mid-screen, so that is always
+  // halfway down the room at the moment it is passed.
+  function flashAt(x: number) {
+    const el = flash.current;
+    if (!el) return;
+    el.style.setProperty("--flash-x", `${x * 100}%`);
+    el.animate([{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 0 }], {
+      duration: FLASH_MS,
+      easing: FLARE_EASE,
+    });
+  }
+
   /** The scroll position that puts section-y `screens` mid-viewport. */
   function centred(screens: number): number | null {
     const el = ref.current;
@@ -470,6 +490,8 @@ export default function RiverLife() {
 
         <canvas ref={canvas} aria-hidden className="river-canvas" />
 
+        <span ref={flash} aria-hidden className="river-flash" />
+
         {!still && (
           <motion.div
             aria-hidden
@@ -512,26 +534,29 @@ export default function RiverLife() {
           </svg>
         )}
 
-        {course.bends.map((x, i) => (
-          <Bend
-            key={TIMELINE[i].age}
-            index={i}
-            x={x}
-            y={bendY(i)}
-            river={
-              depths
-                ? bankHalfWidth(
-                    arcAtDepth(depths, bendY(i) * screenPx),
-                    box.w >= 768 ? WIDEST.wide : WIDEST.narrow
-                  )
-                : 0
-            }
-            labelSide={course.card(x).left > x ? "left" : "right"}
-            reach={still ? undefined : draw}
-            active={active === i}
-            onSelect={goToChapter}
-          />
-        ))}
+        {course.bends.map((x, i) => {
+          const arc = depths ? arcAtDepth(depths, bendY(i) * screenPx) : null;
+          return (
+            <Bend
+              key={TIMELINE[i].age}
+              index={i}
+              x={x}
+              y={bendY(i)}
+              at={arc}
+              river={
+                arc === null
+                  ? 0
+                  : bankHalfWidth(arc, box.w >= 768 ? WIDEST.wide : WIDEST.narrow)
+              }
+              labelSide={course.card(x).left > x ? "left" : "right"}
+              reach={still ? undefined : draw}
+              still={still}
+              active={active === i}
+              onSelect={goToChapter}
+              onPass={() => flashAt(x)}
+            />
+          );
+        })}
 
         {/* The overture, in the screen above the source. */}
         <div
@@ -697,29 +722,82 @@ function Bend({
   index,
   x,
   y,
+  at,
   river,
   labelSide,
   reach,
+  still,
   active,
   onSelect,
+  onPass,
 }: {
   index: number;
   x: number;
   y: number;
+  /** How far down the course this bend is, as a fraction of it; null until measured. */
+  at: number | null;
   /** The river's bank half-width at this bend, px, which the label clears. */
   river: number;
   labelSide: "left" | "right";
   reach?: MotionValue<number>;
+  still: boolean;
   active: boolean;
   onSelect: (index: number) => void;
+  /** Called as the head of the current passes this bend going downstream. */
+  onPass: () => void;
 }) {
   const arrived = useMotionValue(1);
+  const flow = reach ?? arrived;
   const here = (y - SOURCE_Y) / (MOUTH_Y - SOURCE_Y);
-  const surfaced = useTransform(reach ?? arrived, [here - 0.08, here], [0, 1]);
+  const surfaced = useTransform(flow, [here - 0.08, here], [0, 1]);
   const milestone = TIMELINE[index];
+
+  const button = useRef<HTMLButtonElement>(null);
+  const burst = useRef<HTMLSpanElement>(null);
+  const ring = useRef<HTMLSpanElement>(null);
+  // Whether the current is past this bend; null until it has been measured.
+  const passed = useRef<boolean | null>(null);
+
+  // Where the current already is when the bend is first measured — on a
+  // reload partway down, say — it is simply lit or not, without a flash.
+  useEffect(() => {
+    const el = button.current;
+    if (!el || at === null) return;
+    passed.current = flow.get() >= at;
+    el.dataset.passed = String(passed.current);
+  }, [at, flow]);
+
+  // Passed, the marker turns red and glows; passed going downstream, it
+  // flares as it does — a burst of light and a ring thrown off it — and the
+  // room flashes with it. Going back upstream it simply goes out.
+  useMotionValueEvent(flow, "change", (v) => {
+    const el = button.current;
+    if (!el || at === null || passed.current === null) return;
+    const now = v >= at;
+    if (now === passed.current) return;
+    passed.current = now;
+    el.dataset.passed = String(now);
+    if (!now || still) return;
+    burst.current?.animate(
+      [
+        { transform: "scale(0.2)", opacity: 1 },
+        { transform: "scale(6.5)", opacity: 0 },
+      ],
+      { duration: BURST_MS, easing: FLARE_EASE }
+    );
+    ring.current?.animate(
+      [
+        { transform: "scale(0.6)", opacity: 0.95 },
+        { transform: "scale(7)", opacity: 0 },
+      ],
+      { duration: RING_MS, easing: FLARE_EASE }
+    );
+    onPass();
+  });
 
   return (
     <motion.button
+      ref={button}
       type="button"
       onClick={() => onSelect(index)}
       data-active={active}
@@ -735,6 +813,8 @@ function Bend({
         } as MotionStyle
       }
     >
+      <span ref={burst} aria-hidden className="river-bend-burst" />
+      <span ref={ring} aria-hidden className="river-bend-ring" />
       <span className="river-bend-dot" />
       <span className="river-bend-label font-mono text-[10px] tracking-[0.18em] uppercase whitespace-nowrap">
         <span className="tabular-nums">

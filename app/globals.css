@@ -717,6 +717,85 @@ body::after {
   box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.1);
 }
 
+/* Passed: the current has gone by, and the marker is left burning red,
+   its glow breathing slowly. */
+.river-bend[data-passed="true"] .river-bend-dot {
+  background: #ff2b2b;
+  box-shadow:
+    0 0 5px 1px rgba(255, 43, 43, 0.85),
+    0 0 14px 3px rgba(255, 20, 20, 0.4),
+    0 0 30px 8px rgba(255, 0, 0, 0.12);
+  animation: bend-ember 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes bend-ember {
+  from {
+    box-shadow:
+      0 0 5px 1px rgba(255, 43, 43, 0.85),
+      0 0 14px 3px rgba(255, 20, 20, 0.4),
+      0 0 30px 8px rgba(255, 0, 0, 0.12);
+  }
+  to {
+    box-shadow:
+      0 0 7px 2px rgba(255, 60, 50, 1),
+      0 0 20px 6px rgba(255, 24, 24, 0.55),
+      0 0 44px 14px rgba(255, 0, 0, 0.2);
+  }
+}
+
+/* The flare as the current passes: a white-hot burst going red as it
+   spreads, and a red ring thrown off behind it. Both are played from
+   RiverLife and sit at rest unseen. */
+.river-bend-burst,
+.river-bend-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.river-bend-burst {
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    rgba(255, 70, 60, 0.9) 30%,
+    rgba(255, 20, 20, 0.35) 55%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+}
+
+.river-bend-ring {
+  border: 1.5px solid rgba(255, 48, 48, 0.9);
+  box-shadow: 0 0 10px rgba(255, 30, 30, 0.6);
+}
+
+/* And the room flashing with it, centred on the marker (--flash-x): a hot
+   white core going red as it spreads, over a faint lift of the whole room.
+   One pulse per milestone, and never near full brightness. */
+.river-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(
+      circle at var(--flash-x, 50%) 50%,
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 70, 60, 0.38) 12%,
+      rgba(255, 20, 20, 0.12) 32%,
+      rgba(255, 0, 0, 0.04) 55%,
+      transparent 75%
+    ),
+    linear-gradient(rgba(255, 232, 232, 0.07), rgba(255, 232, 232, 0.07));
+}
+
 .river-bend-label {
   position: absolute;
   top: 50%;
@@ -823,7 +902,8 @@ body {
   .marquee,
   .scroll-cue,
   .liquid-metal > span,
-  .river-smoke > span {
+  .river-smoke > span,
+  .river-bend[data-passed="true"] .river-bend-dot {
     animation: none;
   }
   * {
