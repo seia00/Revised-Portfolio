@@ -61,6 +61,9 @@
 
   --band: #0a0a0a;
   --on-band: #ffffff;
+
+  /* The ground the idle figure's frames were drawn on, matched exactly. */
+  --idle-ground: #e4e6e0;
 }
 
 /* Night: the page goes to near-black and the type to a soft white rather
@@ -83,6 +86,8 @@
 
   --band: #161618;
   --on-band: #e4e4e1;
+
+  --idle-ground: #03060c;
 }
 
 html,
@@ -1273,4 +1278,190 @@ body {
 
 :root[data-theme="dark"] .theme-toggle-disc {
   transform: rotate(180deg);
+}
+
+/* ══ THE ENDING ═════════════════════════════════════════════════════
+   The last chapter, set on the ground the idle figure's frames were drawn
+   on, matched exactly, so the 16:9 frame has no edge wherever the camera
+   puts it. */
+.ending {
+  position: relative;
+  background: var(--idle-ground);
+}
+
+.ending-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* The frame, standing on the foot of the screen: the figure runs off the
+   frame's lower edge, so that edge never leaves the screen's. Connect sizes
+   it to the screen and the details; this height only holds until then.
+   Centred with `translate`, because Framer owns `transform` for the camera. */
+.ending-camera {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 60svh;
+  aspect-ratio: 16 / 9;
+  translate: -50% 0;
+}
+
+/* The sprite exactly as drawn: one frame at a time, scaled with hard pixel
+   edges, never smoothed, filtered or faded. */
+.idle-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* The details. On a phone or a portrait screen they stack in a band under
+   the header with the figure below them; on a wide screen they take the
+   four corners around it. Connect reads `--ending-layout` to frame the
+   figure to whichever it is. */
+.ending-details {
+  --ending-layout: stacked;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  grid-template-areas:
+    "status links"
+    "mail mail"
+    "dm dm";
+  align-content: start;
+  column-gap: 16px;
+  row-gap: 22px;
+  padding: calc(64px + 24px) 20px 0;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.75;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.ending-details > * {
+  pointer-events: auto;
+}
+
+.ending-status {
+  grid-area: status;
+}
+
+.ending-links {
+  grid-area: links;
+  text-align: right;
+}
+
+.ending-mail {
+  grid-area: mail;
+}
+
+.ending-dm {
+  grid-area: dm;
+}
+
+.ending-label {
+  margin-bottom: 2px;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--ink-2);
+}
+
+.ending-big {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(20px, 6.2vw, 34px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.ending-fine {
+  margin-top: 10px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--ink-2);
+}
+
+.ending-colophon {
+  display: none;
+}
+
+.ending-link {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 0.3s ease;
+}
+
+.ending-link:hover,
+.ending-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+@media (min-width: 768px) {
+  .ending-details {
+    padding: calc(64px + 32px) 40px 0;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 1200px) and (min-aspect-ratio: 1/1) {
+  .ending-details {
+    --ending-layout: corners;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "status links"
+      ". ."
+      "mail dm";
+    padding: calc(64px + 32px) 64px 44px;
+  }
+
+  .ending-dm {
+    text-align: right;
+  }
+
+  .ending-big {
+    font-size: clamp(22px, 1.9vw, 34px);
+  }
+
+  .ending-colophon {
+    display: block;
+  }
+}
+
+/* While the scene is in view the paper grain stands aside, so the frames
+   show exactly as drawn; while it is close up, so do the header and the
+   scroll indicator. After the night rules, which set the grain too. */
+body::after {
+  transition: opacity 0.6s ease;
+}
+
+:root[data-ending] body::after {
+  opacity: 0;
+}
+
+.site-header {
+  transition: translate 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-ending="close"] .site-header {
+  translate: 0 -100%;
+}
+
+:root[data-ending="close"] .scroll-indicator {
+  visibility: hidden;
 }
