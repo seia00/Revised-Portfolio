@@ -128,16 +128,21 @@ float strip(float x, float from, float to) {
   return smoothstep(from - 0.04, from + 0.02, x) * (1.0 - smoothstep(to - 0.02, to + 0.06, x));
 }
 
-// Polished chrome: a mirror in a bright white studio, lighter overhead and
-// toward the right, with no dark band anywhere in it — so the metal is silver
-// from end to end. It shines by contrast within that: each band runs from
-// light silver where it turns down to white where it turns up, with a thin,
-// crisp gleam along its whole length, two light strips off to either side
-// and a hot key glint.
+// Polished chrome: a mirror in a bright studio, reflected crisply. What reads
+// as polish is contrast with a clean edge to it, so the studio is a sky blown
+// nearly to white over a sharp horizon, with a floor of clean steel grey below
+// it — never dark, so no black band runs along the metal — a broad softbox
+// overhead, two strips off to the sides and a hot key glint. Each band of the
+// rim turns through that horizon across its width, so it runs from white to
+// steel over one crisp line, evenly from end to end, the way the header's
+// mark does. The rim is too narrow at this size to hold anything finer: thin
+// bars of light would only fall between the pixels and sparkle.
 float mirror(vec3 r) {
-  float lit = 0.8 + 1.1 * smoothstep(-0.6, 0.7, r.y) + 0.3 * smoothstep(-0.4, 0.5, r.x);
-  lit += strip(r.y, 0.3, 0.36) * 1.6;
-  lit += strip(r.x, 0.58, 0.66) * 2.2 + strip(-r.x, 0.58, 0.64) * 1.5;
+  float below = 0.42 + 0.25 * smoothstep(-0.2, -0.9, r.y);
+  float above = 1.9 + 1.0 * smoothstep(0.15, 0.8, r.y) + 0.3 * smoothstep(-0.4, 0.5, r.x);
+  float lit = mix(below, above, smoothstep(-0.06, 0.04, r.y));
+  lit += strip(r.y, 0.3, 0.38) * 1.8;
+  lit += strip(r.x, 0.6, 0.68) * 1.2 + strip(-r.x, 0.6, 0.66) * 0.8;
   lit += pow(max(dot(r, normalize(vec3(0.5, 0.62, 0.6))), 0.0), 120.0) * 8.0;
   return lit;
 }
@@ -200,9 +205,10 @@ vec3 rim(float d, vec2 n, float bead, float face, float bevel, vec3 v) {
   }
 
   // The face: crowned, so as it turns across its width it sweeps through the
-  // studio's gradients rather than reading as one flat tone.
+  // studio — past the horizon and the bars — rather than reading as one flat
+  // tone.
   float w = (e - bead) / max(face, 1e-3);
-  return mirrorOf(tilt(n, 0.5 * cos(PI * w)), v);
+  return mirrorOf(tilt(n, 0.7 * cos(PI * w)), v);
 }
 
 // A band of light sweeping diagonally across the metal every few seconds of
