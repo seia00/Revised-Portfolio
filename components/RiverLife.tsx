@@ -74,13 +74,17 @@ const CODA_Y = SCREENS - 0.32;
  *
  * On a wide screen it meanders properly from bank to bank and the text sits in
  * the bend it has just left, so the reader crosses the water at every chapter.
- * A phone has no room for that: the course drops to a rail down the left and
- * the text runs beside it.
+ * A phone sways it too, from the middle out to one side and the other and
+ * back to the middle, but its cards fill most of the width, so the river runs
+ * straight down beside each one (`hold`) and only swings across in the dark
+ * between them, where it cannot cut through the text.
  */
 type Course = {
   readonly source: number;
   readonly bends: readonly number[];
   readonly mouth: number;
+  /** Screens either side of each bend that the river runs straight down. */
+  readonly hold?: number;
   /** Where that bend's card sits, given the bend's own x. */
   readonly card: (x: number) => { left: number; width: number };
 };
@@ -93,11 +97,18 @@ const WIDE: Course = {
     x < 0.5 ? { left: x + 0.09, width: 0.44 } : { left: x - 0.53, width: 0.44 },
 };
 
+/**
+ * Each card is held a little over a sixth of a screen tall either side of its
+ * bend on the smallest phones, so a hold of 0.22 keeps the river beside the
+ * whole of it, clear by the bank and a margin.
+ */
 const NARROW: Course = {
-  source: 0.17,
-  bends: [0.11, 0.2, 0.11, 0.2],
-  mouth: 0.16,
-  card: () => ({ left: 0.3, width: 0.67 }),
+  source: 0.5,
+  bends: [0.18, 0.82, 0.18, 0.82],
+  mouth: 0.5,
+  hold: 0.22,
+  card: (x) =>
+    x < 0.5 ? { left: x + 0.11, width: 0.67 } : { left: x - 0.78, width: 0.67 },
 };
 
 /** Length of the bright head of the current, as a fraction of the river. */
@@ -253,10 +264,13 @@ export default function RiverLife() {
 
   const path = useMemo(() => {
     if (box.w === 0 || box.h === 0) return "";
+    // A held bend is three points down the same line, so the curve runs
+    // straight through them and does all its swinging between bends.
+    const reach = course.hold ? [-course.hold, 0, course.hold] : [0];
     const points: [number, number][] = [
       [course.source * box.w, SOURCE_Y * screenPx],
-      ...course.bends.map(
-        (x, i) => [x * box.w, bendY(i) * screenPx] as [number, number],
+      ...course.bends.flatMap((x, i) =>
+        reach.map((d) => [x * box.w, (bendY(i) + d) * screenPx] as [number, number]),
       ),
       [course.mouth * box.w, MOUTH_Y * screenPx],
     ];
