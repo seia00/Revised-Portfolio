@@ -17,23 +17,42 @@ const ROLL = 6;
 const STATIC_WIDTH = 420;
 const STATIC_FRAMES = 6;
 
+/**
+ * The signal bleeds: the static runs red and its fringes are all reds, each
+ * beat picking its own — bright ones laid over the static as light, deep
+ * ones pressed into it as stain (see globals.css).
+ */
+const BRIGHT_REDS = [
+  "rgba(255, 26, 38, 0.6)",
+  "rgba(232, 18, 52, 0.6)",
+  "rgba(255, 64, 40, 0.55)",
+] as const;
+const BLOOD_REDS = [
+  "rgba(138, 3, 3, 0.92)",
+  "rgba(112, 0, 12, 0.92)",
+  "rgba(86, 0, 4, 0.92)",
+  "rgba(164, 10, 22, 0.88)",
+] as const;
+
 type Layers = {
   root: HTMLDivElement;
   snow: HTMLCanvasElement;
-  red: HTMLDivElement;
-  cyan: HTMLDivElement;
+  /** The two coloured fringes, pulled either way off each band. */
+  lead: HTMLDivElement;
+  trail: HTMLDivElement;
   mark: HTMLDivElement;
 };
 
 const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
 const either = () => (Math.random() < 0.5 ? -1 : 1);
+const pick = <T,>(from: readonly T[]) => from[Math.floor(Math.random() * from.length)];
 const beat = () => new Promise((r) => setTimeout(r, BEAT));
 
 /**
  * The theme switch, played as a channel losing its signal: bands of static
- * tear across the page with their red and cyan pulled apart, the static takes
- * the whole screen — the theme changes underneath it, and the mark flickers
- * through — then it rolls up off the new page.
+ * tear across the page with their colours pulled apart, the static takes the
+ * whole screen — the theme changes underneath it, and the mark flickers
+ * through — then it rolls up off the new page. All of it runs red.
  *
  * Kept to two changes of the whole screen, in and out, and no full-screen
  * colour flashes: the flicker is all in the static's grain, which holds its
@@ -42,16 +61,16 @@ const beat = () => new Promise((r) => setTimeout(r, BEAT));
 export default function ThemeGlitch() {
   const root = useRef<HTMLDivElement>(null);
   const snow = useRef<HTMLCanvasElement>(null);
-  const red = useRef<HTMLDivElement>(null);
-  const cyan = useRef<HTMLDivElement>(null);
+  const lead = useRef<HTMLDivElement>(null);
+  const trail = useRef<HTMLDivElement>(null);
   const mark = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const layers = {
       root: root.current,
       snow: snow.current,
-      red: red.current,
-      cyan: cyan.current,
+      lead: lead.current,
+      trail: trail.current,
       mark: mark.current,
     };
     if (Object.values(layers).some((el) => el === null)) return;
@@ -71,8 +90,8 @@ export default function ThemeGlitch() {
   return (
     <div ref={root} aria-hidden className="theme-glitch">
       <canvas ref={snow} className="theme-glitch-snow" />
-      <div ref={red} className="theme-glitch-red" />
-      <div ref={cyan} className="theme-glitch-cyan" />
+      <div ref={lead} className="theme-glitch-lead" />
+      <div ref={trail} className="theme-glitch-trail" />
       <div ref={mark} className="theme-glitch-mark">
         <svg viewBox={`0 0 ${MARK_WIDTH} ${MARK_HEIGHT}`}>
           <path d={MARK_PATH} fillRule="evenodd" fill="#ffffff" />
@@ -98,7 +117,7 @@ function prepare(snow: HTMLCanvasElement): ImageData[] | null {
 }
 
 async function play(layers: Layers, swap: () => void): Promise<void> {
-  const { root, snow, red, cyan, mark } = layers;
+  const { root, snow, lead, trail, mark } = layers;
   const ctx = snow.getContext("2d");
   const reel = prepare(snow);
   if (!ctx || !reel) {
@@ -114,16 +133,18 @@ async function play(layers: Layers, swap: () => void): Promise<void> {
     el.style.transform = `translate3d(${dx}px, 0, 0)`;
   };
   /**
-   * The colour fringes on a band, flickering: red pulled one way and up a
-   * little, cyan the other way and down, so they show as separate edges
-   * rather than mixing back to grey.
+   * The colour fringes on a band, flickering: one pulled one way and up a
+   * little, the other the other way and down, so they show as separate edges
+   * rather than mixing back together.
    */
   const fringe = (top: number, bottom: number) => {
     const pull = rand(9, 16) * either();
     const lift = rand(0.8, 2.2);
     const lit = Math.random() < 0.75;
-    band(red, Math.max(0, top - lift), bottom - lift, pull, lit);
-    band(cyan, top + lift, Math.min(100, bottom + lift), -pull, lit);
+    lead.style.backgroundColor = pick(BRIGHT_REDS);
+    trail.style.backgroundColor = pick(BLOOD_REDS);
+    band(lead, Math.max(0, top - lift), bottom - lift, pull, lit);
+    band(trail, top + lift, Math.min(100, bottom + lift), -pull, lit);
   };
 
   root.dataset.on = "";
@@ -160,10 +181,11 @@ async function play(layers: Layers, swap: () => void): Promise<void> {
     await beat();
   }
 
-  for (const el of [snow, red, cyan, mark]) {
+  for (const el of [snow, lead, trail, mark]) {
     el.style.opacity = "0";
     el.style.clipPath = "";
     el.style.transform = "";
+    el.style.backgroundColor = "";
   }
   delete root.dataset.on;
 }

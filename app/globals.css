@@ -1110,17 +1110,20 @@ body {
   image-rendering: pixelated;
 }
 
-.theme-glitch-red {
-  background: rgba(255, 34, 68, 0.45);
+/* The two fringes, both reds: their exact shades are picked beat by beat in
+   ThemeGlitch. The bright one is screened over the static as light; the deep
+   one is multiplied into it, so it stains it like blood instead. */
+.theme-glitch-lead {
+  background: rgba(255, 26, 38, 0.6);
   mix-blend-mode: screen;
 }
 
-.theme-glitch-cyan {
-  background: rgba(0, 214, 255, 0.45);
-  mix-blend-mode: screen;
+.theme-glitch-trail {
+  background: rgba(138, 3, 3, 0.92);
+  mix-blend-mode: multiply;
 }
 
-/* The mark, split into its red and cyan like the bands around it. */
+/* The mark, split into a bright red and a blood red like the bands around it. */
 .theme-glitch-mark {
   display: flex;
   align-items: center;
@@ -1130,7 +1133,7 @@ body {
 .theme-glitch-mark svg {
   width: clamp(120px, 20vw, 260px);
   height: auto;
-  filter: drop-shadow(-5px 0 0 rgba(255, 34, 68, 0.85)) drop-shadow(5px 0 0 rgba(0, 214, 255, 0.85));
+  filter: drop-shadow(-5px 0 0 rgba(230, 16, 30, 0.9)) drop-shadow(5px 0 0 rgba(120, 0, 8, 0.95));
 }
 
 /* The toggle in the header (see ThemeToggle). The disc is half ink: the
