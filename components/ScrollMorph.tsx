@@ -383,17 +383,17 @@ function Card({
             sizes="(max-width: 767px) 110px, 170px"
             className="object-cover object-top"
           />
-          <span className="absolute inset-0 bg-ink/10 transition-colors group-hover:bg-transparent" />
+          <span className="absolute inset-0 bg-night/10 transition-colors group-hover:bg-transparent" />
         </span>
-        <span className="morph-face morph-back bg-ink text-field">
+        <span className="morph-face morph-back bg-band text-on-band">
           <span className="morph-back-inner">
-            <span className="morph-index font-mono uppercase tracking-[0.2em] text-field/55">
+            <span className="morph-index font-mono uppercase tracking-[0.2em] text-on-band/55">
               Nº {String(index + 1).padStart(2, "0")}
             </span>
             <span className="morph-name font-sans font-semibold uppercase tracking-[-0.03em]">
               {project.name}
             </span>
-            <span className="morph-kind text-field/70">{project.kind}</span>
+            <span className="morph-kind text-on-band/70">{project.kind}</span>
           </span>
         </span>
       </motion.button>

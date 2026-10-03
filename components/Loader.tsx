@@ -63,7 +63,7 @@ function Panel({ half, parting }: { half: "top" | "bottom"; parting: boolean }) 
   const isTop = half === "top";
   return (
     <motion.div
-      className={`absolute inset-x-0 h-1/2 overflow-hidden bg-ink ${isTop ? "top-0" : "bottom-0"}`}
+      className={`absolute inset-x-0 h-1/2 overflow-hidden bg-night ${isTop ? "top-0" : "bottom-0"}`}
       animate={{ y: parting ? (isTop ? "-100%" : "100%") : "0%" }}
       transition={{ duration: PART, ease: easeOutExpo }}
     >
@@ -87,8 +87,8 @@ function Panel({ half, parting }: { half: "top" | "bottom"; parting: boolean }) 
 
       {!isTop && (
         <div className="absolute inset-x-0 bottom-0 h-svh flex flex-col items-center justify-end pb-10 md:pb-14 gap-4">
-          <span className="loader-rule block h-px w-[clamp(120px,22vw,260px)] bg-field/35 origin-left" />
-          <span className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase text-field/55">
+          <span className="loader-rule block h-px w-[clamp(120px,22vw,260px)] bg-snow/35 origin-left" />
+          <span className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase text-snow/55">
             Seia Funayama
           </span>
         </div>

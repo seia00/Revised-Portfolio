@@ -5,6 +5,8 @@ import Nav from "@/components/Nav";
 import ScrollIndicator from "@/components/scroll-indicator/ScrollIndicator";
 import Loader from "@/components/Loader";
 import SmoothScroll from "@/components/SmoothScroll";
+import ThemeGlitch from "@/components/theme/ThemeGlitch";
+import { THEME_SCRIPT } from "@/lib/themeScript";
 
 const serif = Instrument_Serif({
   variable: "--font-instrument-serif",
@@ -36,12 +38,23 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
+    // The theme script may set data-theme on <html> before React arrives, so
+    // its attributes are allowed to differ from the server's.
+    <html
+      lang="en"
+      className={`${serif.variable} ${sans.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* A fixed string of our own, not user input. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="min-h-screen bg-field text-ink antialiased font-sans selection:bg-ink selection:text-field">
         <SmoothScroll />
         <Loader />
         <Nav />
         <ScrollIndicator />
+        <ThemeGlitch />
         {children}
       </body>
     </html>

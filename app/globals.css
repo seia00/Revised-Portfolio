@@ -8,28 +8,87 @@
 
   /* ══ BLACK / WHITE ═══════════════════════════════════════════
      `field` is the background scale, `ink` is the text scale.
-     No accent colour — contrast and type do all the work. */
+     No accent colour — contrast and type do all the work.
 
-  --color-field: #ffffff;
-  --color-field-2: #f6f6f4;
-  --color-field-3: #ececea;
+     Each points at a variable below rather than holding a colour, so the
+     utilities built from them follow the theme. */
 
-  --color-ink: #0a0a0a;
-  --color-ink-2: #3d3d3d;
-  --color-ink-3: #717171;   /* 4.9:1 on white — passes AA at small sizes */
-  --color-ink-4: #a6a6a6;   /* decorative marks only, never information */
+  --color-field: var(--field);
+  --color-field-2: var(--field-2);
+  --color-field-3: var(--field-3);
+
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+
+  --color-plate: var(--plate);
+
+  --color-edge: var(--edge);
+  --color-edge-2: var(--edge-2);
+
+  /* An inverse band set into the page — the marquee, the backs of the
+     project cards: ink-dark in the light theme, a raised surface in the
+     dark one rather than a slab of white. */
+  --color-band: var(--band);
+  --color-on-band: var(--on-band);
+
+  /* Fixed, whatever the theme: for scenes that are dark by nature — the
+     river at night, the title card. */
+  --color-night: #0a0a0a;
+  --color-snow: #ffffff;
+}
+
+/* ══ THEMES ════════════════════════════════════════════════════════
+   Light is the default; `data-theme="dark"` on <html> switches. The
+   choice is set before first paint by the script in app/layout.tsx. */
+:root {
+  color-scheme: light;
+  --field: #ffffff;
+  --field-2: #f6f6f4;
+  --field-3: #ececea;
+
+  --ink: #0a0a0a;
+  --ink-2: #3d3d3d;
+  --ink-3: #717171;   /* 4.9:1 on white — passes AA at small sizes */
+  --ink-4: #a6a6a6;   /* decorative marks only, never information */
 
   /* The ground the hands plate was drawn on — a third neutral, used only there. */
-  --color-plate: #c8cac8;
+  --plate: #c8cac8;
 
-  --color-edge: rgba(10, 10, 10, 0.12);
-  --color-edge-2: rgba(10, 10, 10, 0.3);
+  --edge: rgba(10, 10, 10, 0.12);
+  --edge-2: rgba(10, 10, 10, 0.3);
+
+  --band: #0a0a0a;
+  --on-band: #ffffff;
+}
+
+/* Night: the page goes to near-black and the type to a soft white rather
+   than a pure one, so it does not glare. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --field: #0a0a0b;
+  --field-2: #111113;
+  --field-3: #19191c;
+
+  --ink: #e4e4e1;
+  --ink-2: #b9b9b5;
+  --ink-3: #8b8b88;   /* 5.9:1 on the dark field */
+  --ink-4: #545452;
+
+  --plate: #1b1c1d;
+
+  --edge: rgba(228, 228, 225, 0.12);
+  --edge-2: rgba(228, 228, 225, 0.3);
+
+  --band: #161618;
+  --on-band: #e4e4e1;
 }
 
 html,
 body {
-  background: #ffffff;
-  color: #0a0a0a;
+  background: var(--field);
+  color: var(--ink);
 }
 
 /* No native scrollbar: the scroll indicator shows where the reader is, and a
@@ -72,7 +131,7 @@ body::after {
 /* Column guides behind the hero at 20/40/60/80% — no centre line, so
    nothing runs through the seal — and faded out under the name. */
 .hero-grid {
-  --rule: linear-gradient(var(--color-edge), var(--color-edge));
+  --rule: linear-gradient(var(--edge), var(--edge));
   background:
     var(--rule) 20% 0 / 1px 100% no-repeat,
     var(--rule) 40% 0 / 1px 100% no-repeat,
@@ -388,7 +447,7 @@ body::after {
   isolation: isolate;
   width: clamp(140px, 30vw, 320px);
   overflow: hidden;
-  background: #0a0a0a; /* --color-ink; @theme inline does not emit it as a variable */
+  background: #0a0a0a; /* the title card is black in either theme */
   animation: mark-print 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
 
@@ -793,7 +852,7 @@ body {
 }
 
 .morph-flip:focus-visible {
-  outline: 1px solid #0a0a0a;
+  outline: 1px solid var(--ink);
   outline-offset: 3px;
 }
 
@@ -914,8 +973,35 @@ body {
 .chrome-mark {
   display: block;
   overflow: visible;
-  filter: drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.9))
+  filter: var(--mark-shadow);
+}
+
+/* Black chrome on paper. The brightest band stops just short of white, so a
+   band crossing a bar never quite melts into the paper behind it. */
+:root {
+  --steel-1: #08090a;
+  --steel-2: #25292e;
+  --steel-3: #80868e;
+  --steel-4: #d9dde1;
+  --steel-5: #6f757d;
+  --steel-6: #16181b;
+  --steel-7: #060708;
+  --mark-shadow: drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.9))
     drop-shadow(0 1px 1.2px rgba(10, 10, 10, 0.28));
+}
+
+/* Silver at night: the same bands, lifted, so it shines against the black
+   instead of sinking into it, and set down on a shadow rather than a
+   highlight. */
+:root[data-theme="dark"] {
+  --steel-1: #464b52;
+  --steel-2: #a1a7ae;
+  --steel-3: #dde0e4;
+  --steel-4: #ffffff;
+  --steel-5: #c0c5cb;
+  --steel-6: #6a7078;
+  --steel-7: #393d44;
+  --mark-shadow: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.75));
 }
 
 .chrome-mark-glint {
@@ -947,4 +1033,161 @@ body {
   .chrome-mark-glint {
     display: none;
   }
+}
+
+/* ── Night ──────────────────────────────────────────────────────────
+   What the dark theme changes beyond the tokens: the pieces drawn for
+   paper, which have to be printed differently on black. */
+
+/* Grain lightens on black rather than darkening. */
+:root[data-theme="dark"] body::after {
+  mix-blend-mode: screen;
+  opacity: 0.045;
+}
+
+/* The shatter plate as light instead of ink. The fractures are already the
+   bright part of the source, so on black it needs no negative, and `screen`
+   drops its dark field away the way `multiply` drops the paper — once the
+   contrast has pushed that field, which is near-black rather than black, all
+   the way down; left grey, it shows as a pale rectangle on a phone. */
+:root[data-theme="dark"] .shatter-plate {
+  mix-blend-mode: screen;
+}
+
+:root[data-theme="dark"] .shatter-ink {
+  filter: grayscale(1) contrast(1.6) brightness(1.2);
+}
+
+/* The hands plate in graphite rather than polished steel — the same sweep
+   and pools, the light dropped a long way. The hands are left as they are:
+   their dark pixel ground sinks into the graphite and the light hands come
+   forward out of it. */
+:root[data-theme="dark"] .lm-sweep {
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #2a2d2e 0deg, #686d6e 34deg, #1c1f20 86deg, #4f5455 136deg,
+    #181b1c 194deg, #737879 246deg, #282b2c 300deg, #2a2d2e 360deg
+  );
+}
+
+:root[data-theme="dark"] .lm-pool-a {
+  background: radial-gradient(42% 38% at 34% 36%, #5d6263 0%, rgba(93, 98, 99, 0) 70%);
+  opacity: 0.55;
+}
+
+:root[data-theme="dark"] .lm-pool-b {
+  background: radial-gradient(46% 42% at 68% 68%, #08090a 0%, rgba(8, 9, 10, 0) 72%);
+  opacity: 0.8;
+}
+
+/* ── Theme switch ───────────────────────────────────────────────────
+   The static the page drops into between themes (see ThemeGlitch). Idle,
+   it is hidden and takes no clicks; while it plays it covers everything,
+   header included, and holds the pointer so nothing is hit mid-switch. */
+.theme-glitch {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.theme-glitch[data-on] {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.theme-glitch > * {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: transform, clip-path, opacity;
+}
+
+.theme-glitch-snow {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.theme-glitch-red {
+  background: rgba(255, 34, 68, 0.45);
+  mix-blend-mode: screen;
+}
+
+.theme-glitch-cyan {
+  background: rgba(0, 214, 255, 0.45);
+  mix-blend-mode: screen;
+}
+
+/* The mark, split into its red and cyan like the bands around it. */
+.theme-glitch-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-glitch-mark svg {
+  width: clamp(120px, 20vw, 260px);
+  height: auto;
+  filter: drop-shadow(-5px 0 0 rgba(255, 34, 68, 0.85)) drop-shadow(5px 0 0 rgba(0, 214, 255, 0.85));
+}
+
+/* The toggle in the header (see ThemeToggle). The disc is half ink: the
+   left half by day, turned over to the right by night. */
+.theme-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--edge-2);
+  border-radius: 999px;
+  overflow: hidden;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.theme-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: translateX(-101%);
+  transition: transform 0.38s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--field);
+}
+
+.theme-toggle:hover::before,
+.theme-toggle:focus-visible::before {
+  transform: translateX(0);
+}
+
+/* On touch there is no hover to undo, so the fill would stick after a tap. */
+@media (hover: none) {
+  .theme-toggle:hover {
+    color: var(--ink);
+  }
+  .theme-toggle:hover::before {
+    transform: translateX(-101%);
+  }
+}
+
+.theme-toggle-disc {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root[data-theme="dark"] .theme-toggle-disc {
+  transform: rotate(180deg);
 }
