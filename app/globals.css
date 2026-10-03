@@ -226,8 +226,8 @@ body::after {
   container-type: inline-size;
   /* Room for the turned figure on a phone — see .hands-figure. A percentage,
      because a container's own units resolve against the one above it; on a
-     phone the stage is the full width, so this is 13% of the stage. */
-  padding-top: 13%;
+     phone the stage is the full width, so this is 20% of the stage. */
+  padding-top: 20%;
 }
 
 /* The sliced layers are positioned as percentages of the 1280x720 source,
@@ -245,13 +245,20 @@ body::after {
    has. The pieces translate in along their own local x, so their entrances
    swing onto the same diagonal for free.
 
-   Turned, the hands reach about 13% of the plate's width past its top and
-   bottom edges. The stage pads for that above, and the words clear it below,
-   so the pair is centred on what is actually drawn rather than on the box. */
+   Each forearm is sliced off flat where the source picture ends. Turned, that
+   end swings in off the screen edge, so the figure is scaled until both ends
+   sit past it (from 1.36) with a margin to spare: the arms then always reach
+   in from beyond the screen, never stopping short of it. On a phone the plate
+   is the screen's width, so this holds at every phone size.
+
+   At that size the hands reach about 19% of the plate's width past its top
+   and bottom edges, within the screen. The stage pads for that above, and the
+   words clear it below, so the pair is centred on what is actually drawn
+   rather than on the box. */
 .hands-figure {
   position: absolute;
   inset: 0;
-  transform: rotate(-30deg) scale(1.15);
+  transform: rotate(-30deg) scale(1.45);
 }
 
 /* ── Plate readouts ─────────────────────────────────────────────────
@@ -260,7 +267,7 @@ body::after {
    against the right edge; from md up they run as a single line across the band
    of empty ground above the hands. */
 .plate-readouts {
-  margin-top: 19cqw;
+  margin-top: 24cqw;
   padding: 0 5.5cqw;
 }
 
