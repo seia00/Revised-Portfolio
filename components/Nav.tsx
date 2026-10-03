@@ -174,7 +174,7 @@ export default function Nav() {
 
         <nav
           aria-label="Section navigation"
-          className="hidden md:flex justify-self-center items-center gap-6 lg:gap-8"
+          className="hidden md:flex justify-self-center items-center gap-4 lg:gap-8"
         >
           {LINKS.map((l, i) => {
             const isActive = active === l.id;
@@ -207,10 +207,10 @@ export default function Nav() {
             <span className="absolute inset-0 rounded-full bg-ink animate-ping opacity-40" />
             <span className="relative w-1.5 h-1.5 rounded-full bg-ink" />
           </span>
-          <span>Tokyo</span>
+          <span className="md:max-lg:hidden">Tokyo</span>
           <span className="text-ink tabular-nums">{time ?? "--:--"}</span>
-          <span>JST</span>
-          <span className="ml-2 md:ml-4">
+          <span className="md:max-lg:hidden">JST</span>
+          <span className="ml-2 lg:ml-4">
             <ThemeToggle />
           </span>
         </div>
